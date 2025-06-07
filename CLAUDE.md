@@ -85,9 +85,27 @@ Implements mobile-first design with Tailwind breakpoints:
 - `sm:` prefix for desktop (≥ 640px)
 - Responsive typography, spacing, and layout adjustments
 
+## Next.js 15 Compatibility
+
+This project uses Next.js 15 which has breaking changes:
+- **Dynamic Route Params**: `params` in page components is now a Promise and must be awaited
+- **Example**: `const { id } = await params;` instead of `params.id`
+
+## Deployment
+
+**Automated via GitHub Actions**: 
+- Pushes to main branch trigger automatic Vercel deployment
+- Workflow includes linting and build verification
+- Requires GitHub Secrets: `VERCEL_TOKEN`, `ORG_ID`, `PROJECT_ID`
+
+**Manual Vercel Deployment**:
+- Import GitHub repository at https://vercel.com/new
+- Set environment variable: `NEXT_PUBLIC_STRAPI_URL`
+
 ## Common Issues
 
 1. **Build Errors on Vercel**: Ensure all dependencies are in package.json and committed to GitHub
 2. **API Connection**: Verify NEXT_PUBLIC_STRAPI_URL environment variable is set correctly
 3. **Content Not Displaying**: Check Strapi Cloud API permissions for public access to Blog content type
 4. **Korean Font Issues**: Pretendard font is loaded via CDN in globals.css
+5. **Next.js 15 Params**: Remember to await params in dynamic routes

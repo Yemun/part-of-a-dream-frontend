@@ -39,7 +39,7 @@ export default async function Home() {
                         {post.Title}
                       </h2>
                       <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed">
-                        {contentText.substring(0, 150)}...
+                        {contentText.substring(0, 80)}...
                       </p>
                       <div className="text-xs sm:text-sm text-gray-500">
                         <time dateTime={post.publishedAt}>
