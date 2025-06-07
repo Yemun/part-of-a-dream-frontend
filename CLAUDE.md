@@ -46,7 +46,7 @@ The application fetches blog content from Strapi Cloud via REST API:
 
 ## TypeScript Interfaces
 
-Updated BlogPost interface for current Strapi schema:
+The BlogPost interface is defined in `src/lib/strapi.ts` with the current Strapi schema:
 
 ```typescript
 interface BlogPost {
@@ -55,9 +55,15 @@ interface BlogPost {
   Slug: string;      // UID field for URL routing
   Title: string;     // Post title
   Content: string;   // Markdown content
+  createdAt: string;
+  updatedAt: string;
   publishedAt: string;
 }
 ```
+
+Strapi API functions are exported from `src/lib/strapi.ts`:
+- `getBlogPosts()`: Fetches all published posts
+- `getBlogPost(slug)`: Fetches single post by slug
 
 ## Design System
 
@@ -109,3 +115,9 @@ This project uses Next.js 15 which has breaking changes:
 3. **Content Not Displaying**: Check Strapi Cloud API permissions for public access to Blog content type
 4. **Korean Font Issues**: Pretendard font is loaded via CDN in globals.css
 5. **Next.js 15 Params**: Remember to await params in dynamic routes
+
+## Code Quality
+
+Always run these commands before committing:
+- `npm run lint` - ESLint checks for code quality
+- `npm run build` - Verify production build succeeds
