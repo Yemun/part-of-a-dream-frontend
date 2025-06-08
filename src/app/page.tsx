@@ -24,6 +24,8 @@ const markdownComponents: any = {
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
+export const revalidate = 300; // 5분마다 재생성
+
 export default async function Home() {
   const [posts, profile] = await Promise.all([getBlogPosts(), getProfile()]);
 

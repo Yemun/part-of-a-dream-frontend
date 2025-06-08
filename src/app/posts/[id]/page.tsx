@@ -25,6 +25,8 @@ const markdownComponents: any = {
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
+export const revalidate = 300; // 5분마다 재생성
+
 interface PageProps {
   params: Promise<{
     id: string;
