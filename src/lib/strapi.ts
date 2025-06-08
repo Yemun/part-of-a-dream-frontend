@@ -7,9 +7,9 @@ const strapi = axios.create({
 export interface BlogPost {
   id: number;
   documentId: string;
-  Slug: string;
-  Title: string;
-  Content: string;
+  slug: string;
+  title: string;
+  content: string;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
@@ -39,7 +39,7 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
 
 export const getBlogPost = async (slug: string): Promise<BlogPost | null> => {
   try {
-    const response = await strapi.get<StrapiResponse<BlogPost[]>>(`/api/blogs?filters[Slug]=${slug}&populate=*`);
+    const response = await strapi.get<StrapiResponse<BlogPost[]>>(`/api/blogs?filters[slug]=${slug}&populate=*`);
     return response.data.data[0] || null;
   } catch (error) {
     console.error('Error fetching blog post:', error);

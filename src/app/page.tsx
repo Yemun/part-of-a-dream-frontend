@@ -27,16 +27,16 @@ export default async function Home() {
           {posts.length > 0 ? (
             <div className="grid gap-4 sm:gap-8">
               {posts.map((post: BlogPost) => {
-                const contentText = post.Content.replace(
+                const contentText = post.content.replace(
                   /[#*\-\n]/g,
                   " "
                 ).trim();
 
                 return (
-                  <Link key={post.id} href={`/posts/${post.Slug}`}>
+                  <Link key={post.id} href={`/posts/${post.slug}`}>
                     <article className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-all duration-200 cursor-pointer transform hover:scale-[1.02]">
                       <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2 sm:mb-3 hover:text-blue-600 transition-colors leading-tight">
-                        {post.Title}
+                        {post.title}
                       </h2>
                       <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed">
                         {contentText.substring(0, 80)}...

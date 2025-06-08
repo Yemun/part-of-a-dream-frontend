@@ -36,7 +36,7 @@ export default async function PostPage({ params }: PageProps) {
         <article className="bg-white rounded-lg shadow-md p-4 sm:p-8">
           <header className="mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">
-              {post.Title}
+              {post.title}
             </h1>
             <div className="text-gray-600">
               <time dateTime={post.publishedAt}>
@@ -59,7 +59,7 @@ export default async function PostPage({ params }: PageProps) {
                 pre: ({children}) => <pre className="bg-gray-100 p-2 sm:p-4 rounded-lg overflow-x-auto mb-3 sm:mb-4 text-xs sm:text-sm">{children}</pre>
               }}
             >
-              {post.Content}
+              {post.content}
             </ReactMarkdown>
           </div>
         </article>
