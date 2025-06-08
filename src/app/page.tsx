@@ -1,5 +1,6 @@
-import { getBlogPosts, BlogPost } from "@/lib/strapi";
+import { getBlogPosts, getProfile, BlogPost } from "@/lib/strapi";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 
 const formatKoreanDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -9,7 +10,7 @@ const formatKoreanDate = (dateString: string) => {
 };
 
 export default async function Home() {
-  const posts = await getBlogPosts();
+  const [posts, profile] = await Promise.all([getBlogPosts(), getProfile()]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -18,19 +19,15 @@ export default async function Home() {
           <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
             꿈의 일환
           </h1>
-          <p className="text-base sm:text-lg text-gray-600">
-            을지로에서 디자인 시스템을 만들고 있습니다.
-          </p>
         </header>
 
         <main>
           {posts.length > 0 ? (
             <div className="grid gap-4 sm:gap-8">
               {posts.map((post: BlogPost) => {
-                const contentText = post.content.replace(
-                  /[#*\-\n]/g,
-                  " "
-                ).trim();
+                const contentText = post.content
+                  .replace(/[#*\-\n]/g, " ")
+                  .trim();
 
                 return (
                   <Link key={post.id} href={`/posts/${post.slug}`}>
@@ -59,6 +56,112 @@ export default async function Home() {
             </div>
           )}
         </main>
+
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8 mt-12 sm:mt-16">
+          프로파일
+        </h2>
+
+        {profile && (
+          <section className="mb-12 sm:mb-16">
+            <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
+                {profile.title}
+              </h2>
+
+              {profile.biography && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                    소개
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    {profile.biography}
+                  </p>
+                </div>
+              )}
+
+              <div className="grid gap-6 sm:grid-cols-2">
+                {profile.career && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                      경력
+                    </h3>
+                    <div className="prose prose-sm max-w-none text-gray-700">
+                      <ReactMarkdown>{profile.career}</ReactMarkdown>
+                    </div>
+                  </div>
+                )}
+
+                {profile.education && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                      학력
+                    </h3>
+                    <div className="prose prose-sm max-w-none text-gray-700">
+                      <ReactMarkdown>{profile.education}</ReactMarkdown>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {profile.contact && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                    연락처
+                  </h3>
+                  <div className="text-gray-700">
+                    {typeof profile.contact === "object" &&
+                    profile.contact !== null ? (
+                      <div className="space-y-1">
+                        {profile.contact.email && (
+                          <p>
+                            이메일:{" "}
+                            <a
+                              href={`mailto:${profile.contact.email}`}
+                              className="text-blue-600 hover:underline"
+                            >
+                              {profile.contact.email}
+                            </a>
+                          </p>
+                        )}
+                        {profile.contact.phone && (
+                          <p>전화: {profile.contact.phone}</p>
+                        )}
+                        {profile.contact.linkedin && (
+                          <p>
+                            LinkedIn:{" "}
+                            <a
+                              href={profile.contact.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              {profile.contact.linkedin}
+                            </a>
+                          </p>
+                        )}
+                        {profile.contact.github && (
+                          <p>
+                            GitHub:{" "}
+                            <a
+                              href={profile.contact.github}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              {profile.contact.github}
+                            </a>
+                          </p>
+                        )}
+                      </div>
+                    ) : profile.contact ? (
+                      <p>{profile.contact}</p>
+                    ) : null}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

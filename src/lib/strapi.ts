@@ -15,6 +15,25 @@ export interface BlogPost {
   publishedAt: string;
 }
 
+export interface Profile {
+  id: number;
+  documentId: string;
+  title: string;
+  biography: string;
+  career: string;
+  education: string;
+  contact: {
+    email?: string;
+    phone?: string;
+    linkedin?: string;
+    github?: string;
+    [key: string]: string | undefined;
+  } | string | null;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
 export interface StrapiResponse<T> {
   data: T;
   meta: {
@@ -43,6 +62,16 @@ export const getBlogPost = async (slug: string): Promise<BlogPost | null> => {
     return response.data.data[0] || null;
   } catch (error) {
     console.error('Error fetching blog post:', error);
+    return null;
+  }
+};
+
+export const getProfile = async (): Promise<Profile | null> => {
+  try {
+    const response = await strapi.get<{ data: Profile }>('/api/profile?populate=*');
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching profile:', error);
     return null;
   }
 };
