@@ -99,7 +99,7 @@ export default async function PostPage({ params }: PageProps) {
           </Link>
         </nav>
 
-        <article className="p-4 sm:p-8">
+        <article className="pt-4 sm:pt-8">
           <header className="mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">
               {post.title}

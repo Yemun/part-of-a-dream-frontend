@@ -41,20 +41,39 @@ The application fetches blog content from Strapi Cloud via REST API:
 ### Key API Integration
 
 - **Blog Posts**: `GET /api/blogs?populate=*` - Fetches all published posts
-- **Individual Post**: `GET /api/blogs?filters[Slug]=${slug}&populate=*` - Fetches post by slug
-- **Content Type**: Blog posts have `Title` (string), `Content` (markdown), and `Slug` (UID)
+- **Individual Post**: `GET /api/blogs?filters[slug]=${slug}&populate=*` - Fetches post by slug
+- **Profile**: `GET /api/profile?populate=*` - Fetches profile information
+- **Content Types**: Blog posts and Profile with lowercase field names
 
 ## TypeScript Interfaces
 
-The BlogPost interface is defined in `src/lib/strapi.ts` with the current Strapi schema:
+The BlogPost and Profile interfaces are defined in `src/lib/strapi.ts` with the current Strapi schema:
 
 ```typescript
 interface BlogPost {
   id: number;
   documentId: string;
-  Slug: string;      // UID field for URL routing
-  Title: string;     // Post title
-  Content: string;   // Markdown content
+  slug: string;      // UID field for URL routing (lowercase)
+  title: string;     // Post title (lowercase)
+  content: string;   // Markdown content (lowercase)
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+interface Profile {
+  id: number;
+  documentId: string;
+  title: string;
+  biography: string;
+  career: string;
+  education: string;
+  contact: {
+    email?: string;
+    phone?: string;
+    linkedin?: string;
+    github?: string;
+  } | string | null;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
@@ -64,6 +83,7 @@ interface BlogPost {
 Strapi API functions are exported from `src/lib/strapi.ts`:
 - `getBlogPosts()`: Fetches all published posts
 - `getBlogPost(slug)`: Fetches single post by slug
+- `getProfile()`: Fetches profile information for homepage display
 
 ## Design System
 
@@ -74,9 +94,9 @@ Strapi API functions are exported from `src/lib/strapi.ts`:
 
 ## Routing Strategy
 
-- **Dynamic Routes**: `/posts/[id]` where `id` is the Slug field
+- **Dynamic Routes**: `/posts/[id]` where `id` is the slug field
 - **Slug-based URLs**: Uses Strapi UID field for SEO-friendly URLs
-- **API Filtering**: Queries Strapi by slug using `filters[Slug]=${slug}`
+- **API Filtering**: Queries Strapi by slug using `filters[slug]=${slug}`
 
 ## Localization Features
 
@@ -116,8 +136,26 @@ This project uses Next.js 15 which has breaking changes:
 4. **Korean Font Issues**: Pretendard font is loaded via CDN in globals.css
 5. **Next.js 15 Params**: Remember to await params in dynamic routes
 
+## Performance & Caching
+
+- **ISR (Incremental Static Regeneration)**: Pages revalidate every 5 minutes (300 seconds)
+- **Static Generation**: Homepage and blog posts use static generation with ISR
+- **Content Updates**: Strapi content changes appear within 5 minutes without manual deployment
+
+## Deployment Script
+
+```bash
+# Quick deploy command (lint, build, commit, push)
+npm run deploy
+```
+
 ## Code Quality
 
 Always run these commands before committing:
 - `npm run lint` - ESLint checks for code quality
 - `npm run build` - Verify production build succeeds
+
+## URL Handling
+
+- **External Links**: LinkedIn and GitHub URLs are automatically prefixed with `https://` if missing to prevent 404 errors
+- **Utility Function**: `ensureAbsoluteUrl()` in page components handles relative URL conversion

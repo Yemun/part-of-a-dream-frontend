@@ -11,16 +11,52 @@ const formatKoreanDate = (dateString: string) => {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const markdownComponents: any = {
-  h1: ({children}: any) => <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mt-6 sm:mt-8 mb-3 sm:mb-4">{children}</h1>,
-  h2: ({children}: any) => <h2 className="text-lg sm:text-2xl font-bold text-gray-900 mt-4 sm:mt-6 mb-2 sm:mb-3">{children}</h2>,
-  h3: ({children}: any) => <h3 className="text-base sm:text-xl font-bold text-gray-900 mt-3 sm:mt-4 mb-2">{children}</h3>,
-  h4: ({children}: any) => <h4 className="text-sm sm:text-lg font-semibold text-gray-900 mt-2 sm:mt-3 mb-1 sm:mb-2">{children}</h4>,
-  p: ({children}: any) => <p className="mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base">{children}</p>,
-  ul: ({children}: any) => <ul className="list-disc list-outside mb-3 sm:mb-4 space-y-1 text-sm sm:text-base pl-5">{children}</ul>,
-  ol: ({children}: any) => <ol className="list-decimal list-outside mb-3 sm:mb-4 space-y-1 text-sm sm:text-base pl-5">{children}</ol>,
-  li: ({children}: any) => <li>{children}</li>,
-  code: ({children}: any) => <code className="bg-gray-100 px-1 sm:px-2 py-1 rounded text-xs sm:text-sm font-mono">{children}</code>,
-  pre: ({children}: any) => <pre className="bg-gray-100 p-2 sm:p-4 rounded-lg overflow-x-auto mb-3 sm:mb-4 text-xs sm:text-sm">{children}</pre>
+  h1: ({ children }: any) => (
+    <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mt-6 sm:mt-8 mb-3 sm:mb-4">
+      {children}
+    </h1>
+  ),
+  h2: ({ children }: any) => (
+    <h2 className="text-lg sm:text-2xl font-bold text-gray-900 mt-4 sm:mt-6 mb-2 sm:mb-3">
+      {children}
+    </h2>
+  ),
+  h3: ({ children }: any) => (
+    <h3 className="text-base sm:text-xl font-bold text-gray-900 mt-3 sm:mt-4 mb-2">
+      {children}
+    </h3>
+  ),
+  h4: ({ children }: any) => (
+    <h4 className="text-sm sm:text-lg font-semibold text-gray-900 mt-2 sm:mt-3 mb-1 sm:mb-2">
+      {children}
+    </h4>
+  ),
+  p: ({ children }: any) => (
+    <p className="mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base">
+      {children}
+    </p>
+  ),
+  ul: ({ children }: any) => (
+    <ul className="list-disc list-outside mb-3 sm:mb-4 space-y-1 text-sm sm:text-base pl-5">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }: any) => (
+    <ol className="list-decimal list-outside mb-3 sm:mb-4 space-y-1 text-sm sm:text-base pl-5">
+      {children}
+    </ol>
+  ),
+  li: ({ children }: any) => <li>{children}</li>,
+  code: ({ children }: any) => (
+    <code className="bg-gray-100 px-1 sm:px-2 py-1 rounded text-xs sm:text-sm font-mono">
+      {children}
+    </code>
+  ),
+  pre: ({ children }: any) => (
+    <pre className="bg-gray-100 p-2 sm:p-4 rounded-lg overflow-x-auto mb-3 sm:mb-4 text-xs sm:text-sm">
+      {children}
+    </pre>
+  ),
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
