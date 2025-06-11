@@ -71,7 +71,7 @@ const markdownComponents: any = {
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-export const revalidate = 300; // 5분마다 재생성
+export const revalidate = 604800; // 1주일(7일)마다 재생성
 
 interface PageProps {
   params: Promise<{

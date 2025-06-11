@@ -9,7 +9,7 @@ const formatKoreanDate = (dateString: string) => {
   return `${month}월 ${day}일`;
 };
 
-export const revalidate = 300; // 5분마다 재생성
+export const revalidate = 604800; // 1주일(7일)마다 재생성
 
 export default async function Home() {
   const posts = await getBlogPosts();
