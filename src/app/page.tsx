@@ -15,7 +15,7 @@ export default async function Home() {
   const posts = await getBlogPosts();
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white dark:bg-gray-950 min-h-screen">
       <div className="flex flex-col items-center min-h-screen">
         <div className="flex flex-col gap-12 sm:gap-20 items-center justify-start px-4 sm:px-8 lg:px-16 py-8 sm:py-12 lg:py-20 w-full">
           <Navigation />
@@ -33,24 +33,20 @@ export default async function Home() {
                         <div className="flex flex-col gap-2 sm:gap-3 items-start justify-start w-full">
                           <div>
                             <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-end justify-start leading-none">
-                              <div className="font-bold text-slate-950 text-xl sm:text-2xl lg:text-3xl leading-6 sm:leading-8 lg:leading-9">
+                              <div className="font-bold text-slate-950 dark:text-white text-xl sm:text-2xl lg:text-3xl leading-6 sm:leading-8 lg:leading-9">
                                 <p className="whitespace-pre-wrap break-words group-hover:underline transition-all">
                                   {post.title}
                                 </p>
                               </div>
-                              <div className="font-normal text-slate-700 text-xs sm:text-sm leading-4 sm:leading-5">
+                              <div className="font-normal text-slate-700 dark:text-gray-300 text-xs sm:text-sm leading-4 sm:leading-5">
                                 <p className="whitespace-pre">
                                   {formatKoreanDate(post.publishedAt)}
                                 </p>
                               </div>
                             </div>
                           </div>
-                          <div className="min-w-full">
-                            <div className="font-normal text-slate-950 text-sm sm:text-base leading-5 sm:leading-6">
-                              <p className="mb-0 line-clamp-2">
-                                {contentText}
-                              </p>
-                            </div>
+                          <div className="font-normal text-slate-950 dark:text-gray-200 text-sm sm:text-base leading-5 sm:leading-6 line-clamp-2">
+                            {contentText.substring(0, 120)}
                           </div>
                         </div>
                       </div>
@@ -59,7 +55,7 @@ export default async function Home() {
                 })
               ) : (
                 <div className="text-center py-6 sm:py-8 lg:py-12">
-                  <p className="text-gray-600 text-sm sm:text-base lg:text-lg">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base lg:text-lg">
                     No blog posts found. Create your first post in Strapi!
                   </p>
                 </div>

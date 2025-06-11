@@ -20,7 +20,7 @@ const markdownComponents: any = {
     </h3>
   ),
   h4: ({ children }: any) => (
-    <h4 className="text-sm sm:text-lg font-semibold text-gray-900 mt-2 sm:mt-3 mb-1 sm:mb-2">
+    <h4 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white mt-2 sm:mt-3 mb-1 sm:mb-2">
       {children}
     </h4>
   ),
@@ -59,26 +59,26 @@ export default async function Profile() {
   const profile = await getProfile();
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white dark:bg-gray-950 min-h-screen">
       <div className="flex flex-col items-center min-h-screen">
         <div className="flex flex-col gap-12 sm:gap-20 items-center justify-start px-4 sm:px-8 lg:px-16 py-8 sm:py-12 lg:py-20 w-full">
           <Navigation />
 
           {profile ? (
             <div className="max-w-4xl w-full">
-              <section className="bg-white">
+              <section>
                 <div className="mb-6 sm:mb-8">
-                  <h1 className="font-bold text-slate-950 text-2xl sm:text-3xl leading-7 sm:leading-9">
+                  <h1 className="font-bold text-slate-950 dark:text-white text-2xl sm:text-3xl leading-7 sm:leading-9">
                     {profile.title}
                   </h1>
                 </div>
 
                 {profile.biography && (
                   <div className="mb-4 sm:mb-6">
-                    <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">
+                    <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
                       소개
                     </h2>
-                    <p className="text-gray-700 leading-relaxed font-normal text-sm sm:text-base">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed font-normal text-sm sm:text-base">
                       {profile.biography}
                     </p>
                   </div>
@@ -87,10 +87,10 @@ export default async function Profile() {
                 <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
                   {profile.career && (
                     <div>
-                      <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">
+                      <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
                         경력
                       </h2>
-                      <div className="prose prose-sm max-w-none text-gray-700">
+                      <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
                         <ReactMarkdown components={markdownComponents}>
                           {profile.career}
                         </ReactMarkdown>
@@ -100,10 +100,10 @@ export default async function Profile() {
 
                   {profile.education && (
                     <div>
-                      <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">
+                      <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
                         학력
                       </h2>
-                      <div className="prose prose-sm max-w-none text-gray-700">
+                      <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
                         <ReactMarkdown components={markdownComponents}>
                           {profile.education}
                         </ReactMarkdown>
@@ -113,11 +113,11 @@ export default async function Profile() {
                 </div>
 
                 {profile.contact && (
-                  <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
-                    <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">
+                  <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
                       연락처
                     </h2>
-                    <div className="text-gray-700">
+                    <div className="text-gray-700 dark:text-gray-300">
                       {typeof profile.contact === "object" &&
                       profile.contact !== null ? (
                         <div className="space-y-1">
@@ -126,7 +126,7 @@ export default async function Profile() {
                               이메일:{" "}
                               <a
                                 href={`mailto:${profile.contact.email}`}
-                                className="text-blue-600 hover:underline"
+                                className="text-blue-600 dark:text-blue-400 hover:underline"
                               >
                                 {profile.contact.email}
                               </a>
@@ -142,7 +142,7 @@ export default async function Profile() {
                                 href={profile.contact.linkedin}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline"
+                                className="text-blue-600 dark:text-blue-400 hover:underline"
                               >
                                 {profile.contact.linkedin}
                               </a>
@@ -155,7 +155,7 @@ export default async function Profile() {
                                 href={profile.contact.github}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline"
+                                className="text-blue-600 dark:text-blue-400 hover:underline"
                               >
                                 {profile.contact.github}
                               </a>
@@ -172,7 +172,7 @@ export default async function Profile() {
             </div>
           ) : (
             <div className="max-w-4xl w-full text-center py-6 sm:py-8">
-              <p className="text-gray-600 text-sm sm:text-base">
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
                 프로필 정보를 불러올 수 없습니다.
               </p>
             </div>
