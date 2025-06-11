@@ -1,5 +1,4 @@
 import { getBlogPost } from "@/lib/strapi";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import Navigation from "@/components/Navigation";

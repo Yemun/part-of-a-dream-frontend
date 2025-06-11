@@ -1,5 +1,4 @@
 import { getProfile } from "@/lib/strapi";
-import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import Navigation from "@/components/Navigation";
 
