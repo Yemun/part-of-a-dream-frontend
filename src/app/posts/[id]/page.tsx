@@ -73,6 +73,21 @@ const markdownComponents: any = {
 
 export const revalidate = 604800; // 1주일(7일)마다 재생성
 
+// 정적 경로 생성 - 주요 포스트들을 미리 생성
+export async function generateStaticParams() {
+  try {
+    const { getBlogPosts } = await import("@/lib/strapi");
+    const posts = await getBlogPosts();
+    
+    return posts.map((post) => ({
+      id: post.slug,
+    }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [];
+  }
+}
+
 interface PageProps {
   params: Promise<{
     id: string;
