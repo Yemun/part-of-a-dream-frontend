@@ -1,10 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // 성능 최적화
-  experimental: {
-    optimizeCss: true,
-  },
+  // 성능 최적화 (optimizeCss 제거 - critters 의존성 문제)
   // 압축 활성화
   compress: true,
   // 이미지 최적화
