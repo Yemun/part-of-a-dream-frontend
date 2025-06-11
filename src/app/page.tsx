@@ -1,6 +1,6 @@
-import { getBlogPosts, getProfile, BlogPost } from "@/lib/strapi";
+import { getBlogPosts, BlogPost } from "@/lib/strapi";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
+import Navigation from "@/components/Navigation";
 
 const formatKoreanDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -9,216 +9,64 @@ const formatKoreanDate = (dateString: string) => {
   return `${month}월 ${day}일`;
 };
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const markdownComponents: any = {
-  h1: ({ children }: any) => (
-    <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mt-6 sm:mt-8 mb-3 sm:mb-4">
-      {children}
-    </h1>
-  ),
-  h2: ({ children }: any) => (
-    <h2 className="text-lg sm:text-2xl font-bold text-gray-900 mt-4 sm:mt-6 mb-2 sm:mb-3">
-      {children}
-    </h2>
-  ),
-  h3: ({ children }: any) => (
-    <h3 className="text-base sm:text-xl font-bold text-gray-900 mt-3 sm:mt-4 mb-2">
-      {children}
-    </h3>
-  ),
-  h4: ({ children }: any) => (
-    <h4 className="text-sm sm:text-lg font-semibold text-gray-900 mt-2 sm:mt-3 mb-1 sm:mb-2">
-      {children}
-    </h4>
-  ),
-  p: ({ children }: any) => (
-    <p className="mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base">
-      {children}
-    </p>
-  ),
-  ul: ({ children }: any) => (
-    <ul className="list-disc list-outside mb-3 sm:mb-4 space-y-1 text-sm sm:text-base pl-5">
-      {children}
-    </ul>
-  ),
-  ol: ({ children }: any) => (
-    <ol className="list-decimal list-outside mb-3 sm:mb-4 space-y-1 text-sm sm:text-base pl-5">
-      {children}
-    </ol>
-  ),
-  li: ({ children }: any) => <li>{children}</li>,
-  code: ({ children }: any) => (
-    <code className="bg-gray-100 px-1 sm:px-2 py-1 rounded text-xs sm:text-sm font-mono">
-      {children}
-    </code>
-  ),
-  pre: ({ children }: any) => (
-    <pre className="bg-gray-100 p-2 sm:p-4 rounded-lg overflow-x-auto mb-3 sm:mb-4 text-xs sm:text-sm">
-      {children}
-    </pre>
-  ),
-};
-/* eslint-enable @typescript-eslint/no-explicit-any */
-
 export const revalidate = 300; // 5분마다 재생성
 
 export default async function Home() {
-  const [posts, profile] = await Promise.all([getBlogPosts(), getProfile()]);
+  const posts = await getBlogPosts();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto py-4 px-4 sm:py-8">
-        <header className="text-center mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-            꿈의 일환
-          </h1>
-        </header>
+    <div className="bg-white min-h-screen">
+      <div className="flex flex-col items-center min-h-screen">
+        <div className="flex flex-col gap-12 sm:gap-20 items-center justify-start px-4 sm:px-8 lg:px-16 py-8 sm:py-12 lg:py-20 w-full">
+          <Navigation />
+          <div className="max-w-4xl w-full">
+            <div className="flex flex-col gap-12 sm:gap-16 lg:gap-20 items-start justify-start w-full">
+              {posts.length > 0 ? (
+                posts.map((post: BlogPost) => {
+                  const contentText = post.content
+                    .replace(/[#*\\-\\n]/g, " ")
+                    .trim();
 
-        <main>
-          {posts.length > 0 ? (
-            <div className="grid gap-4 sm:gap-8">
-              {posts.map((post: BlogPost) => {
-                const contentText = post.content
-                  .replace(/[#*\-\n]/g, " ")
-                  .trim();
-
-                return (
-                  <Link key={post.id} href={`/posts/${post.slug}`}>
-                    <article className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-all duration-200 cursor-pointer transform hover:scale-[1.02]">
-                      <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2 sm:mb-3 hover:text-blue-600 transition-colors leading-tight">
-                        {post.title}
-                      </h2>
-                      <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed">
-                        {contentText.substring(0, 80)}...
-                      </p>
-                      <div className="text-xs sm:text-sm text-gray-500">
-                        <time dateTime={post.publishedAt}>
-                          {formatKoreanDate(post.publishedAt)}
-                        </time>
+                  return (
+                    <Link key={post.id} href={`/posts/${post.slug}`}>
+                      <div className="w-full cursor-pointer hover:opacity-80 transition-opacity group">
+                        <div className="flex flex-col gap-2 sm:gap-3 items-start justify-start w-full">
+                          <div>
+                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-end justify-start leading-none">
+                              <div className="font-bold text-slate-950 text-xl sm:text-2xl lg:text-3xl leading-6 sm:leading-8 lg:leading-9">
+                                <p className="whitespace-pre-wrap break-words group-hover:underline transition-all">
+                                  {post.title}
+                                </p>
+                              </div>
+                              <div className="font-normal text-slate-700 text-xs sm:text-sm leading-4 sm:leading-5">
+                                <p className="whitespace-pre">
+                                  {formatKoreanDate(post.publishedAt)}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="min-w-full">
+                            <div className="font-normal text-slate-950 text-sm sm:text-base leading-5 sm:leading-6">
+                              <p className="mb-0 line-clamp-2">
+                                {contentText}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </article>
-                  </Link>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-8 sm:py-12">
-              <p className="text-gray-600 text-base sm:text-lg">
-                No blog posts found. Create your first post in Strapi!
-              </p>
-            </div>
-          )}
-        </main>
-
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 sm:mb-8 mt-12 sm:mt-16">
-          프로필
-        </h2>
-
-        {profile && (
-          <section className="mb-12 sm:mb-16">
-            <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
-                {profile.title}
-              </h2>
-
-              {profile.biography && (
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                    소개
-                  </h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    {profile.biography}
+                    </Link>
+                  );
+                })
+              ) : (
+                <div className="text-center py-6 sm:py-8 lg:py-12">
+                  <p className="text-gray-600 text-sm sm:text-base lg:text-lg">
+                    No blog posts found. Create your first post in Strapi!
                   </p>
                 </div>
               )}
-
-              <div className="grid gap-6 sm:grid-cols-2">
-                {profile.career && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                      경력
-                    </h3>
-                    <div className="prose prose-sm max-w-none text-gray-700">
-                      <ReactMarkdown components={markdownComponents}>
-                        {profile.career}
-                      </ReactMarkdown>
-                    </div>
-                  </div>
-                )}
-
-                {profile.education && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                      학력
-                    </h3>
-                    <div className="prose prose-sm max-w-none text-gray-700">
-                      <ReactMarkdown components={markdownComponents}>
-                        {profile.education}
-                      </ReactMarkdown>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {profile.contact && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                    연락처
-                  </h3>
-                  <div className="text-gray-700">
-                    {typeof profile.contact === "object" &&
-                    profile.contact !== null ? (
-                      <div className="space-y-1">
-                        {profile.contact.email && (
-                          <p>
-                            이메일:{" "}
-                            <a
-                              href={`mailto:${profile.contact.email}`}
-                              className="text-blue-600 hover:underline"
-                            >
-                              {profile.contact.email}
-                            </a>
-                          </p>
-                        )}
-                        {profile.contact.phone && (
-                          <p>전화: {profile.contact.phone}</p>
-                        )}
-                        {profile.contact.linkedin && (
-                          <p>
-                            LinkedIn:{" "}
-                            <a
-                              href={profile.contact.linkedin}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline"
-                            >
-                              {profile.contact.linkedin}
-                            </a>
-                          </p>
-                        )}
-                        {profile.contact.github && (
-                          <p>
-                            GitHub:{" "}
-                            <a
-                              href={profile.contact.github}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:underline"
-                            >
-                              {profile.contact.github}
-                            </a>
-                          </p>
-                        )}
-                      </div>
-                    ) : profile.contact ? (
-                      <p>{profile.contact}</p>
-                    ) : null}
-                  </div>
-                </div>
-              )}
             </div>
-          </section>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );
