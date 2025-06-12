@@ -64,119 +64,119 @@ export default async function Profile() {
         <div className="flex flex-col gap-12 sm:gap-20 items-center justify-start px-4 sm:px-8 lg:px-16 py-8 sm:py-12 lg:py-20 w-full">
           <Navigation />
 
-          {profile ? (
-            <div className="max-w-4xl w-full">
-              <section>
-                <div className="mb-6 sm:mb-8">
-                  <h1 className="font-bold text-slate-950 dark:text-white text-2xl sm:text-3xl leading-7 sm:leading-9">
-                    {profile.title}
-                  </h1>
-                </div>
+        {profile ? (
+          <div className="max-w-4xl w-full">
+            <section>
+              <div className="mb-6 sm:mb-8">
+                <h1 className="font-bold text-slate-950 dark:text-white text-2xl sm:text-3xl leading-7 sm:leading-9">
+                  {profile.title}
+                </h1>
+              </div>
 
-                {profile.biography && (
-                  <div className="mb-4 sm:mb-6">
+              {profile.biography && (
+                <div className="mb-4 sm:mb-6">
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
+                    소개
+                  </h2>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed font-normal text-sm sm:text-base">
+                    {profile.biography}
+                  </p>
+                </div>
+              )}
+
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
+                {profile.career && (
+                  <div>
                     <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
-                      소개
+                      경력
                     </h2>
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed font-normal text-sm sm:text-base">
-                      {profile.biography}
-                    </p>
+                    <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
+                      <ReactMarkdown components={markdownComponents}>
+                        {profile.career}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 )}
 
-                <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
-                  {profile.career && (
-                    <div>
-                      <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
-                        경력
-                      </h2>
-                      <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
-                        <ReactMarkdown components={markdownComponents}>
-                          {profile.career}
-                        </ReactMarkdown>
-                      </div>
-                    </div>
-                  )}
-
-                  {profile.education && (
-                    <div>
-                      <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
-                        학력
-                      </h2>
-                      <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
-                        <ReactMarkdown components={markdownComponents}>
-                          {profile.education}
-                        </ReactMarkdown>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {profile.contact && (
-                  <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+                {profile.education && (
+                  <div>
                     <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
-                      연락처
+                      학력
                     </h2>
-                    <div className="text-gray-700 dark:text-gray-300">
-                      {typeof profile.contact === "object" &&
-                      profile.contact !== null ? (
-                        <div className="space-y-1">
-                          {profile.contact.email && (
-                            <p>
-                              이메일:{" "}
-                              <a
-                                href={`mailto:${profile.contact.email}`}
-                                className="text-blue-600 dark:text-blue-400 hover:underline"
-                              >
-                                {profile.contact.email}
-                              </a>
-                            </p>
-                          )}
-                          {profile.contact.phone && (
-                            <p>전화: {profile.contact.phone}</p>
-                          )}
-                          {profile.contact.linkedin && (
-                            <p>
-                              LinkedIn:{" "}
-                              <a
-                                href={profile.contact.linkedin}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 dark:text-blue-400 hover:underline"
-                              >
-                                {profile.contact.linkedin}
-                              </a>
-                            </p>
-                          )}
-                          {profile.contact.github && (
-                            <p>
-                              GitHub:{" "}
-                              <a
-                                href={profile.contact.github}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 dark:text-blue-400 hover:underline"
-                              >
-                                {profile.contact.github}
-                              </a>
-                            </p>
-                          )}
-                        </div>
-                      ) : profile.contact ? (
-                        <p>{profile.contact}</p>
-                      ) : null}
+                    <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
+                      <ReactMarkdown components={markdownComponents}>
+                        {profile.education}
+                      </ReactMarkdown>
                     </div>
                   </div>
                 )}
-              </section>
-            </div>
-          ) : (
-            <div className="max-w-4xl w-full text-center py-6 sm:py-8">
-              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-                프로필 정보를 불러올 수 없습니다.
-              </p>
-            </div>
-          )}
+              </div>
+
+              {profile.contact && (
+                <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
+                    연락처
+                  </h2>
+                  <div className="text-gray-700 dark:text-gray-300">
+                    {typeof profile.contact === "object" &&
+                    profile.contact !== null ? (
+                      <div className="space-y-1">
+                        {profile.contact.email && (
+                          <p>
+                            이메일:{" "}
+                            <a
+                              href={`mailto:${profile.contact.email}`}
+                              className="text-blue-600 dark:text-blue-400 hover:underline"
+                            >
+                              {profile.contact.email}
+                            </a>
+                          </p>
+                        )}
+                        {profile.contact.phone && (
+                          <p>전화: {profile.contact.phone}</p>
+                        )}
+                        {profile.contact.linkedin && (
+                          <p>
+                            LinkedIn:{" "}
+                            <a
+                              href={profile.contact.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 dark:text-blue-400 hover:underline"
+                            >
+                              {profile.contact.linkedin}
+                            </a>
+                          </p>
+                        )}
+                        {profile.contact.github && (
+                          <p>
+                            GitHub:{" "}
+                            <a
+                              href={profile.contact.github}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 dark:text-blue-400 hover:underline"
+                            >
+                              {profile.contact.github}
+                            </a>
+                          </p>
+                        )}
+                      </div>
+                    ) : profile.contact ? (
+                      <p>{profile.contact}</p>
+                    ) : null}
+                  </div>
+                </div>
+              )}
+            </section>
+          </div>
+        ) : (
+          <div className="max-w-4xl w-full text-center py-6 sm:py-8">
+            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+              프로필 정보를 불러올 수 없습니다.
+            </p>
+          </div>
+        )}
         </div>
       </div>
     </div>
