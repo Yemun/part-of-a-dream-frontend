@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
-import PageTransition from "@/components/PageTransition";
 
 export const metadata: Metadata = {
   title: "꿈의 일환",
@@ -30,9 +29,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className="antialiased">
-        <PageTransition>{children}</PageTransition>
-      </body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
