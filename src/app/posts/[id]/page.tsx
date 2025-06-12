@@ -109,7 +109,7 @@ export default async function PostPage({ params }: PageProps) {
   return (
     <div className="bg-white dark:bg-gray-950 min-h-screen">
       <div className="flex flex-col items-center min-h-screen">
-        <div className="flex flex-col gap-12 sm:gap-20 items-center justify-start px-4 sm:px-8 lg:px-16 pt-8 pb-52 sm:pt-12 sm:pb-52 lg:pt-20 lg:pb-52 w-full">
+        <div className="flex flex-col gap-12 sm:gap-20 items-center justify-start px-4 sm:px-8 lg:px-16 pt-8 pb-36 sm:pt-12 sm:pb-36 lg:pt-20 lg:pb-52 w-full">
           <Navigation />
           <div className="max-w-4xl w-full">
             <article>
