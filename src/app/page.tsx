@@ -49,7 +49,7 @@ export default async function Home() {
                                 </div>
                               </div>
                             </div>
-                            <div className="font-normal text-slate-950 dark:text-gray-200 text-sm sm:text-base leading-6 sm:leading-7 line-clamp-2">
+                            <div className="font-normal text-slate-950 dark:text-gray-200 text-sm sm:text-base leading-5 sm:leading-6 line-clamp-2">
                               {contentText.substring(0, 180)}
                             </div>
                           </div>
