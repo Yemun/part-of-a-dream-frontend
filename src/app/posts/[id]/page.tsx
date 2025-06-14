@@ -1,8 +1,9 @@
-import { getBlogPost } from "@/lib/strapi";
+import { getBlogPost, getAdjacentPosts } from "@/lib/strapi";
 import { notFound } from "next/navigation";
 import PageLayout from "@/components/PageLayout";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import RelativeTime from "@/components/RelativeTime";
+import PostNavigation from "@/components/PostNavigation";
 
 export const revalidate = 604800; // 1주일(7일)마다 재생성
 
@@ -29,7 +30,10 @@ interface PageProps {
 
 export default async function PostPage({ params }: PageProps) {
   const { id } = await params;
-  const post = await getBlogPost(id);
+  const [post, adjacentPosts] = await Promise.all([
+    getBlogPost(id),
+    getAdjacentPosts(id),
+  ]);
 
   if (!post) {
     notFound();
@@ -50,6 +54,11 @@ export default async function PostPage({ params }: PageProps) {
         </header>
 
         <MarkdownRenderer content={post.content} />
+        
+        <PostNavigation 
+          previous={adjacentPosts.previous} 
+          next={adjacentPosts.next} 
+        />
       </article>
     </PageLayout>
   );

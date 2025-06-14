@@ -72,6 +72,27 @@ export const getBlogPost = async (slug: string): Promise<BlogPost | null> => {
   }
 };
 
+export const getAdjacentPosts = async (
+  currentSlug: string
+): Promise<{ previous: BlogPost | null; next: BlogPost | null }> => {
+  try {
+    const posts = await getBlogPosts();
+    const sortedPosts = posts.sort(
+      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
+    
+    const currentIndex = sortedPosts.findIndex(post => post.slug === currentSlug);
+    
+    return {
+      previous: currentIndex > 0 ? sortedPosts[currentIndex - 1] : null,
+      next: currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null,
+    };
+  } catch (error) {
+    console.error("Error fetching adjacent posts:", error);
+    return { previous: null, next: null };
+  }
+};
+
 export const getProfile = async (): Promise<Profile | null> => {
   try {
     const response = await strapi.get<{ data: Profile }>(
