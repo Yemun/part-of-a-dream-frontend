@@ -12,6 +12,51 @@
   --color-foreground: var(--foreground);
 }
 
+/* Custom prose styles */
+.prose img {
+  @apply rounded-xl mb-8 bg-slate-100;
+}
+
+@media (min-width: 640px) {
+  .prose img {
+    @apply mb-12;
+  }
+}
+
+.dark .prose img {
+  @apply bg-gray-800;
+}
+
+.prose p {
+  @apply mb-4 leading-8 text-base whitespace-pre-wrap;
+}
+
+@media (min-width: 640px) {
+  .prose p {
+    @apply mb-5 text-lg;
+  }
+}
+
+.prose ul {
+  @apply mb-4 space-y-2 text-base pl-6;
+}
+
+@media (min-width: 640px) {
+  .prose ul {
+    @apply mb-5 text-lg;
+  }
+}
+
+.prose ol {
+  @apply mb-4 space-y-2 text-base pl-6;
+}
+
+@media (min-width: 640px) {
+  .prose ol {
+    @apply mb-5 text-lg;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
