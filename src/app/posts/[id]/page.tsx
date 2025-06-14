@@ -4,8 +4,6 @@ import PageLayout from "@/components/PageLayout";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import RelativeTime from "@/components/RelativeTime";
 
-
-
 export const revalidate = 604800; // 1주일(7일)마다 재생성
 
 // 정적 경로 생성 - 주요 포스트들을 미리 생성
@@ -40,18 +38,18 @@ export default async function PostPage({ params }: PageProps) {
   return (
     <PageLayout customPadding="pt-8 pb-36 sm:pt-12 sm:pb-36 lg:pt-20 lg:pb-52">
       <article>
-              <header className="mb-6 sm:mb-8">
-                <h1 className="font-bold text-slate-950 dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-3 sm:mb-4">
-                  {post.title}
-                </h1>
-                <div className="font-normal text-slate-700 dark:text-gray-300 text-sm sm:text-base leading-5 sm:leading-6">
-                  <time dateTime={post.publishedAt}>
-                    <RelativeTime dateString={post.publishedAt} />
-                  </time>
-                </div>
-              </header>
+        <header className="mb-6 sm:mb-8">
+          <h1 className="font-bold text-slate-950 dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-3 sm:mb-4">
+            {post.title}
+          </h1>
+          <div className="font-normal text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-5 sm:leading-6">
+            <time dateTime={post.publishedAt}>
+              <RelativeTime dateString={post.publishedAt} />
+            </time>
+          </div>
+        </header>
 
-              <MarkdownRenderer content={post.content} />
+        <MarkdownRenderer content={post.content} />
       </article>
     </PageLayout>
   );

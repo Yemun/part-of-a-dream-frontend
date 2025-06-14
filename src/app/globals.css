@@ -14,17 +14,17 @@
 
 /* Custom prose styles */
 .prose img {
-  @apply rounded-xl mb-8 bg-slate-100;
+  @apply rounded-xl mb-2 bg-slate-100;
 }
 
 @media (min-width: 640px) {
   .prose img {
-    @apply mb-12;
+    @apply mb-4;
   }
 }
 
 .dark .prose img {
-  @apply bg-gray-800;
+  @apply bg-slate-800;
 }
 
 .prose p {

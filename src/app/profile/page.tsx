@@ -19,10 +19,10 @@ export default async function Profile() {
 
           {profile.biography && (
             <div className="mb-8 sm:mb-10">
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
+              <h2 className="text-xl sm:text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-2 sm:mb-3">
                 소개
               </h2>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed font-normal text-base sm:text-lg">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-normal text-base sm:text-lg">
                 {profile.biography}
               </p>
             </div>
@@ -30,21 +30,21 @@ export default async function Profile() {
 
           {profile.career && (
             <div className="mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
+              <h2 className="text-xl sm:text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-2 sm:mb-3">
                 경력
               </h2>
-              <div className="text-gray-700 dark:text-gray-300">
+              <div className="text-slate-700 dark:text-slate-300">
                 <MarkdownRenderer content={profile.career} />
               </div>
             </div>
           )}
 
           {profile.contact && (
-            <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-3">
+            <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-200 dark:border-slate-700">
+              <h2 className="text-base sm:text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2 sm:mb-3">
                 연락처
               </h2>
-              <div className="text-gray-700 dark:text-gray-300">
+              <div className="text-slate-700 dark:text-slate-300">
                 {typeof profile.contact === "object" &&
                 profile.contact !== null ? (
                   <div className="space-y-1">
@@ -98,7 +98,7 @@ export default async function Profile() {
         </section>
       ) : (
         <div className="text-center py-6 sm:py-8">
-          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+          <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
             프로필 정보를 불러올 수 없습니다.
           </p>
         </div>

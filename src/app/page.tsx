@@ -3,7 +3,6 @@ import Link from "next/link";
 import PageLayout from "@/components/PageLayout";
 import RelativeTime from "@/components/RelativeTime";
 
-
 export const revalidate = 604800; // 1주일(7일)마다 재생성
 
 export default async function Home() {
@@ -33,14 +32,14 @@ export default async function Home() {
                           <h2 className="font-bold text-slate-950 dark:text-white text-xl sm:text-2xl lg:text-3xl leading-6 sm:leading-8 lg:leading-9">
                             {post.title}
                           </h2>
-                          <div className="font-normal text-slate-700 dark:text-gray-300 text-xs sm:text-sm leading-3 sm:leading-5">
+                          <div className="font-normal text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-3 sm:leading-5">
                             <p className="whitespace-pre">
                               <RelativeTime dateString={post.publishedAt} />
                             </p>
                           </div>
                         </div>
                       </div>
-                      <div className="font-normal text-slate-950 dark:text-gray-200 text-sm sm:text-base leading-6 sm:leading-7 line-clamp-2">
+                      <div className="font-normal text-slate-950 dark:text-slate-200 text-sm sm:text-base leading-6 sm:leading-7 line-clamp-2">
                         {contentText.substring(0, 180)}
                       </div>
                     </div>
@@ -50,7 +49,7 @@ export default async function Home() {
             })
         ) : (
           <div className="text-center py-6 sm:py-8 lg:py-12">
-            <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base lg:text-lg">
+            <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base lg:text-lg">
               No blog posts found. Create your first post in Strapi!
             </p>
           </div>
