@@ -1,7 +1,7 @@
-import axios from 'axios';
+import axios from "axios";
 
 const strapi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
+  baseURL: process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337",
 });
 
 export interface BlogPost {
@@ -21,14 +21,16 @@ export interface Profile {
   title: string;
   biography: string;
   career: string;
-  education: string;
-  contact: {
-    email?: string;
-    phone?: string;
-    linkedin?: string;
-    github?: string;
-    [key: string]: string | undefined;
-  } | string | null;
+  contact:
+    | {
+        email?: string;
+        phone?: string;
+        linkedin?: string;
+        github?: string;
+        [key: string]: string | undefined;
+      }
+    | string
+    | null;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
@@ -48,30 +50,36 @@ export interface StrapiResponse<T> {
 
 export const getBlogPosts = async (): Promise<BlogPost[]> => {
   try {
-    const response = await strapi.get<StrapiResponse<BlogPost[]>>('/api/blogs?populate=*');
+    const response = await strapi.get<StrapiResponse<BlogPost[]>>(
+      "/api/blogs?populate=*"
+    );
     return response.data.data;
   } catch (error) {
-    console.error('Error fetching blog posts:', error);
+    console.error("Error fetching blog posts:", error);
     return [];
   }
 };
 
 export const getBlogPost = async (slug: string): Promise<BlogPost | null> => {
   try {
-    const response = await strapi.get<StrapiResponse<BlogPost[]>>(`/api/blogs?filters[slug]=${slug}&populate=*`);
+    const response = await strapi.get<StrapiResponse<BlogPost[]>>(
+      `/api/blogs?filters[slug]=${slug}&populate=*`
+    );
     return response.data.data[0] || null;
   } catch (error) {
-    console.error('Error fetching blog post:', error);
+    console.error("Error fetching blog post:", error);
     return null;
   }
 };
 
 export const getProfile = async (): Promise<Profile | null> => {
   try {
-    const response = await strapi.get<{ data: Profile }>('/api/profile?populate=*');
+    const response = await strapi.get<{ data: Profile }>(
+      "/api/profile?populate=*"
+    );
     return response.data.data;
   } catch (error) {
-    console.error('Error fetching profile:', error);
+    console.error("Error fetching profile:", error);
     return null;
   }
 };

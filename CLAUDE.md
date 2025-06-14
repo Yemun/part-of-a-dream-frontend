@@ -53,9 +53,9 @@ The BlogPost and Profile interfaces are defined in `src/lib/strapi.ts` with the 
 interface BlogPost {
   id: number;
   documentId: string;
-  slug: string;      // UID field for URL routing (lowercase)
-  title: string;     // Post title (lowercase)
-  content: string;   // Markdown content (lowercase)
+  slug: string; // UID field for URL routing (lowercase)
+  title: string; // Post title (lowercase)
+  content: string; // Markdown content (lowercase)
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
@@ -67,13 +67,15 @@ interface Profile {
   title: string;
   biography: string;
   career: string;
-  education: string;
-  contact: {
-    email?: string;
-    phone?: string;
-    linkedin?: string;
-    github?: string;
-  } | string | null;
+  contact:
+    | {
+        email?: string;
+        phone?: string;
+        linkedin?: string;
+        github?: string;
+      }
+    | string
+    | null;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
@@ -81,6 +83,7 @@ interface Profile {
 ```
 
 Strapi API functions are exported from `src/lib/strapi.ts`:
+
 - `getBlogPosts()`: Fetches all published posts
 - `getBlogPost(slug)`: Fetches single post by slug
 - `getProfile()`: Fetches profile information for homepage display
@@ -107,6 +110,7 @@ Strapi API functions are exported from `src/lib/strapi.ts`:
 ## Mobile Responsiveness
 
 Implements mobile-first design with Tailwind breakpoints:
+
 - Base styles for mobile (< 640px)
 - `sm:` prefix for desktop (≥ 640px)
 - Responsive typography, spacing, and layout adjustments
@@ -114,17 +118,20 @@ Implements mobile-first design with Tailwind breakpoints:
 ## Next.js 15 Compatibility
 
 This project uses Next.js 15 which has breaking changes:
+
 - **Dynamic Route Params**: `params` in page components is now a Promise and must be awaited
 - **Example**: `const { id } = await params;` instead of `params.id`
 
 ## Deployment
 
-**Automated via GitHub Actions**: 
+**Automated via GitHub Actions**:
+
 - Pushes to main branch trigger automatic Vercel deployment
 - Workflow includes linting and build verification
 - Requires GitHub Secrets: `VERCEL_TOKEN`, `ORG_ID`, `PROJECT_ID`
 
 **Manual Vercel Deployment**:
+
 - Import GitHub repository at https://vercel.com/new
 - Set environment variable: `NEXT_PUBLIC_STRAPI_URL`
 
@@ -152,6 +159,7 @@ npm run deploy
 ## Code Quality
 
 Always run these commands before committing:
+
 - `npm run lint` - ESLint checks for code quality
 - `npm run build` - Verify production build succeeds
 
