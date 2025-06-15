@@ -163,7 +163,7 @@ export default function CommentList({
     return (
       <div className="mt-8">
         <h3 className="text-lg font-semibold mb-4">댓글 ({comments.length})</h3>
-        <p className="text-slate-500 text-center py-20">
+        <p className="text-slate-500 text-center py-12 sm:py-20">
           아직 댓글이 없습니다. 첫 번째 댓글을 남겨보세요!
         </p>
       </div>
@@ -204,7 +204,7 @@ export default function CommentList({
                         type="text"
                         value={editAuthor}
                         onChange={(e) => setEditAuthor(e.target.value)}
-                        placeholder="이름"
+                        placeholder="별명"
                         className="px-2 py-1 text-sm border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
                       <input

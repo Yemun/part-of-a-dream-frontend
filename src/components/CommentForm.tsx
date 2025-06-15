@@ -57,7 +57,7 @@ export default function CommentForm({
               htmlFor="author"
               className="block text-sm font-medium text-slate-700 mb-1"
             >
-              이름
+              닉네임
             </label>
             <input
               type="text"
@@ -65,7 +65,7 @@ export default function CommentForm({
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
               className="w-full px-3 py-2 border bg-white border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="이름을 입력하세요"
+              placeholder="닉네임을 입력하세요"
               disabled={isSubmitting}
             />
           </div>
