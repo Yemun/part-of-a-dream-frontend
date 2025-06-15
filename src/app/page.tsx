@@ -25,7 +25,7 @@ export default async function Home() {
 
               return (
                 <Link key={post.id} href={`/posts/${post.slug}`}>
-                  <div className="w-full cursor-pointer hover:bg-slate-50 transition-opacity py-4 px-4 sm:py-5 sm:px-5 rounded-xl dark:hover:bg-gray-900 transition-colors group ">
+                  <div className="w-full cursor-pointer hover:bg-slate-50 py-2 px-2 rounded-xl sm:py-5 sm:px-5 dark:hover:bg-gray-900 transition-opacity transition-colors group ">
                     <div className="flex flex-col gap-2 sm:gap-3 items-start justify-start w-full">
                       <div>
                         <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-end justify-start leading-none">
