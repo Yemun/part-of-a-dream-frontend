@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { createComment } from "@/lib/strapi";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
 
 interface CommentFormProps {
   blogId: string;
@@ -48,69 +51,45 @@ export default function CommentForm({
   };
 
   return (
-    <div className="mt-8 p-6 bg-slate-50 rounded-lg">
-      <h3 className="text-lg font-semibold mb-4">댓글 남기기</h3>
+    <div className="mt-8 p-6 bg-slate-50 dark:bg-gray-900 rounded-lg">
+      <h3 className="text-lg font-semibold mb-4 dark:text-white">
+        댓글 남기기
+      </h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="author"
-              className="block text-sm font-medium text-slate-700 mb-1"
-            >
-              닉네임
-            </label>
-            <input
-              type="text"
-              id="author"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              className="w-full px-3 py-2 border bg-white border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="닉네임을 입력하세요"
-              disabled={isSubmitting}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-slate-700 mb-1"
-            >
-              이메일
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border bg-white border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="이메일을 입력하세요"
-              disabled={isSubmitting}
-            />
-          </div>
-        </div>
-        <div>
-          <label
-            htmlFor="content"
-            className="block text-sm font-medium text-slate-700 mb-1"
-          >
-            댓글
-          </label>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={4}
-            className="w-full px-3 py-2 border bg-white border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
-            placeholder="댓글을 입력하세요"
+          <Input
+            type="text"
+            id="author"
+            label="닉네임"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            placeholder="닉네임을 입력하세요"
+            disabled={isSubmitting}
+          />
+          <Input
+            type="email"
+            id="email"
+            label="이메일"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="이메일을 입력하세요"
             disabled={isSubmitting}
           />
         </div>
-        <button
-          type="submit"
+        <Textarea
+          id="content"
+          label="댓글"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          rows={4}
+          placeholder="댓글을 입력하세요"
           disabled={isSubmitting}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors "
-        >
-          {isSubmitting ? "등록 중..." : "댓글 등록"}
-        </button>
+        />
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isSubmitting} size="lg">
+            {isSubmitting ? "등록 중..." : "댓글 등록"}
+          </Button>
+        </div>
       </form>
     </div>
   );

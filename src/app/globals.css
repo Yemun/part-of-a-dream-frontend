@@ -3,28 +3,27 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: oklch(100% 0 0);
+  --foreground: oklch(15% 0 0);
+  --lv1-background: oklch(96% 0.004 247);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-image-background: var(--image-background);
 }
 
 /* Custom prose styles */
 .prose img {
-  @apply rounded-2xl mb-2 bg-slate-100 w-full max-h-[50vh] object-contain mx-auto;
+  @apply rounded-2xl mb-2 w-full max-h-[50vh] object-contain mx-auto;
+  background-color: var(--lv1-background);
 }
 
 @media (min-width: 640px) {
   .prose img {
     @apply mb-4;
   }
-}
-
-.dark .prose img {
-  @apply bg-slate-800;
 }
 
 .prose p {
@@ -59,12 +58,14 @@
 
 .prose pre {
   @apply rounded-2xl;
+  background-color: var(--lv1-background);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: oklch(7% 0 0);
+    --foreground: oklch(92% 0 0);
+    --lv1-background: oklch(21% 0.034 264.665);
   }
 }
 

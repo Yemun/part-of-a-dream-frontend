@@ -125,24 +125,12 @@ export const getProfile = async (): Promise<Profile | null> => {
 
 export const getComments = async (blogId: string): Promise<Comment[]> => {
   try {
+    // Server-side filtering for better performance
     const response = await strapi.get<StrapiResponse<Comment[]>>(
-      `/api/comments?populate=*&sort[0]=createdAt:desc`
+      `/api/comments?populate=*&sort[0]=createdAt:desc&filters[blog][documentId][$eq]=${blogId}&filters[approved][$eq]=true`
     );
     
-    const allComments = response.data.data;
-    
-    // Filter on client side
-    const filteredComments = allComments.filter((comment) => {
-      const blogMatch = comment.blog && 
-        typeof comment.blog === "object" && 
-        comment.blog.documentId === blogId;
-      
-      const approvedMatch = comment.approved === true;
-      
-      return blogMatch && approvedMatch;
-    });
-    
-    return filteredComments;
+    return response.data.data;
   } catch (error) {
     console.error("Error fetching comments:", error);
     return [];

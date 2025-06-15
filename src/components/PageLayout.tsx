@@ -12,7 +12,7 @@ export default function PageLayout({
   className = "",
 }: PageLayoutProps) {
   return (
-    <div className="bg-white dark:bg-gray-950 min-h-screen">
+    <div className="min-h-screen">
       <div className="flex flex-col items-center min-h-screen">
         <div
           className={`flex flex-col gap-12 sm:gap-20 items-center justify-start px-4 sm:px-8 lg:px-16 ${customPadding} w-full ${className}`}

@@ -35,14 +35,14 @@ export default function CommentSection({ blogId }: CommentSectionProps) {
 
   if (isLoading) {
     return (
-      <div className="mt-12 pt-8 border-t border-slate-200">
+      <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
         <div className="text-center text-slate-500">댓글을 불러오는 중...</div>
       </div>
     );
   }
 
   return (
-    <div className="mt-12 pt-8 border-t border-slate-200">
+    <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
       <CommentList comments={comments} onCommentUpdated={handleCommentAdded} />
       <CommentForm blogId={blogId} onCommentAdded={handleCommentAdded} />
     </div>
