@@ -58,7 +58,7 @@
 
 .prose pre {
   @apply rounded-2xl;
-  background-color: var(--lv1-background);
+  /* background-color: var(--lv1-background); */
 }
 
 @media (prefers-color-scheme: dark) {

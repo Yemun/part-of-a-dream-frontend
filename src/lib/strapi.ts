@@ -13,6 +13,7 @@ export interface BlogPost {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
+  comments?: Comment[];
 }
 
 export interface Profile {
@@ -125,12 +126,13 @@ export const getProfile = async (): Promise<Profile | null> => {
 
 export const getComments = async (blogId: string): Promise<Comment[]> => {
   try {
-    // Server-side filtering for better performance
-    const response = await strapi.get<StrapiResponse<Comment[]>>(
-      `/api/comments?populate=*&sort[0]=createdAt:desc&filters[blog][documentId][$eq]=${blogId}&filters[approved][$eq]=true`
+    // Get comments through Blog's comments relation for better filtering
+    const response = await strapi.get<{ data: BlogPost }>(
+      `/api/blogs/${blogId}?populate[comments][populate]=*&populate[comments][sort][0]=createdAt:desc&populate[comments][filters][approved][$eq]=true`
     );
-    
-    return response.data.data;
+
+    const blog = response.data.data;
+    return blog?.comments || [];
   } catch (error) {
     console.error("Error fetching comments:", error);
     return [];

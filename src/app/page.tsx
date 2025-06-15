@@ -10,7 +10,7 @@ export default async function Home() {
 
   return (
     <PageLayout>
-      <div className="flex flex-col gap-12 sm:gap-16 lg:gap-20 items-start justify-start w-full">
+      <div className="flex flex-col gap-4 sm:gap-8 items-start justify-start w-full">
         {posts.length > 0 ? (
           posts
             .sort(
@@ -25,11 +25,11 @@ export default async function Home() {
 
               return (
                 <Link key={post.id} href={`/posts/${post.slug}`}>
-                  <div className="w-full cursor-pointer hover:opacity-80 transition-opacity group">
+                  <div className="w-full cursor-pointer hover:bg-slate-50 transition-opacity py-4 px-4 sm:py-5 sm:px-5 rounded-xl dark:hover:bg-gray-900 transition-colors group ">
                     <div className="flex flex-col gap-2 sm:gap-3 items-start justify-start w-full">
                       <div>
                         <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-end justify-start leading-none">
-                          <h2 className="font-bold text-slate-950 dark:text-white text-xl sm:text-2xl lg:text-3xl leading-6 sm:leading-8 lg:leading-9">
+                          <h2 className="font-bold text-slate-950 dark:text-white text-l sm:text-xl lg:text-2xl leading-6 sm:leading-8 lg:leading-9 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                             {post.title}
                           </h2>
                           <div className="font-normal text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-3 sm:leading-5">
