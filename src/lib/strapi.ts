@@ -36,6 +36,18 @@ export interface Profile {
   publishedAt: string;
 }
 
+export interface Comment {
+  id: number;
+  documentId: string;
+  author: string;
+  email: string;
+  content: string;
+  blog: BlogPost;
+  approved: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface StrapiResponse<T> {
   data: T;
   meta: {
@@ -78,14 +90,20 @@ export const getAdjacentPosts = async (
   try {
     const posts = await getBlogPosts();
     const sortedPosts = posts.sort(
-      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      (a, b) =>
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
-    
-    const currentIndex = sortedPosts.findIndex(post => post.slug === currentSlug);
-    
+
+    const currentIndex = sortedPosts.findIndex(
+      (post) => post.slug === currentSlug
+    );
+
     return {
       previous: currentIndex > 0 ? sortedPosts[currentIndex - 1] : null,
-      next: currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null,
+      next:
+        currentIndex < sortedPosts.length - 1
+          ? sortedPosts[currentIndex + 1]
+          : null,
     };
   } catch (error) {
     console.error("Error fetching adjacent posts:", error);
@@ -102,6 +120,123 @@ export const getProfile = async (): Promise<Profile | null> => {
   } catch (error) {
     console.error("Error fetching profile:", error);
     return null;
+  }
+};
+
+export const getComments = async (blogId: string): Promise<Comment[]> => {
+  try {
+    const response = await strapi.get<StrapiResponse<Comment[]>>(
+      `/api/comments?populate=*&sort[0]=createdAt:desc`
+    );
+    
+    const allComments = response.data.data;
+    
+    // Filter on client side
+    const filteredComments = allComments.filter((comment) => {
+      const blogMatch = comment.blog && 
+        typeof comment.blog === "object" && 
+        comment.blog.documentId === blogId;
+      
+      const approvedMatch = comment.approved === true;
+      
+      return blogMatch && approvedMatch;
+    });
+    
+    return filteredComments;
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    return [];
+  }
+};
+
+export const createComment = async (commentData: {
+  author: string;
+  email: string;
+  content: string;
+  blog: string;
+}): Promise<Comment | null> => {
+  try {
+    const response = await strapi.post<{ data: Comment }>("/api/comments", {
+      data: {
+        author: commentData.author,
+        email: commentData.email,
+        content: commentData.content,
+        blog: commentData.blog,
+        approved: true,
+      },
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    return null;
+  }
+};
+
+export const updateComment = async (
+  comment: Comment,
+  commentData: {
+    author: string;
+    email: string;
+    content: string;
+  }
+): Promise<Comment | null> => {
+  try {
+    // Try with documentId first (Strapi v4.6+)
+    let response;
+    try {
+      response = await strapi.put<{ data: Comment }>(
+        `/api/comments/${comment.documentId}`,
+        {
+          data: commentData,
+        }
+      );
+    } catch (error: unknown) {
+      // Fallback to id if documentId fails
+      if (
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        (error as { response?: { status?: number } }).response?.status === 404
+      ) {
+        response = await strapi.put<{ data: Comment }>(
+          `/api/comments/${comment.id}`,
+          {
+            data: commentData,
+          }
+        );
+      } else {
+        throw error;
+      }
+    }
+    return response.data.data;
+  } catch (error) {
+    console.error("Error updating comment:", error);
+    return null;
+  }
+};
+
+export const deleteComment = async (comment: Comment): Promise<boolean> => {
+  try {
+    // Try with documentId first (Strapi v4.6+)
+    try {
+      await strapi.delete(`/api/comments/${comment.documentId}`);
+    } catch (error: unknown) {
+      // Fallback to id if documentId fails
+      if (
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        (error as { response?: { status?: number } }).response?.status === 404
+      ) {
+        await strapi.delete(`/api/comments/${comment.id}`);
+      } else {
+        throw error;
+      }
+    }
+    return true;
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    return false;
   }
 };
 

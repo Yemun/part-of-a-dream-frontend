@@ -14,7 +14,7 @@
 
 /* Custom prose styles */
 .prose img {
-  @apply rounded-xl mb-2 bg-slate-100;
+  @apply rounded-2xl mb-2 bg-slate-100 w-full max-h-[50vh] object-contain mx-auto;
 }
 
 @media (min-width: 640px) {
@@ -55,6 +55,10 @@
   .prose ol {
     @apply mb-5 text-lg;
   }
+}
+
+.prose pre {
+  @apply rounded-2xl;
 }
 
 @media (prefers-color-scheme: dark) {

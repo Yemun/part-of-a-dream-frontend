@@ -4,6 +4,7 @@ import PageLayout from "@/components/PageLayout";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import RelativeTime from "@/components/RelativeTime";
 import PostNavigation from "@/components/PostNavigation";
+import CommentSection from "@/components/CommentSection";
 
 export const revalidate = 604800; // 1주일(7일)마다 재생성
 
@@ -59,6 +60,8 @@ export default async function PostPage({ params }: PageProps) {
           previous={adjacentPosts.previous} 
           next={adjacentPosts.next} 
         />
+        
+        <CommentSection blogId={post.documentId} />
       </article>
     </PageLayout>
   );
