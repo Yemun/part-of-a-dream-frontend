@@ -2,6 +2,10 @@ import axios from "axios";
 
 const strapi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337",
+  timeout: 10000, // 10초 타임아웃
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 export interface BlogPost {
@@ -126,13 +130,18 @@ export const getProfile = async (): Promise<Profile | null> => {
 
 export const getComments = async (blogId: string): Promise<Comment[]> => {
   try {
-    // Get comments through Blog's comments relation for better filtering
+    // Simple populate with client-side filtering for reliability
     const response = await strapi.get<{ data: BlogPost }>(
-      `/api/blogs/${blogId}?populate[comments][populate]=*&populate[comments][sort][0]=createdAt:desc&populate[comments][filters][approved][$eq]=true`
+      `/api/blogs/${blogId}?populate=comments`
     );
-
+    
     const blog = response.data.data;
-    return blog?.comments || [];
+    const comments = blog?.comments || [];
+    
+    // Filter and sort on client side for now
+    return comments
+      .filter(comment => comment.approved === true)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   } catch (error) {
     console.error("Error fetching comments:", error);
     return [];

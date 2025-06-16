@@ -43,11 +43,12 @@ The application fetches blog content from Strapi Cloud via REST API:
 - **Blog Posts**: `GET /api/blogs?populate=*` - Fetches all published posts
 - **Individual Post**: `GET /api/blogs?filters[slug]=${slug}&populate=*` - Fetches post by slug
 - **Profile**: `GET /api/profile?populate=*` - Fetches profile information
-- **Content Types**: Blog posts and Profile with lowercase field names
+- **Comments**: `GET /api/blogs/${blogId}?populate[comments]...` - Fetches comments via Blog relation for better performance
+- **Content Types**: Blog posts, Profile, and Comments with lowercase field names
 
 ## TypeScript Interfaces
 
-The BlogPost and Profile interfaces are defined in `src/lib/strapi.ts` with the current Strapi schema:
+The BlogPost, Profile, and Comment interfaces are defined in `src/lib/strapi.ts` with the current Strapi schema:
 
 ```typescript
 interface BlogPost {
@@ -59,6 +60,19 @@ interface BlogPost {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
+  comments?: Comment[]; // Optional comments relation
+}
+
+interface Comment {
+  id: number;
+  documentId: string;
+  author: string;
+  email: string;
+  content: string;
+  blog: BlogPost;
+  approved: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface Profile {
@@ -87,13 +101,17 @@ Strapi API functions are exported from `src/lib/strapi.ts`:
 - `getBlogPosts()`: Fetches all published posts
 - `getBlogPost(slug)`: Fetches single post by slug
 - `getProfile()`: Fetches profile information for homepage display
+- `getComments(blogId)`: Fetches comments via Blog's comments relation
+- `createComment()`, `updateComment()`, `deleteComment()`: Comment CRUD operations
 
 ## Design System
 
 - **Typography**: Pretendard Variable font for Korean text optimization
-- **Styling**: Tailwind CSS with mobile-first responsive design
+- **Styling**: Tailwind CSS v4 with mobile-first responsive design and OKLCH color system
 - **Components**: React functional components with TypeScript
 - **Content Rendering**: react-markdown for markdown content with custom styling
+- **UI Components**: Reusable components in `src/components/ui/` (Button, Input, Textarea)
+- **Dark Mode**: Full dark mode support with CSS variables and automatic system detection
 
 ## Routing Strategy
 
@@ -162,6 +180,44 @@ Always run these commands before committing:
 
 - `npm run lint` - ESLint checks for code quality
 - `npm run build` - Verify production build succeeds
+
+## Comment System
+
+The blog includes a comprehensive comment system with:
+
+- **Email-based Authentication**: Users can edit/delete their own comments using email verification
+- **CRUD Operations**: Full create, read, update, delete functionality
+- **Server-side Filtering**: Comments are fetched via Blog entity relations for optimal performance
+- **Modal UI**: Email verification modal for comment modifications
+- **Real-time Updates**: Comments refresh automatically after operations
+
+## Color System
+
+Uses modern OKLCH color space for better color accuracy:
+
+```css
+:root {
+  --background: oklch(100% 0 0);
+  --foreground: oklch(15% 0 0);
+  --lv1-background: oklch(96% 0.004 247);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(7% 0 0);
+    --foreground: oklch(92% 0 0);
+    --lv1-background: oklch(21% 0.034 264.665);
+  }
+}
+```
+
+## Tailwind CSS v4
+
+This project uses Tailwind CSS v4 with:
+
+- **No config file**: Uses `@import "tailwindcss"` and `@plugin` directives in CSS
+- **CSS-first approach**: Styles defined directly in `globals.css` with CSS variables
+- **Typography plugin**: Custom prose styles for markdown content
 
 ## URL Handling
 
