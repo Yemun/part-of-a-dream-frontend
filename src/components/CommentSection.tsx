@@ -7,11 +7,12 @@ import CommentForm from "./CommentForm";
 
 interface CommentSectionProps {
   blogId: string;
+  initialComments?: Comment[];
 }
 
-export default function CommentSection({ blogId }: CommentSectionProps) {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export default function CommentSection({ blogId, initialComments = [] }: CommentSectionProps) {
+  const [comments, setComments] = useState<Comment[]>(initialComments);
+  const [isLoading, setIsLoading] = useState(false); // 초기 댓글이 있으면 로딩하지 않음
   const [error, setError] = useState<string | null>(null);
 
   const fetchComments = useCallback(async () => {
@@ -19,6 +20,7 @@ export default function CommentSection({ blogId }: CommentSectionProps) {
     
     try {
       setError(null);
+      setIsLoading(true);
       const fetchedComments = await getComments(blogId);
       setComments(fetchedComments);
     } catch (error) {
@@ -29,9 +31,12 @@ export default function CommentSection({ blogId }: CommentSectionProps) {
     }
   }, [blogId]);
 
+  // 초기 댓글이 없을 때만 서버에서 가져옴
   useEffect(() => {
-    fetchComments();
-  }, [fetchComments]);
+    if (initialComments.length === 0) {
+      fetchComments();
+    }
+  }, [fetchComments, initialComments.length]);
 
   const handleCommentAdded = useCallback(() => {
     fetchComments();

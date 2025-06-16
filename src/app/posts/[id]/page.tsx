@@ -1,4 +1,4 @@
-import { getBlogPost, getAdjacentPosts } from "@/lib/strapi";
+import { getBlogPost, getAdjacentPosts, getComments } from "@/lib/strapi";
 import { notFound } from "next/navigation";
 import PageLayout from "@/components/PageLayout";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
@@ -40,6 +40,9 @@ export default async function PostPage({ params }: PageProps) {
     notFound();
   }
 
+  // 포스트를 가져온 후 댓글을 가져옵니다
+  const initialComments = await getComments(post.documentId);
+
   return (
     <PageLayout customPadding="pt-8 pb-36 sm:pt-12 sm:pb-36 lg:pt-20 lg:pb-52">
       <article>
@@ -61,7 +64,7 @@ export default async function PostPage({ params }: PageProps) {
           next={adjacentPosts.next} 
         />
         
-        <CommentSection blogId={post.documentId} />
+        <CommentSection blogId={post.documentId} initialComments={initialComments} />
       </article>
     </PageLayout>
   );
