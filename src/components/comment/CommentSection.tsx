@@ -47,7 +47,7 @@ export default function CommentSection({
 
   if (isLoading) {
     return (
-      <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+      <div className="pt-8">
         <div className="text-center text-gray-500 dark:text-gray-400">
           댓글을 불러오는 중...
         </div>
@@ -57,7 +57,7 @@ export default function CommentSection({
 
   if (error) {
     return (
-      <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+      <div className="pt-8">
         <div className="text-center text-red-500 dark:text-red-400">
           {error}
         </div>
