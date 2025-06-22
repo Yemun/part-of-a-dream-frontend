@@ -1,4 +1,4 @@
-import { getBlogPost, getAdjacentPosts, getComments } from "@/lib/strapi";
+import { getPostWithDetails } from "@/lib/strapi";
 import { notFound } from "next/navigation";
 import MarkdownRenderer from "@/components/post/MarkdownRenderer";
 import RelativeTime from "@/components/common/RelativeTime";
@@ -30,17 +30,13 @@ interface PageProps {
 
 export default async function PostPage({ params }: PageProps) {
   const { id } = await params;
-  const [post, adjacentPosts] = await Promise.all([
-    getBlogPost(id),
-    getAdjacentPosts(id),
-  ]);
+  
+  // 단일 API 호출로 모든 데이터 가져오기 (3개 → 1개 API 호출)
+  const { post, adjacentPosts, comments: initialComments } = await getPostWithDetails(id);
 
   if (!post) {
     notFound();
   }
-
-  // 포스트를 가져온 후 댓글을 가져옵니다
-  const initialComments = await getComments(post.documentId);
 
   return (
     <article>

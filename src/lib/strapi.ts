@@ -1,5 +1,22 @@
 import axios from "axios";
 
+// 간단한 메모리 캐시 (서버 사이드 렌더링용)
+const cache = new Map<string, { data: unknown; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5분 캐시
+
+const getCached = <T>(key: string): T | null => {
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data as T;
+  }
+  cache.delete(key);
+  return null;
+};
+
+const setCache = <T>(key: string, data: T): void => {
+  cache.set(key, { data: data as unknown, timestamp: Date.now() });
+};
+
 const strapi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337",
   timeout: 30000, // 30초 타임아웃으로 증가
@@ -66,11 +83,19 @@ export interface StrapiResponse<T> {
 }
 
 export const getBlogPosts = async (): Promise<BlogPost[]> => {
+  const cacheKey = "blog-posts";
+  const cached = getCached<BlogPost[]>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   try {
     const response = await strapi.get<StrapiResponse<BlogPost[]>>(
       "/api/blogs?populate=*"
     );
-    return response.data.data;
+    const posts = response.data.data;
+    setCache(cacheKey, posts);
+    return posts;
   } catch (error) {
     console.error("Error fetching blog posts:", error);
     return [];
@@ -86,6 +111,62 @@ export const getBlogPost = async (slug: string): Promise<BlogPost | null> => {
   } catch (error) {
     console.error("Error fetching blog post:", error);
     return null;
+  }
+};
+
+// 통합 API 호출로 포스트, 인접 포스트, 코멘트를 한 번에 가져오기
+export const getPostWithDetails = async (
+  slug: string
+): Promise<{
+  post: BlogPost | null;
+  adjacentPosts: { previous: BlogPost | null; next: BlogPost | null };
+  comments: Comment[];
+}> => {
+  const cacheKey = `post-details-${slug}`;
+  const cached = getCached<{
+    post: BlogPost | null;
+    adjacentPosts: { previous: BlogPost | null; next: BlogPost | null };
+    comments: Comment[];
+  }>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  try {
+    // 포스트 데이터와 모든 포스트 목록을 병렬로 가져오기
+    const [postResponse, allPostsResponse] = await Promise.all([
+      strapi.get<StrapiResponse<BlogPost[]>>(
+        `/api/blogs?filters[slug]=${slug}&populate[comments][filters][approved][$eq]=true&populate[comments][sort][0]=createdAt:desc`
+      ),
+      strapi.get<StrapiResponse<BlogPost[]>>(
+        "/api/blogs?fields[0]=id&fields[1]=slug&fields[2]=title&fields[3]=publishedAt&sort[0]=publishedAt:desc"
+      ),
+    ]);
+
+    const post = postResponse.data.data[0] || null;
+    const allPosts = allPostsResponse.data.data;
+
+    if (!post) {
+      const result = { post: null, adjacentPosts: { previous: null, next: null }, comments: [] };
+      setCache(cacheKey, result);
+      return result;
+    }
+
+    // 인접 포스트 찾기
+    const currentIndex = allPosts.findIndex((p) => p.slug === slug);
+    const adjacentPosts = {
+      previous: currentIndex > 0 ? allPosts[currentIndex - 1] : null,
+      next: currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null,
+    };
+
+    const comments = post.comments || [];
+    const result = { post, adjacentPosts, comments };
+    setCache(cacheKey, result);
+
+    return result;
+  } catch (error) {
+    console.error("Error fetching post with details:", error);
+    return { post: null, adjacentPosts: { previous: null, next: null }, comments: [] };
   }
 };
 
