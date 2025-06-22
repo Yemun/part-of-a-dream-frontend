@@ -1,6 +1,5 @@
 import { getBlogPost, getAdjacentPosts, getComments } from "@/lib/strapi";
 import { notFound } from "next/navigation";
-import PageLayout from "@/components/layout/PageLayout";
 import MarkdownRenderer from "@/components/post/MarkdownRenderer";
 import RelativeTime from "@/components/common/RelativeTime";
 import PostNavigation from "@/components/post/PostNavigation";
@@ -44,31 +43,29 @@ export default async function PostPage({ params }: PageProps) {
   const initialComments = await getComments(post.documentId);
 
   return (
-    <PageLayout>
-      <article>
-        <header className="mb-14 sm:mb-18">
-          <h1 className="font-bold text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-4 sm:mb-4">
-            {post.title}
-          </h1>
-          <div className="font-normal text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-5 sm:leading-6">
-            <time dateTime={post.publishedAt}>
-              <RelativeTime dateString={post.publishedAt} absolute />
-            </time>
-          </div>
-        </header>
+    <article>
+      <header className="mb-10 sm:mb-14">
+        <h1 className="font-bold text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-4 sm:mb-4">
+          {post.title}
+        </h1>
+        <div className="font-normal text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-5 sm:leading-6">
+          <time dateTime={post.publishedAt}>
+            <RelativeTime dateString={post.publishedAt} absolute />
+          </time>
+        </div>
+      </header>
 
-        <MarkdownRenderer content={post.content} />
+      <MarkdownRenderer content={post.content} />
 
-        <PostNavigation
-          previous={adjacentPosts.previous}
-          next={adjacentPosts.next}
-        />
+      <PostNavigation
+        previous={adjacentPosts.previous}
+        next={adjacentPosts.next}
+      />
 
-        <CommentSection
-          blogId={post.documentId}
-          initialComments={initialComments}
-        />
-      </article>
-    </PageLayout>
+      <CommentSection
+        blogId={post.documentId}
+        initialComments={initialComments}
+      />
+    </article>
   );
 }

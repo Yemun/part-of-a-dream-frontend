@@ -13,11 +13,11 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
   if (!post) {
     return (
       <div className="flex-1 min-w-[128px]" style={{ opacity }}>
-        <div className="border-[0.5px] outline-[0.5px] flex flex-col">
+        <div className="border-b border-r flex flex-col">
           <div className="border-b flex justify-center leading-7 text-sm font-semibold text-stroke-effect dot-pattern">
             {text || "-"}
           </div>
-          <div className="flex justify-center items-center py-3">
+          <div className="flex justify-center items-center py-4 sm:py-3">
             <div className="w-[106px] h-[106px]"></div>
           </div>
         </div>
@@ -28,11 +28,11 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
   // Post 모드 (post가 있는 경우)
   return (
     <div className="flex-1 min-w-[128px]">
-      <div className="border-[0.5px] outline-[0.5px] flex flex-col">
+      <div className="border-b border-r flex flex-col">
         <div className="border-b flex justify-center leading-7 text-sm font-semibold text-stroke-effect dot-pattern">
           <RelativeTime dateString={post.publishedAt} />
         </div>
-        <div className="flex justify-center items-center py-3">
+        <div className="flex justify-center items-center py-4 sm:py-3">
           <Link
             href={`/posts/${post.slug}`}
             className="w-[106px] h-[106px] rounded-full border border-red-500 dark:border-red-400 block"

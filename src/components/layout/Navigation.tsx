@@ -11,7 +11,7 @@ export default function Navigation() {
       <div className="flex flex-row items-center justify-between w-full">
         <Link
           href="/"
-          className={`text-sm sm:text-base leading-5 sm:leading-6 hover:opacity-80 transition-opacity ${
+          className={`text-sm sm:text-base leading-5 sm:leading-6 hover:text-blue-700 transition-colors ${
             pathname === "/" || pathname.startsWith("/posts/")
               ? "font-semibold underline"
               : "font-normal"
@@ -21,7 +21,7 @@ export default function Navigation() {
         </Link>
         <Link
           href="/profile"
-          className={`text-sm sm:text-base leading-5 sm:leading-6 hover:opacity-80 transition-opacity ${
+          className={`text-sm sm:text-base leading-5 sm:leading-6 hover:text-blue-700 transition-colors ${
             pathname === "/profile" ? "font-semibold underline" : "font-normal"
           } `}
         >

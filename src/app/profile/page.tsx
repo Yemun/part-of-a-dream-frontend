@@ -1,5 +1,4 @@
 import { getProfile } from "@/lib/strapi";
-import PageLayout from "@/components/layout/PageLayout";
 import MarkdownRenderer from "@/components/post/MarkdownRenderer";
 
 export const revalidate = 604800; // 1주일(7일)마다 재생성
@@ -8,7 +7,7 @@ export default async function Profile() {
   const profile = await getProfile();
 
   return (
-    <PageLayout>
+    <>
       {profile ? (
         <section>
           <div className="mb-6 sm:mb-8">
@@ -113,6 +112,6 @@ export default async function Profile() {
           </p>
         </div>
       )}
-    </PageLayout>
+    </>
   );
 }
