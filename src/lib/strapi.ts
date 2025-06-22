@@ -128,23 +128,37 @@ export const getProfile = async (): Promise<Profile | null> => {
   }
 };
 
-export const getComments = async (blogId: string): Promise<Comment[]> => {
+export const getCommentsCount = async (blogId: string): Promise<number> => {
   try {
-    // Simple populate with client-side filtering for reliability
+    // Lightweight API call to check comment count without fetching full data
     const response = await strapi.get<{ data: BlogPost }>(
-      `/api/blogs/${blogId}?populate=comments`
+      `/api/blogs/${blogId}?fields[0]=id&populate[comments][fields][0]=id&populate[comments][filters][approved][$eq]=true`
     );
 
     const blog = response.data.data;
-    const comments = blog?.comments || [];
+    return blog?.comments?.length || 0;
+  } catch (error) {
+    console.error("Error fetching comments count:", error);
+    return 0;
+  }
+};
 
-    // Filter and sort on client side for now
-    return comments
-      .filter((comment) => comment.approved === true)
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+export const getComments = async (blogId: string): Promise<Comment[]> => {
+  try {
+    // First check if there are any comments to avoid unnecessary data fetching
+    const commentCount = await getCommentsCount(blogId);
+    
+    if (commentCount === 0) {
+      return [];
+    }
+
+    // Only fetch full comment data if comments exist
+    const response = await strapi.get<{ data: BlogPost }>(
+      `/api/blogs/${blogId}?populate[comments][filters][approved][$eq]=true&populate[comments][sort][0]=createdAt:desc`
+    );
+
+    const blog = response.data.data;
+    return blog?.comments || [];
   } catch (error) {
     console.error("Error fetching comments:", error);
     return [];
