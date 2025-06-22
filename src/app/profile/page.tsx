@@ -49,7 +49,7 @@ export default async function Profile() {
                   <div className="space-y-1">
                     {profile.contact.email && (
                       <p>
-                        이메일 :{" "}
+                        이메일 -{" "}
                         <a
                           href={`mailto:${profile.contact.email}`}
                           className="dark:text-blue-400 underline"
@@ -58,11 +58,11 @@ export default async function Profile() {
                         </a>
                       </p>
                     )}
-                    {profile.contact.intagram && (
+                    {profile.contact.instagram && (
                       <p>
-                        Instagram :{" "}
+                        Instagram -{" "}
                         <a
-                          href={profile.contact.linkedin}
+                          href={profile.contact.instagram}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="underline"
@@ -73,7 +73,7 @@ export default async function Profile() {
                     )}
                     {profile.contact.linkedin && (
                       <p>
-                        LinkedIn :{" "}
+                        LinkedIn -{" "}
                         <a
                           href={profile.contact.linkedin}
                           target="_blank"
@@ -86,7 +86,7 @@ export default async function Profile() {
                     )}
                     {profile.contact.github && (
                       <p>
-                        GitHub :{" "}
+                        GitHub -{" "}
                         <a
                           href={profile.contact.github}
                           target="_blank"

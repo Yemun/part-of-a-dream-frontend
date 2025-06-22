@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className="antialiased">
         <div className="min-h-screen">
           <div className="flex flex-col items-center min-h-screen">
-            <div className="flex flex-col gap-12 sm:gap-20 items-center justify-start px-4 sm:px-8 lg:px-16 py-8 sm:py-12 lg:py-20 w-full">
+            <div className="flex flex-col gap-12 sm:gap-20 items-center justify-start px-4 sm:px-8 lg:px-16 pt-8 pb-22 sm:pt-12 sm:pb-24 lg:pt-20 lg:pb-26 w-full">
               <Navigation />
               <div className="max-w-4xl w-full">{children}</div>
             </div>
