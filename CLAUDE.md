@@ -45,13 +45,13 @@ The application uses a hybrid server/client architecture for optimal performance
 - **Client Components**: Comment interactions, forms, and dynamic UI elements
 - **Hybrid Approach**: Combines SSR performance with client-side interactivity
 
-### Key API Integration
+#### Key API Integration
 
 - **Blog Posts**: `GET /api/blogs?populate=*` - Fetches all published posts
 - **Individual Post**: `GET /api/blogs?filters[slug]=${slug}&populate=*` - Fetches post by slug
 - **Profile**: `GET /api/profile?populate=*` - Fetches profile information
 - **Comments**: `GET /api/blogs/${blogId}?populate=comments` - Fetches comments via Blog relation
-- **API Timeout**: 10-second timeout configured for all requests
+- **API Timeout**: 30-second timeout configured for all requests
 - **Content Types**: Blog posts, Profile, and Comments with lowercase field names
 
 ## TypeScript Interfaces
@@ -112,14 +112,34 @@ Strapi API functions are exported from `src/lib/strapi.ts`:
 - `getComments(blogId)`: Fetches comments via Blog's comments relation
 - `createComment()`, `updateComment()`, `deleteComment()`: Comment CRUD operations
 
+## Component Architecture
+
+Components are organized by feature for better maintainability:
+
+```
+src/components/
+├── layout/           # Page layout and navigation
+├── post/             # Blog post related components (PostCard, MarkdownRenderer, PostNavigation)
+├── comment/          # Comment system (CommentForm, CommentList, CommentSection)
+├── common/           # Shared utilities (RelativeTime with absolute/relative options)
+└── ui/               # Base UI components (Button, Input, Textarea) with shared formStyles
+```
+
+### Key Components
+
+- **PostCard**: Unified component handling both blog posts (with SVG circular text) and placeholder states
+- **RelativeTime**: Supports both relative ("2일 전") and absolute ("6월 22일 금요일") time display
+- **Form Components**: Shared styling via `formStyles.ts` utility with consistent focus states
+
 ## Design System
 
 - **Typography**: Pretendard Variable font for Korean text optimization
 - **Styling**: Tailwind CSS v4 with mobile-first responsive design and OKLCH color system
 - **Components**: React functional components with TypeScript
 - **Content Rendering**: react-markdown for markdown content with custom styling
-- **UI Components**: Reusable components in `src/components/ui/` (Button, Input, Textarea)
+- **UI Components**: Reusable components with shared styling utilities
 - **Dark Mode**: Full dark mode support with CSS variables and automatic system detection
+- **Patterns**: Dot-pattern backgrounds (`.dot-pattern` class) with light/dark mode variants
 
 ## Routing Strategy
 
@@ -129,7 +149,7 @@ Strapi API functions are exported from `src/lib/strapi.ts`:
 
 ## Localization Features
 
-- **Date Formatting**: Korean format (M월 D일) using custom `formatKoreanDate` function
+- **Date Formatting**: Korean format with RelativeTime component supporting both relative and absolute formats
 - **Content**: Korean language interface and content
 - **Font Optimization**: Pretendard for optimal Korean character rendering
 
@@ -177,7 +197,7 @@ This project uses Next.js 15 which has breaking changes:
 - **Static Generation**: Homepage and blog posts use static generation with ISR
 - **Server-side Data Fetching**: Comments and posts fetched server-side for immediate display
 - **Parallel Data Loading**: Posts and comments fetched concurrently using Promise.all
-- **API Optimization**: 10-second timeout prevents hanging requests
+- **API Optimization**: 30-second timeout prevents hanging requests
 - **Content Updates**: Strapi content changes appear within 5 minutes without manual deployment
 
 ## Deployment Script
@@ -224,17 +244,22 @@ Uses modern OKLCH color space for better color accuracy:
 :root {
   --background: oklch(100% 0 0);
   --foreground: oklch(15% 0 0);
-  --lv1-background: oklch(96% 0.004 247);
+  --dot-pattern: url("data:image/svg+xml,...")  /* Black dots for light mode */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: oklch(7% 0 0);
     --foreground: oklch(92% 0 0);
-    --lv1-background: oklch(21% 0.034 264.665);
+    --dot-pattern: url("data:image/svg+xml,...")  /* White dots for dark mode */
   }
 }
 ```
+
+### CSS Utilities
+
+- `.dot-pattern`: Applies repeating dot background pattern with automatic dark mode support
+- `.text-stroke-effect`: Adds text outline using background color for better readability
 
 ## Tailwind CSS v4
 
@@ -244,7 +269,24 @@ This project uses Tailwind CSS v4 with:
 - **CSS-first approach**: Styles defined directly in `globals.css` with CSS variables
 - **Typography plugin**: Custom prose styles for markdown content
 
-## URL Handling
+## Development Guidelines
 
-- **External Links**: LinkedIn and GitHub URLs are automatically prefixed with `https://` if missing to prevent 404 errors
-- **Utility Function**: `ensureAbsoluteUrl()` in page components handles relative URL conversion
+### Form Components
+
+When creating or modifying form inputs, use the shared `getFormFieldClasses()` utility from `src/components/ui/formStyles.ts` to ensure consistent styling across Input and Textarea components. This utility handles:
+- Base form field styling with proper focus states
+- Error state styling
+- Dark mode compatibility
+- Consistent outline behavior in Tailwind CSS v4
+
+### Time Display
+
+Use `RelativeTime` component with the `absolute` prop for post detail pages:
+```tsx
+<RelativeTime dateString={post.publishedAt} absolute />  // "6월 22일 금요일"
+<RelativeTime dateString={post.publishedAt} />          // "2일 전"
+```
+
+### Component Organization
+
+When adding new components, follow the feature-based directory structure. Place components in the appropriate subdirectory based on their primary function rather than creating flat component structures.

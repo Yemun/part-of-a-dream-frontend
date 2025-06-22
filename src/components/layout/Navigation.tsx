@@ -7,7 +7,7 @@ export default function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="w-full">
+    <nav className="w-full max-w-5xl">
       <div className="flex flex-row items-center justify-between w-full">
         <Link
           href="/"
