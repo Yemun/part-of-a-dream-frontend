@@ -51,8 +51,8 @@ export default function CommentForm({
   };
 
   return (
-    <div className="mt-8 p-6 bg-slate-50 dark:bg-gray-900 rounded-lg">
-      <h3 className="text-lg font-semibold mb-4 dark:text-white">
+    <div className="mt-8 p-6 rounded-lg border border-gray-300 dot-pattern">
+      <h3 className="text-lg font-semibold mb-4 text-stroke-effect dark:text-white">
         댓글 남기기
       </h3>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -60,7 +60,7 @@ export default function CommentForm({
           <Input
             type="text"
             id="author"
-            label="닉네임"
+            // label="닉네임"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
             placeholder="닉네임을 입력하세요"
@@ -69,7 +69,7 @@ export default function CommentForm({
           <Input
             type="email"
             id="email"
-            label="이메일"
+            // label="이메일"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="이메일을 입력하세요"
@@ -78,7 +78,7 @@ export default function CommentForm({
         </div>
         <Textarea
           id="content"
-          label="댓글"
+          // label="댓글"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={4}

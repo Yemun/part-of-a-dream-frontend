@@ -1,4 +1,5 @@
 import React from "react";
+import { getFormFieldClasses } from "./formStyles";
 
 interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -13,12 +14,7 @@ export default function Textarea({
   id,
   ...props
 }: TextareaProps) {
-  const baseClasses =
-    "w-full px-3 py-2 border bg-white border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical dark:bg-slate-800 dark:border-slate-600 dark:text-white placeholder-slate-400 dark:placeholder-slate-600";
-  const errorClasses = error
-    ? "border-red-300 focus:ring-red-500 dark:border-red-500"
-    : "";
-  const classes = `${baseClasses} ${errorClasses} ${className}`;
+  const classes = getFormFieldClasses(error, `resize-vertical ${className}`);
 
   return (
     <div>

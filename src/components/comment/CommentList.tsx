@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Comment, updateComment, deleteComment } from "@/lib/strapi";
-import RelativeTime from "./RelativeTime";
+import RelativeTime from "@/components/common/RelativeTime";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
@@ -120,11 +120,11 @@ export default function CommentList({
         className="fixed inset-0 flex items-center justify-center z-50 bg-black/50"
         onClick={handleBackdropClick}
       >
-        <div className="bg-white dark:bg-slate-800 rounded-lg p-6 w-96 max-w-[90%]">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-[90%]">
           <h3 className="text-lg font-semibold mb-2 dark:text-white">
             {showAuthModal.action === "edit" ? "댓글 수정" : "댓글 삭제"}
           </h3>
-          <p className="text-slate-600 dark:text-slate-300 mb-4">
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
             작성 시 사용한 이메일을 입력해주세요.
           </p>
           <Input
@@ -169,7 +169,7 @@ export default function CommentList({
         <h3 className="text-lg font-semibold mb-4 dark:text-white">
           댓글 ({comments.length})
         </h3>
-        <p className="text-slate-500 dark:text-slate-400 text-center py-12 sm:py-20">
+        <p className="text-gray-500 dark:text-gray-400 text-center py-12 sm:py-20">
           아직 댓글이 없습니다. 첫 번째 댓글을 남겨보세요!
         </p>
       </div>
@@ -186,15 +186,15 @@ export default function CommentList({
           {comments.map((comment) => (
             <div
               key={comment.id}
-              className="border-b border-slate-200 dark:border-slate-700 pb-6 last:border-b-0"
+              className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-slate-900 dark:text-white">
+                <span className="font-medium text-gray-900 dark:text-white">
                   {comment.author}
                 </span>
                 <RelativeTime
                   dateString={comment.createdAt}
-                  className="text-sm text-slate-500 dark:text-slate-400"
+                  className="text-sm text-gray-500 dark:text-gray-400"
                 />
               </div>
               <div>
@@ -242,10 +242,10 @@ export default function CommentList({
                   </div>
                 ) : (
                   <div>
-                    <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
+                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
                       {comment.content}
                     </p>
-                    <div className="flex space-x-1 text-sm text-slate-600 dark:text-slate-400 mt-2">
+                    <div className="flex space-x-1 text-sm text-gray-600 dark:text-gray-400 mt-2">
                       <button
                         onClick={() =>
                           setShowAuthModal({
@@ -258,7 +258,7 @@ export default function CommentList({
                       >
                         수정
                       </button>
-                      <span className="text-slate-300 dark:text-slate-600">
+                      <span className="text-gray-300 dark:text-gray-600">
                         |
                       </span>
                       <button

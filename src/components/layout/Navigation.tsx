@@ -12,8 +12,10 @@ export default function Navigation() {
         <Link
           href="/"
           className={`text-sm sm:text-base leading-5 sm:leading-6 hover:opacity-80 transition-opacity ${
-            pathname === "/" || pathname.startsWith("/posts/") ? "font-semibold underline" : "font-normal"
-          } text-slate-950 dark:text-white`}
+            pathname === "/" || pathname.startsWith("/posts/")
+              ? "font-semibold underline"
+              : "font-normal"
+          } `}
         >
           <p className="whitespace-pre">블로그</p>
         </Link>
@@ -21,7 +23,7 @@ export default function Navigation() {
           href="/profile"
           className={`text-sm sm:text-base leading-5 sm:leading-6 hover:opacity-80 transition-opacity ${
             pathname === "/profile" ? "font-semibold underline" : "font-normal"
-          } text-slate-950 dark:text-white`}
+          } `}
         >
           <p className="whitespace-pre">프로필</p>
         </Link>

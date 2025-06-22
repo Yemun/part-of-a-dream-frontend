@@ -2,22 +2,25 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getComments, Comment } from "@/lib/strapi";
-import CommentList from "./CommentList";
-import CommentForm from "./CommentForm";
+import CommentList from "@/components/comment/CommentList";
+import CommentForm from "@/components/comment/CommentForm";
 
 interface CommentSectionProps {
   blogId: string;
   initialComments?: Comment[];
 }
 
-export default function CommentSection({ blogId, initialComments = [] }: CommentSectionProps) {
+export default function CommentSection({
+  blogId,
+  initialComments = [],
+}: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [isLoading, setIsLoading] = useState(false); // 초기 댓글이 있으면 로딩하지 않음
   const [error, setError] = useState<string | null>(null);
 
   const fetchComments = useCallback(async () => {
     if (!blogId) return;
-    
+
     try {
       setError(null);
       setIsLoading(true);
@@ -44,17 +47,21 @@ export default function CommentSection({ blogId, initialComments = [] }: Comment
 
   if (isLoading) {
     return (
-      <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
-        <div className="text-center text-slate-500 dark:text-slate-400">댓글을 불러오는 중...</div>
+      <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+        <div className="text-center text-gray-500 dark:text-gray-400">
+          댓글을 불러오는 중...
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
-        <div className="text-center text-red-500 dark:text-red-400">{error}</div>
-        <button 
+      <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+        <div className="text-center text-red-500 dark:text-red-400">
+          {error}
+        </div>
+        <button
           onClick={() => {
             setIsLoading(true);
             setError(null);
@@ -69,7 +76,7 @@ export default function CommentSection({ blogId, initialComments = [] }: Comment
   }
 
   return (
-    <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
+    <div className="pt-8">
       <CommentList comments={comments} onCommentUpdated={handleCommentAdded} />
       <CommentForm blogId={blogId} onCommentAdded={handleCommentAdded} />
     </div>

@@ -6,7 +6,7 @@ const markdownComponents: any = {
     <span className="block">
       <img src={src} alt={alt} />
       {alt && (
-        <span className="block text-sm sm:text-base text-slate-500 dark:text-slate-400 italic mt-2 sm:mt-3 mb-8 sm:mb-12 text-center">
+        <span className="block text-sm sm:text-base text-gray-500 dark:text-gray-400 italic mt-2 sm:mt-3 mb-8 sm:mb-12 text-center">
           {alt}
         </span>
       )}
@@ -21,7 +21,7 @@ interface MarkdownRendererProps {
 
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
-    <div className="prose prose-slate dark:prose-invert max-w-none">
+    <div className="prose prose-gray dark:prose-invert max-w-none">
       <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>
     </div>
   );

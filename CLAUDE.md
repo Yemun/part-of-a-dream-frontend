@@ -32,18 +32,26 @@ NEXT_PUBLIC_STRAPI_URL=https://appealing-badge-1cb5ca360d.strapiapp.com
 
 ## Architecture & Data Flow
 
-The application fetches blog content from Strapi Cloud via REST API:
+The application uses a hybrid server/client architecture for optimal performance:
 
 1. **Strapi Cloud Backend**: Content management and API endpoints
-2. **Next.js Frontend**: Static generation with server-side rendering
-3. **Deployment**: Vercel hosting with automatic deployments
+2. **Next.js Server Components**: Initial data fetching and SSR
+3. **Client Components**: Interactive features (comments, forms)
+4. **Deployment**: Vercel hosting with automatic deployments
+
+### Rendering Strategy
+
+- **Server Components**: Posts, profile, and initial comment data are fetched server-side
+- **Client Components**: Comment interactions, forms, and dynamic UI elements
+- **Hybrid Approach**: Combines SSR performance with client-side interactivity
 
 ### Key API Integration
 
 - **Blog Posts**: `GET /api/blogs?populate=*` - Fetches all published posts
 - **Individual Post**: `GET /api/blogs?filters[slug]=${slug}&populate=*` - Fetches post by slug
 - **Profile**: `GET /api/profile?populate=*` - Fetches profile information
-- **Comments**: `GET /api/blogs/${blogId}?populate[comments]...` - Fetches comments via Blog relation for better performance
+- **Comments**: `GET /api/blogs/${blogId}?populate=comments` - Fetches comments via Blog relation
+- **API Timeout**: 10-second timeout configured for all requests
 - **Content Types**: Blog posts, Profile, and Comments with lowercase field names
 
 ## TypeScript Interfaces
@@ -160,11 +168,16 @@ This project uses Next.js 15 which has breaking changes:
 3. **Content Not Displaying**: Check Strapi Cloud API permissions for public access to Blog content type
 4. **Korean Font Issues**: Pretendard font is loaded via CDN in globals.css
 5. **Next.js 15 Params**: Remember to await params in dynamic routes
+6. **Comment Loading Issues**: Comments are fetched via Blog relation - ensure Blog populate includes comments
+7. **Slow Performance**: Use server components for initial data fetching, client components only for interactions
 
 ## Performance & Caching
 
 - **ISR (Incremental Static Regeneration)**: Pages revalidate every 5 minutes (300 seconds)
 - **Static Generation**: Homepage and blog posts use static generation with ISR
+- **Server-side Data Fetching**: Comments and posts fetched server-side for immediate display
+- **Parallel Data Loading**: Posts and comments fetched concurrently using Promise.all
+- **API Optimization**: 10-second timeout prevents hanging requests
 - **Content Updates**: Strapi content changes appear within 5 minutes without manual deployment
 
 ## Deployment Script
@@ -183,13 +196,25 @@ Always run these commands before committing:
 
 ## Comment System
 
-The blog includes a comprehensive comment system with:
+The blog includes a comprehensive comment system with hybrid rendering:
 
+- **Server-side Initial Load**: Comments are fetched server-side for immediate display
+- **Client-side Interactions**: Forms, modals, and real-time updates handled client-side
 - **Email-based Authentication**: Users can edit/delete their own comments using email verification
 - **CRUD Operations**: Full create, read, update, delete functionality
-- **Server-side Filtering**: Comments are fetched via Blog entity relations for optimal performance
+- **Performance Optimization**: Initial comments passed as props to avoid client-side loading
 - **Modal UI**: Email verification modal for comment modifications
-- **Real-time Updates**: Comments refresh automatically after operations
+- **Error Handling**: Retry functionality and clear error states
+
+### Comment Architecture
+
+```typescript
+// Server Component (PostPage)
+const initialComments = await getComments(post.documentId);
+
+// Client Component (CommentSection)
+<CommentSection blogId={post.documentId} initialComments={initialComments} />
+```
 
 ## Color System
 

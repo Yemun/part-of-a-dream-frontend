@@ -5,7 +5,7 @@
 :root {
   --background: oklch(100% 0 0);
   --foreground: oklch(15% 0 0);
-  --lv1-background: oklch(96% 0.004 247);
+  --dot-pattern: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='0.5' cy='0.5' r='0.5' fill='black'/%3E%3Ccircle cx='3.5' cy='3.5' r='0.5' fill='black'/%3E%3C/svg%3E");
 }
 
 @theme inline {
@@ -16,8 +16,8 @@
 
 /* Custom prose styles */
 .prose img {
-  @apply rounded-2xl mb-2 w-full max-h-[50vh] object-contain mx-auto;
-  background-color: var(--lv1-background);
+  @apply rounded-2xl border border-gray-300 mb-2 w-full max-h-[50vh] object-contain mx-auto;
+  background-image: var(--dot-pattern);
 }
 
 @media (min-width: 640px) {
@@ -27,45 +27,44 @@
 }
 
 .prose p {
-  @apply mb-4 leading-8 text-base whitespace-pre-wrap;
+  @apply mb-8 leading-8 text-base whitespace-pre-wrap;
 }
 
 @media (min-width: 640px) {
   .prose p {
-    @apply mb-5 text-lg;
+    @apply leading-9 mb-10 text-lg;
   }
 }
 
 .prose ul {
-  @apply mb-4 space-y-2 text-base pl-6;
+  @apply mb-6 space-y-2 text-base pl-6;
 }
 
 @media (min-width: 640px) {
   .prose ul {
-    @apply mb-5 text-lg;
+    @apply mb-8 text-lg;
   }
 }
 
 .prose ol {
-  @apply mb-4 space-y-2 text-base pl-6;
+  @apply mb-6 space-y-2 text-base pl-6;
 }
 
 @media (min-width: 640px) {
   .prose ol {
-    @apply mb-5 text-lg;
+    @apply mb-8 text-lg;
   }
 }
 
 .prose pre {
-  @apply rounded-2xl;
-  /* background-color: var(--lv1-background); */
+  @apply rounded-2xl bg-gray-950 border border-gray-200;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: oklch(7% 0 0);
     --foreground: oklch(92% 0 0);
-    --lv1-background: oklch(21% 0.034 264.665);
+    --dot-pattern: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='0.5' cy='0.5' r='0.5' fill='white'/%3E%3Ccircle cx='3.5' cy='3.5' r='0.5' fill='white'/%3E%3C/svg%3E");
   }
 }
 
@@ -76,4 +75,15 @@ body {
     BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
     "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+.dot-pattern {
+  background-image: var(--dot-pattern);
+  background-repeat: repeat;
+  background-size: 6px 6px;
+}
+
+.text-stroke-effect {
+  text-shadow: -1px -1px 0 var(--background), 1px -1px 0 var(--background),
+    -1px 1px 0 var(--background), 1px 1px 0 var(--background);
 }
