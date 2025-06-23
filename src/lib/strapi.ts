@@ -102,18 +102,6 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
   }
 };
 
-export const getBlogPost = async (slug: string): Promise<BlogPost | null> => {
-  try {
-    const response = await strapi.get<StrapiResponse<BlogPost[]>>(
-      `/api/blogs?filters[slug]=${slug}&populate=*`
-    );
-    return response.data.data[0] || null;
-  } catch (error) {
-    console.error("Error fetching blog post:", error);
-    return null;
-  }
-};
-
 // 통합 API 호출로 포스트, 인접 포스트, 코멘트를 한 번에 가져오기
 export const getPostWithDetails = async (
   slug: string
@@ -170,33 +158,6 @@ export const getPostWithDetails = async (
   }
 };
 
-export const getAdjacentPosts = async (
-  currentSlug: string
-): Promise<{ previous: BlogPost | null; next: BlogPost | null }> => {
-  try {
-    const posts = await getBlogPosts();
-    const sortedPosts = posts.sort(
-      (a, b) =>
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-    );
-
-    const currentIndex = sortedPosts.findIndex(
-      (post) => post.slug === currentSlug
-    );
-
-    return {
-      previous: currentIndex > 0 ? sortedPosts[currentIndex - 1] : null,
-      next:
-        currentIndex < sortedPosts.length - 1
-          ? sortedPosts[currentIndex + 1]
-          : null,
-    };
-  } catch (error) {
-    console.error("Error fetching adjacent posts:", error);
-    return { previous: null, next: null };
-  }
-};
-
 export const getProfile = async (): Promise<Profile | null> => {
   try {
     const response = await strapi.get<{ data: Profile }>(
@@ -209,31 +170,9 @@ export const getProfile = async (): Promise<Profile | null> => {
   }
 };
 
-export const getCommentsCount = async (blogId: string): Promise<number> => {
-  try {
-    // Lightweight API call to check comment count without fetching full data
-    const response = await strapi.get<{ data: BlogPost }>(
-      `/api/blogs/${blogId}?fields[0]=id&populate[comments][fields][0]=id&populate[comments][filters][approved][$eq]=true`
-    );
-
-    const blog = response.data.data;
-    return blog?.comments?.length || 0;
-  } catch (error) {
-    console.error("Error fetching comments count:", error);
-    return 0;
-  }
-};
-
 export const getComments = async (blogId: string): Promise<Comment[]> => {
   try {
-    // First check if there are any comments to avoid unnecessary data fetching
-    const commentCount = await getCommentsCount(blogId);
-    
-    if (commentCount === 0) {
-      return [];
-    }
-
-    // Only fetch full comment data if comments exist
+    // Fetch comments with server-side filtering and sorting
     const response = await strapi.get<{ data: BlogPost }>(
       `/api/blogs/${blogId}?populate[comments][filters][approved][$eq]=true&populate[comments][sort][0]=createdAt:desc`
     );
