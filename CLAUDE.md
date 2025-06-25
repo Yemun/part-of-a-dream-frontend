@@ -185,7 +185,7 @@ This project uses Next.js 15 which has breaking changes:
 
 1. **Build Errors on Vercel**: Ensure all dependencies are in package.json and committed to GitHub
 2. **API Connection**: Verify NEXT_PUBLIC_STRAPI_URL environment variable is set correctly
-3. **Content Not Displaying**: Check Strapi Cloud API permissions for public access to Blog content type
+3. **Content Not Displaying**: Check Strapi Cloud API permissions for access to Blog content type
 4. **Korean Font Issues**: Pretendard font is loaded via CDN in globals.css
 5. **Next.js 15 Params**: Remember to await params in dynamic routes
 6. **Comment Loading Issues**: Comments are fetched via Blog relation - ensure Blog populate includes comments
@@ -233,7 +233,7 @@ The blog includes a comprehensive comment system with hybrid rendering:
 const initialComments = await getComments(post.documentId);
 
 // Client Component (CommentSection)
-<CommentSection blogId={post.documentId} initialComments={initialComments} />
+<CommentSection blogId={post.documentId} initialComments={initialComments} />;
 ```
 
 ## Color System
@@ -244,14 +244,14 @@ Uses modern OKLCH color space for better color accuracy:
 :root {
   --background: oklch(100% 0 0);
   --foreground: oklch(15% 0 0);
-  --dot-pattern: url("data:image/svg+xml,...")  /* Black dots for light mode */
+  --dot-pattern: url("data:image/svg+xml,..."); /* Black dots for light mode */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: oklch(7% 0 0);
     --foreground: oklch(92% 0 0);
-    --dot-pattern: url("data:image/svg+xml,...")  /* White dots for dark mode */
+    --dot-pattern: url("data:image/svg+xml,..."); /* White dots for dark mode */
   }
 }
 ```
@@ -274,6 +274,7 @@ This project uses Tailwind CSS v4 with:
 ### Form Components
 
 When creating or modifying form inputs, use the shared `getFormFieldClasses()` utility from `src/components/ui/formStyles.ts` to ensure consistent styling across Input and Textarea components. This utility handles:
+
 - Base form field styling with proper focus states
 - Error state styling
 - Dark mode compatibility
@@ -282,6 +283,7 @@ When creating or modifying form inputs, use the shared `getFormFieldClasses()` u
 ### Time Display
 
 Use `RelativeTime` component with the `absolute` prop for post detail pages:
+
 ```tsx
 <RelativeTime dateString={post.publishedAt} absolute />  // "6월 22일 금요일"
 <RelativeTime dateString={post.publishedAt} />          // "2일 전"

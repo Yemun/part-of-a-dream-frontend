@@ -14,7 +14,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="border-t border-l radius-md flex items-start content-start self-stretch flex-wrap">
+    <div className="border-t border-l flex items-start content-start self-stretch flex-wrap">
       {posts
         .sort(
           (a, b) =>

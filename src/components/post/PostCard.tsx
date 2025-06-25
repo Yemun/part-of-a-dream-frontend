@@ -14,7 +14,7 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
     return (
       <div className="flex-1 min-w-[128px]" style={{ opacity }}>
         <div className="border-b border-r flex flex-col">
-          <div className="border-b flex justify-center leading-7 text-sm font-semibold text-stroke-effect dot-pattern">
+          <div className="border-b-[0.5px] flex justify-center leading-7 text-sm font-semibold text-stroke-effect dot-pattern">
             {text || "-"}
           </div>
           <div className="flex justify-center items-center py-4 sm:py-3">
@@ -29,7 +29,7 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
   return (
     <div className="flex-1 min-w-[128px]">
       <div className="border-b border-r flex flex-col">
-        <div className="border-b flex justify-center leading-7 text-sm font-semibold text-stroke-effect dot-pattern">
+        <div className="border-b-[0.5px] flex justify-center leading-7 text-sm font-semibold text-stroke-effect dot-pattern">
           <RelativeTime dateString={post.publishedAt} />
         </div>
         <div className="flex justify-center items-center py-4 sm:py-3">

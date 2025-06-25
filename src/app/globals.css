@@ -16,7 +16,7 @@
 
 /* Custom prose styles */
 .prose img {
-  @apply rounded-2xl border border-gray-300 mb-2 w-full max-h-[50vh] object-contain mx-auto;
+  @apply rounded-2xl border-[0.5px] border-black mb-2 w-full max-h-[50vh] object-contain dark:border-white mx-auto;
   background-image: var(--dot-pattern);
 }
 
@@ -57,7 +57,7 @@
 }
 
 .prose pre {
-  @apply rounded-2xl bg-gray-950 border border-gray-200;
+  @apply rounded-2xl bg-gray-950 border-[0.5px] border-white;
 }
 
 @media (prefers-color-scheme: dark) {
