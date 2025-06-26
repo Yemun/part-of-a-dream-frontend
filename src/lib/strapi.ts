@@ -1,4 +1,5 @@
 import axios from "axios";
+import { revalidatePostPages } from "./actions";
 
 // 간단한 메모리 캐시 (서버 사이드 렌더링용)
 const cache = new Map<string, { data: unknown; timestamp: number }>();
@@ -268,6 +269,9 @@ export const createComment = async (commentData: {
     cacheKeysToDelete.forEach(key => cache.delete(key));
     console.log("Invalidated cache keys:", cacheKeysToDelete);
     
+    // Next.js 캐시 재검증 - 모든 포스트 페이지와 홈페이지
+    await revalidatePostPages();
+    
     return createdComment;
   } catch (error) {
     console.error("Error creating comment:", error);
@@ -324,6 +328,9 @@ export const updateComment = async (
     }
     cacheKeysToDelete.forEach(key => cache.delete(key));
     
+    // Next.js 캐시 재검증
+    await revalidatePostPages();
+    
     return response.data.data;
   } catch (error) {
     console.error("Error updating comment:", error);
@@ -358,6 +365,9 @@ export const deleteComment = async (comment: Comment): Promise<boolean> => {
       }
     }
     cacheKeysToDelete.forEach(key => cache.delete(key));
+    
+    // Next.js 캐시 재검증
+    await revalidatePostPages();
     
     return true;
   } catch (error) {

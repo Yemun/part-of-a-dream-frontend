@@ -5,7 +5,7 @@ import RelativeTime from "@/components/common/RelativeTime";
 import PostNavigation from "@/components/post/PostNavigation";
 import CommentSection from "@/components/comment/CommentSection";
 
-export const revalidate = 60; // 1분마다 재생성 (댓글 업데이트를 위해)
+// On-demand revalidation으로 변경 - 댓글 CRUD 시에만 재생성
 
 // 정적 경로 생성 - 주요 포스트들을 미리 생성
 export async function generateStaticParams() {
