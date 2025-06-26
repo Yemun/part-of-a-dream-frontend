@@ -15,8 +15,9 @@ export default function CommentSection({
   initialComments = [],
 }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
-  const [isLoading, setIsLoading] = useState(false); // 초기 댓글이 있으면 로딩하지 않음
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [, setLastFetchTime] = useState<number>(Date.now());
 
   const fetchComments = useCallback(async () => {
     if (!blogId) return;
@@ -26,6 +27,8 @@ export default function CommentSection({
       setIsLoading(true);
       const fetchedComments = await getComments(blogId);
       setComments(fetchedComments);
+      setLastFetchTime(Date.now());
+      console.log(`Fetched ${fetchedComments.length} comments at ${new Date().toLocaleTimeString()}`);
     } catch (error) {
       console.error("댓글 로딩 실패:", error);
       setError("댓글을 불러오는 중 오류가 발생했습니다.");
@@ -34,12 +37,15 @@ export default function CommentSection({
     }
   }, [blogId]);
 
-  // 초기 댓글이 없을 때만 서버에서 가져옴
+  // 컴포넌트 마운트 시 항상 최신 댓글 확인 (SSR 데이터가 오래될 수 있음)
   useEffect(() => {
-    if (initialComments.length === 0) {
+    // 초기 댓글이 있어도 클라이언트에서 한번 더 확인
+    const timer = setTimeout(() => {
       fetchComments();
-    }
-  }, [fetchComments, initialComments.length]);
+    }, 100); // 짧은 지연으로 SSR 데이터를 먼저 보여준 후 업데이트
+    
+    return () => clearTimeout(timer);
+  }, [fetchComments]);
 
   const handleCommentAdded = useCallback(() => {
     fetchComments();

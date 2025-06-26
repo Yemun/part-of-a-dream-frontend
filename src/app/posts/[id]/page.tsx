@@ -5,7 +5,7 @@ import RelativeTime from "@/components/common/RelativeTime";
 import PostNavigation from "@/components/post/PostNavigation";
 import CommentSection from "@/components/comment/CommentSection";
 
-export const revalidate = 604800; // 1주일(7일)마다 재생성
+export const revalidate = 60; // 1분마다 재생성 (댓글 업데이트를 위해)
 
 // 정적 경로 생성 - 주요 포스트들을 미리 생성
 export async function generateStaticParams() {

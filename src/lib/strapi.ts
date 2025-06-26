@@ -121,10 +121,10 @@ export const getPostWithDetails = async (
   }
 
   try {
-    // 포스트 데이터와 모든 포스트 목록을 병렬로 가져오기
+    // 포스트 데이터와 모든 포스트 목록을 병렬로 가져오기 (안전한 방식)
     const [postResponse, allPostsResponse] = await Promise.all([
       strapi.get<StrapiResponse<BlogPost[]>>(
-        `/api/blogs?filters[slug]=${slug}&populate[comments][filters][approved][$eq]=true&populate[comments][sort][0]=createdAt:desc`
+        `/api/blogs?filters[slug]=${slug}&populate=comments`
       ),
       strapi.get<StrapiResponse<BlogPost[]>>(
         "/api/blogs?fields[0]=id&fields[1]=slug&fields[2]=title&fields[3]=publishedAt&sort[0]=publishedAt:desc"
@@ -147,7 +147,15 @@ export const getPostWithDetails = async (
       next: currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null,
     };
 
-    const comments = post.comments || [];
+    // 클라이언트 측에서 안전하게 댓글 처리
+    const rawComments = post.comments || [];
+    const comments = rawComments
+      .filter((comment) => comment.approved === true)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
     const result = { post, adjacentPosts, comments };
     setCache(cacheKey, result);
 
@@ -172,15 +180,38 @@ export const getProfile = async (): Promise<Profile | null> => {
 
 export const getComments = async (blogId: string): Promise<Comment[]> => {
   try {
-    // Fetch comments with server-side filtering and sorting
+    // 먼저 간단한 방식으로 시도
     const response = await strapi.get<{ data: BlogPost }>(
-      `/api/blogs/${blogId}?populate[comments][filters][approved][$eq]=true&populate[comments][sort][0]=createdAt:desc`
+      `/api/blogs/${blogId}?populate=comments`
     );
 
     const blog = response.data.data;
-    return blog?.comments || [];
+    const comments = blog?.comments || [];
+
+    // 클라이언트 측에서 필터링 및 정렬 (안전한 fallback)
+    return comments
+      .filter((comment) => comment.approved === true)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
   } catch (error) {
     console.error("Error fetching comments:", error);
+    
+    // 실패 시 더 간단한 방식으로 재시도
+    try {
+      const fallbackResponse = await strapi.get<{ data: BlogPost }>(
+        `/api/blogs/${blogId}`
+      );
+      
+      // 댓글 없이도 정상 응답이면 빈 배열 반환
+      if (fallbackResponse.data.data) {
+        return [];
+      }
+    } catch (fallbackError) {
+      console.error("Fallback request also failed:", fallbackError);
+    }
+    
     return [];
   }
 };
@@ -192,18 +223,57 @@ export const createComment = async (commentData: {
   blog: string;
 }): Promise<Comment | null> => {
   try {
-    const response = await strapi.post<{ data: Comment }>("/api/comments", {
-      data: {
-        author: commentData.author,
-        email: commentData.email,
-        content: commentData.content,
-        blog: commentData.blog,
-        approved: true,
-      },
-    });
-    return response.data.data;
+    console.log("Creating comment with data:", commentData);
+    
+    // 여러 방식으로 관계 설정 시도
+    let response;
+    try {
+      // 방법 1: documentId로 관계 설정
+      response = await strapi.post<{ data: Comment }>("/api/comments", {
+        data: {
+          author: commentData.author,
+          email: commentData.email,
+          content: commentData.content,
+          blog: {
+            connect: [commentData.blog]
+          },
+          approved: true,
+        },
+      });
+    } catch (connectError) {
+      console.log("Connect method failed, trying direct reference:", connectError);
+      
+      // 방법 2: 직접 참조
+      response = await strapi.post<{ data: Comment }>("/api/comments", {
+        data: {
+          author: commentData.author,
+          email: commentData.email,
+          content: commentData.content,
+          blog: commentData.blog,
+          approved: true,
+        },
+      });
+    }
+    
+    const createdComment = response.data.data;
+    console.log("Comment created successfully:", createdComment);
+    
+    // 캐시 무효화 - 관련된 캐시 키들을 삭제
+    const cacheKeysToDelete = [];
+    for (const [key] of cache) {
+      if (key.includes(`post-details-`) || key === 'blog-posts') {
+        cacheKeysToDelete.push(key);
+      }
+    }
+    cacheKeysToDelete.forEach(key => cache.delete(key));
+    console.log("Invalidated cache keys:", cacheKeysToDelete);
+    
+    return createdComment;
   } catch (error) {
     console.error("Error creating comment:", error);
+    if (error && typeof error === 'object' && 'response' in error) {
+      console.error("API response error:", (error as unknown as { response?: { data: unknown } }).response?.data);
+    }
     return null;
   }
 };
@@ -244,6 +314,16 @@ export const updateComment = async (
         throw error;
       }
     }
+    
+    // 캐시 무효화
+    const cacheKeysToDelete = [];
+    for (const [key] of cache) {
+      if (key.includes(`post-details-`) || key === 'blog-posts') {
+        cacheKeysToDelete.push(key);
+      }
+    }
+    cacheKeysToDelete.forEach(key => cache.delete(key));
+    
     return response.data.data;
   } catch (error) {
     console.error("Error updating comment:", error);
@@ -269,6 +349,16 @@ export const deleteComment = async (comment: Comment): Promise<boolean> => {
         throw error;
       }
     }
+    
+    // 캐시 무효화
+    const cacheKeysToDelete = [];
+    for (const [key] of cache) {
+      if (key.includes(`post-details-`) || key === 'blog-posts') {
+        cacheKeysToDelete.push(key);
+      }
+    }
+    cacheKeysToDelete.forEach(key => cache.delete(key));
+    
     return true;
   } catch (error) {
     console.error("Error deleting comment:", error);
