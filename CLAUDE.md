@@ -20,7 +20,21 @@ npm run start
 
 # Run ESLint checks
 npm run lint
+
+# Quick deploy command (lint, build, commit, push)
+npm run deploy
 ```
+
+## Technology Stack
+
+- **Framework**: Next.js 15.3.3 with App Router
+- **React**: Version 19 with Server Components
+- **TypeScript**: Strict type checking enabled
+- **Styling**: Tailwind CSS v4
+- **HTTP Client**: Axios
+- **Markdown**: react-markdown for content rendering
+- **Date Handling**: dayjs for Korean localization
+- **Font**: Pretendard Variable for Korean text optimization (loaded via CDN)
 
 ## Environment Configuration
 
@@ -41,9 +55,10 @@ The application uses a hybrid server/client architecture for optimal performance
 
 ### Rendering Strategy
 
-- **Server Components**: Posts, profile, and initial comment data are fetched server-side
-- **Client Components**: Comment interactions, forms, and dynamic UI elements
+- **Server Components**: Posts, profile, and initial comment data are fetched server-side for SEO and performance
+- **Client Components**: Interactive elements (forms, modals, real-time updates)
 - **Hybrid Approach**: Combines SSR performance with client-side interactivity
+- **Data Passing**: Server-fetched data passed as props to client components
 
 #### Key API Integration
 
@@ -51,7 +66,6 @@ The application uses a hybrid server/client architecture for optimal performance
 - **Individual Post**: `GET /api/blogs?filters[slug]=${slug}&populate=*` - Fetches post by slug
 - **Profile**: `GET /api/profile?populate=*` - Fetches profile information
 - **Comments**: `GET /api/blogs/${blogId}?populate=comments` - Fetches comments via Blog relation
-- **API Timeout**: 30-second timeout configured for all requests
 - **Content Types**: Blog posts, Profile, and Comments with lowercase field names
 
 ## TypeScript Interfaces
@@ -106,11 +120,11 @@ interface Profile {
 
 Strapi API functions are exported from `src/lib/strapi.ts`:
 
-- `getBlogPosts()`: Fetches all published posts
-- `getBlogPost(slug)`: Fetches single post by slug
+- `getBlogPosts()`: Fetches all published posts with memory caching
+- `getPostWithDetails(slug)`: Unified function fetching post, adjacent posts, and comments in parallel
 - `getProfile()`: Fetches profile information for homepage display
 - `getComments(blogId)`: Fetches comments via Blog's comments relation
-- `createComment()`, `updateComment()`, `deleteComment()`: Comment CRUD operations
+- `createComment()`, `updateComment()`, `deleteComment()`: Comment CRUD operations with automatic cache invalidation and revalidation
 
 ## Component Architecture
 
@@ -133,8 +147,7 @@ src/components/
 
 ## Design System
 
-- **Typography**: Pretendard Variable font for Korean text optimization
-- **Styling**: Tailwind CSS v4 with mobile-first responsive design and OKLCH color system
+- **Styling**: Tailwind CSS v4 with mobile-first responsive design
 - **Components**: React functional components with TypeScript
 - **Content Rendering**: react-markdown for markdown content with custom styling
 - **UI Components**: Reusable components with shared styling utilities
@@ -151,7 +164,6 @@ src/components/
 
 - **Date Formatting**: Korean format with RelativeTime component supporting both relative and absolute formats
 - **Content**: Korean language interface and content
-- **Font Optimization**: Pretendard for optimal Korean character rendering
 
 ## Mobile Responsiveness
 
@@ -172,7 +184,7 @@ This project uses Next.js 15 which has breaking changes:
 
 **Automated via GitHub Actions**:
 
-- Pushes to main branch trigger automatic Vercel deployment
+- Pushes to main branch trigger automatic Vercel deployment via `.github/workflows/deploy.yml`
 - Workflow includes linting and build verification
 - Requires GitHub Secrets: `VERCEL_TOKEN`, `ORG_ID`, `PROJECT_ID`
 
@@ -191,28 +203,59 @@ This project uses Next.js 15 which has breaking changes:
 6. **Comment Loading Issues**: Comments are fetched via Blog relation - ensure Blog populate includes comments
 7. **Slow Performance**: Use server components for initial data fetching, client components only for interactions
 
-## Performance & Caching
+## Performance & Cache Management
 
-- **ISR (Incremental Static Regeneration)**: Pages revalidate every 5 minutes (300 seconds)
-- **Static Generation**: Homepage and blog posts use static generation with ISR
+### Caching Strategy
+- **On-Demand Revalidation**: Post pages use on-demand revalidation for optimal API cost efficiency
+- **ISR for Static Content**: Homepage and profile pages revalidate weekly (604800 seconds)
+- **Memory Caching**: 5-minute TTL cache for API responses to reduce redundant calls
+- **Cache Invalidation**: Automatic cache clearing on comment CRUD operations
+
+### Performance Optimizations
 - **Server-side Data Fetching**: Comments and posts fetched server-side for immediate display
 - **Parallel Data Loading**: Posts and comments fetched concurrently using Promise.all
 - **API Optimization**: 30-second timeout prevents hanging requests
-- **Content Updates**: Strapi content changes appear within 5 minutes without manual deployment
 
-## Deployment Script
+### Server Actions
+- **Server Actions**: Defined in `src/lib/actions.ts` for revalidation operations
+- **Revalidation Pattern**: `revalidatePostPages()` called after comment CRUD operations
 
-```bash
-# Quick deploy command (lint, build, commit, push)
-npm run deploy
+```typescript
+// After comment operations in strapi.ts
+await revalidatePostPages(); // Triggers revalidation of affected pages
 ```
 
-## Code Quality
+### API Cost Optimization
+- **From**: Automatic revalidation every 60 seconds (2,880+ API calls/day)
+- **To**: On-demand revalidation only when content changes (99% reduction)
+- **Memory Cache**: 5-minute TTL reduces redundant API calls during user sessions
 
-Always run these commands before committing:
+## Code Quality & Build Requirements
 
-- `npm run lint` - ESLint checks for code quality
-- `npm run build` - Verify production build succeeds
+**Pre-commit Checklist** (IMPORTANT - always run before committing):
+
+- Run `npm run lint` and fix all errors (warnings acceptable)
+- Run `npm run build` to verify production build
+- Test locally with `npm run dev`
+
+```bash
+npm run lint    # Fix all ESLint errors (warnings OK)
+npm run build   # Ensure production build succeeds
+```
+
+**Common Build Issues**:
+
+- ESLint errors will fail the build (warnings are acceptable)
+- TypeScript type errors must be resolved
+- Missing environment variables will cause build failures
+
+**Code Conventions**:
+
+- Use TypeScript strict mode
+- Follow feature-based component organization (see Component Architecture section)
+- Prefer Server Components for data fetching
+- Use Client Components only for interactivity
+- Implement proper error boundaries and fallbacks
 
 ## Comment System
 
@@ -289,6 +332,13 @@ Use `RelativeTime` component with the `absolute` prop for post detail pages:
 <RelativeTime dateString={post.publishedAt} />          // "2일 전"
 ```
 
-### Component Organization
 
-When adding new components, follow the feature-based directory structure. Place components in the appropriate subdirectory based on their primary function rather than creating flat component structures.
+
+## Key Architectural Decisions
+
+
+
+### Korean Localization Architecture
+
+- **Date Formatting**: dayjs with Korean locale for relative/absolute time display
+- **Content Strategy**: Korean-first interface with proper typography and spacing
