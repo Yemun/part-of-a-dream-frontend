@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://yemun.kr/sitemap.xml
+
+# Disallow crawling of API routes
+Disallow: /api/
+
+# Allow all other content
+Allow: /posts/
+Allow: /profile/
+
+# Crawl delay (optional - helps prevent overwhelming the server)
+Crawl-delay: 1

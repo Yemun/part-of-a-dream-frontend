@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Navigation from "@/components/layout/Navigation";
+import { createMetadata } from "@/lib/metadata";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "꿈의 일환",
-  keywords: ["꿈의 일환", "블로그", "디자인시스템", "서을"],
-  description: "사용자와 제품의 관계을 탐구하는 일지입니다.",
-};
+export const metadata: Metadata = createMetadata();
 
 export default function RootLayout({
   children,
@@ -15,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <head>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-5SYWFDCQER"

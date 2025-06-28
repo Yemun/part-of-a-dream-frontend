@@ -1,13 +1,57 @@
 import { getProfile } from "@/lib/strapi";
 import MarkdownRenderer from "@/components/post/MarkdownRenderer";
+import { createMetadata, createPersonSchema } from "@/lib/metadata";
+import { Metadata } from "next";
 
-export const revalidate = 604800; // 1주일(7일)마다 재생성
+// Generate metadata for profile page
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const profile = await getProfile();
+
+    if (!profile) {
+      return createMetadata({
+        title: "프로필",
+        keywords: ["프로필"]
+      });
+    }
+
+    const description = profile.biography || "사용자와 제품의 관계를 탐구하는 일지입니다.";
+
+    return createMetadata({
+      title: profile.title,
+      description,
+      keywords: ["서을", "프로필"],
+      url: "https://yemun.kr/profile",
+      type: "profile"
+    });
+  } catch (error) {
+    console.error("Error generating profile metadata:", error);
+    return createMetadata({
+      title: "프로필",
+      keywords: ["프로필"]
+    });
+  }
+}
 
 export default async function Profile() {
   const profile = await getProfile();
 
+  // Person schema for profile page
+  const personSchema = profile ? createPersonSchema({
+    name: "예문",
+    alternateName: "서을",
+    description: profile.biography || "사용자와 제품의 관계를 탐구하는 일지를 작성합니다.",
+    contact: typeof profile.contact === "object" && profile.contact !== null ? profile.contact : undefined
+  }) : null;
+
   return (
     <>
+      {personSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        />
+      )}
       {profile ? (
         <section>
           <div className="mb-6 sm:mb-8">

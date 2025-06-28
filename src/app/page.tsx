@@ -1,7 +1,12 @@
 import { getBlogPosts, BlogPost } from "@/lib/strapi";
 import PostCard from "@/components/post/PostCard";
+import { createMetadata } from "@/lib/metadata";
 
-export const revalidate = 604800; // 1주일(7일)마다 재생성
+// Metadata for homepage
+export const metadata = createMetadata({
+  keywords: ["사용자 경험", "제품 디자인"],
+  type: "website"
+});
 
 export default async function Home() {
   let posts: BlogPost[] = [];
