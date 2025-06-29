@@ -30,20 +30,25 @@ export default function CommentSection({
       // 새로운 API 엔드포인트 사용 (더 빠름)
       const response = await fetch(`/api/comments/${blogId}`);
 
+      const data = await response.json();
+      
+      // API가 에러 응답이더라도 comments 배열이 있으면 사용
+      if (data.comments !== undefined) {
+        const fetchedComments = data.comments || [];
+        setComments(fetchedComments);
+        setLastFetchTime(Date.now());
+        console.log(
+          `Fetched ${
+            fetchedComments.length
+          } comments at ${new Date().toLocaleTimeString()}`
+        );
+        return;
+      }
+
+      // comments 배열이 없으면 에러로 처리
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-
-      const data = await response.json();
-      const fetchedComments = data.comments || [];
-
-      setComments(fetchedComments);
-      setLastFetchTime(Date.now());
-      console.log(
-        `Fetched ${
-          fetchedComments.length
-        } comments at ${new Date().toLocaleTimeString()}`
-      );
     } catch (error) {
       console.error("댓글 로딩 실패:", error);
       setError("댓글을 불러오는 중 오류가 발생했습니다.");

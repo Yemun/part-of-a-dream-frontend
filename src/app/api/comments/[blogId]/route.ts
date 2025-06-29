@@ -54,14 +54,30 @@ export async function GET(
     });
 
   } catch (error) {
+    const { blogId } = await params;
     console.error("Error in comments API:", error);
     
+    // axios 오류인 경우 상태 코드 확인
+    if (axios.isAxiosError(error)) {
+      // 404 에러 (블로그 없음)는 정상적으로 빈 댓글로 처리
+      if (error.response?.status === 404) {
+        console.log(`Blog with documentId ${blogId} not found, returning empty comments`);
+        return NextResponse.json({
+          comments: [],
+          count: 0,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+    
+    // 다른 에러는 여전히 500으로 처리하되, 빈 댓글 배열도 함께 반환
     return NextResponse.json(
       { 
         error: "Failed to fetch comments", 
         details: error instanceof Error ? error.message : "Unknown error",
         comments: [],
-        count: 0
+        count: 0,
+        timestamp: new Date().toISOString()
       },
       { status: 500 }
     );
