@@ -70,11 +70,10 @@ export async function generateMetadata({
 export default async function PostPage({ params }: PageProps) {
   const { id } = await params;
 
-  // 단일 API 호출로 모든 데이터 가져오기 (3개 → 1개 API 호출)
+  // 포스트 데이터만 가져오기 (댓글은 클라이언트에서 비동기 로드)
   const {
     post,
     adjacentPosts,
-    comments: initialComments,
   } = await getPostWithDetails(id);
 
   if (!post) {
@@ -118,7 +117,6 @@ export default async function PostPage({ params }: PageProps) {
 
       <CommentSection
         blogId={post.documentId}
-        initialComments={initialComments}
       />
     </article>
     </>

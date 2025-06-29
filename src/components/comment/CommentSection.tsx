@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getComments, Comment } from "@/lib/strapi";
+import { Comment } from "@/lib/strapi";
 import CommentList from "@/components/comment/CommentList";
 import CommentForm from "@/components/comment/CommentForm";
+import CommentSkeleton from "@/components/comment/CommentSkeleton";
 
 interface CommentSectionProps {
   blogId: string;
@@ -25,27 +26,47 @@ export default function CommentSection({
     try {
       setError(null);
       setIsLoading(true);
-      const fetchedComments = await getComments(blogId);
+
+      // 새로운 API 엔드포인트 사용 (더 빠름)
+      const response = await fetch(`/api/comments/${blogId}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const fetchedComments = data.comments || [];
+
       setComments(fetchedComments);
       setLastFetchTime(Date.now());
-      console.log(`Fetched ${fetchedComments.length} comments at ${new Date().toLocaleTimeString()}`);
+      console.log(
+        `Fetched ${
+          fetchedComments.length
+        } comments at ${new Date().toLocaleTimeString()}`
+      );
     } catch (error) {
       console.error("댓글 로딩 실패:", error);
       setError("댓글을 불러오는 중 오류가 발생했습니다.");
+      // Fallback 제거 - 빠른 실패로 사용자 경험 향상
     } finally {
       setIsLoading(false);
     }
   }, [blogId]);
 
-  // 컴포넌트 마운트 시 항상 최신 댓글 확인 (SSR 데이터가 오래될 수 있음)
+  // 컴포넌트 마운트 시 댓글 로드 (초기 데이터가 없으므로)
   useEffect(() => {
-    // 초기 댓글이 있어도 클라이언트에서 한번 더 확인
-    const timer = setTimeout(() => {
+    if (initialComments.length === 0) {
+      // 초기 데이터가 없으면 즉시 로드
       fetchComments();
-    }, 100); // 짧은 지연으로 SSR 데이터를 먼저 보여준 후 업데이트
-    
-    return () => clearTimeout(timer);
-  }, [fetchComments]);
+    } else {
+      // 초기 데이터가 있으면 조금 지연 후 업데이트 확인
+      const timer = setTimeout(() => {
+        fetchComments();
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [fetchComments, initialComments.length]);
 
   const handleCommentAdded = useCallback(() => {
     fetchComments();
@@ -54,9 +75,10 @@ export default function CommentSection({
   if (isLoading) {
     return (
       <div className="pt-8">
-        <div className="text-center text-gray-500 dark:text-gray-400">
-          댓글을 불러오는 중...
-        </div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+          댓글
+        </h3>
+        <CommentSkeleton />
       </div>
     );
   }

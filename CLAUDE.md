@@ -42,7 +42,13 @@ Required environment variables in `.env.local`:
 
 ```
 NEXT_PUBLIC_STRAPI_URL=https://appealing-badge-1cb5ca360d.strapiapp.com
+REVALIDATE_TOKEN=your-webhook-token-for-auto-revalidation
 ```
+
+**Production Configuration**:
+- **Vercel**: Set both environment variables in project settings
+- **Domain**: Production URL hardcoded as `https://yemun.kr` in sitemap and metadata
+- **REVALIDATE_TOKEN**: Used for webhook authentication and manual cache invalidation
 
 ## Architecture & Data Flow
 
@@ -62,11 +68,17 @@ The application uses a hybrid server/client architecture for optimal performance
 
 #### Key API Integration
 
+**Strapi Cloud API Endpoints**:
 - **Blog Posts**: `GET /api/blogs?populate=*` - Fetches all published posts
 - **Individual Post**: `GET /api/blogs?filters[slug]=${slug}&populate=*` - Fetches post by slug
 - **Profile**: `GET /api/profile?populate=*` - Fetches profile information
 - **Comments**: `GET /api/blogs/${blogId}?populate=comments` - Fetches comments via Blog relation
 - **Content Types**: Blog posts, Profile, and Comments with lowercase field names
+
+**Next.js API Routes**:
+- **`/api/comments/[blogId]`**: Client-side comment fetching with 5-second timeout and optimized field selection
+- **`/api/revalidate`**: Webhook endpoint for automatic cache invalidation with Bearer token authentication
+- **Timeout Strategy**: 10-second timeout for main Strapi client, 5-second timeout for comment API routes
 
 ## TypeScript Interfaces
 
@@ -180,18 +192,26 @@ This project uses Next.js 15 which has breaking changes:
 - **Dynamic Route Params**: `params` in page components is now a Promise and must be awaited
 - **Example**: `const { id } = await params;` instead of `params.id`
 
+## Next.js Configuration
+
+**Performance Optimizations** (`next.config.ts`):
+- **Image Optimization**: WebP and AVIF format support enabled
+- **Compression**: Built-in gzip/brotli compression
+- **Preconnect Headers**: Automatic preconnect to Strapi backend for performance
+- **TypeScript**: Strict mode with path aliases (`@/*` maps to `src/*`)
+
 ## Deployment
 
 **Automated via GitHub Actions**:
 
 - Pushes to main branch trigger automatic Vercel deployment via `.github/workflows/deploy.yml`
-- Workflow includes linting and build verification
+- Workflow includes linting and build verification with Node.js 18
 - Requires GitHub Secrets: `VERCEL_TOKEN`, `ORG_ID`, `PROJECT_ID`
 
 **Manual Vercel Deployment**:
 
 - Import GitHub repository at https://vercel.com/new
-- Set environment variable: `NEXT_PUBLIC_STRAPI_URL`
+- Set environment variables: `NEXT_PUBLIC_STRAPI_URL`, `REVALIDATE_TOKEN`
 
 ## Common Issues
 
@@ -209,12 +229,15 @@ This project uses Next.js 15 which has breaking changes:
 - **On-Demand Revalidation**: Post pages use on-demand revalidation for optimal API cost efficiency
 - **ISR for Static Content**: Homepage and profile pages revalidate weekly (604800 seconds)
 - **Memory Caching**: 5-minute TTL cache for API responses to reduce redundant calls
-- **Cache Invalidation**: Automatic cache clearing on comment CRUD operations
+- **Cache Keys**: Specific patterns (`post-details-${slug}`, `comments-${blogId}`, `blog-posts`)
+- **Cache Invalidation**: Automatic cache clearing on comment CRUD operations affecting multiple cache keys
 
 ### Performance Optimizations
 - **Server-side Data Fetching**: Comments and posts fetched server-side for immediate display
 - **Parallel Data Loading**: Posts and comments fetched concurrently using Promise.all
-- **API Optimization**: 30-second timeout prevents hanging requests
+- **Dual Timeout Strategy**: 10-second timeout for main API, 5-second timeout for comment endpoints
+- **Optimized Field Selection**: API queries request only necessary fields for performance
+- **Fallback Mechanisms**: Graceful degradation with empty arrays on API failures
 
 ### Server Actions
 - **Server Actions**: Defined in `src/lib/actions.ts` for revalidation operations
@@ -229,6 +252,50 @@ await revalidatePostPages(); // Triggers revalidation of affected pages
 - **From**: Automatic revalidation every 60 seconds (2,880+ API calls/day)
 - **To**: On-demand revalidation only when content changes (99% reduction)
 - **Memory Cache**: 5-minute TTL reduces redundant API calls during user sessions
+
+## SEO & Metadata System
+
+### Shared Metadata Utilities
+
+The application uses a centralized metadata system in `src/lib/metadata.ts` to eliminate code duplication:
+
+```typescript
+// Create consistent metadata across pages
+import { createMetadata } from "@/lib/metadata";
+
+export const metadata = createMetadata({
+  title: "Page Title",
+  description: "Page description",
+  keywords: ["additional", "keywords"],
+  type: "article" | "website" | "profile"
+});
+```
+
+### SEO Features
+
+- **robots.txt**: Configures search engine crawling directives
+- **Dynamic Sitemap**: Auto-generates sitemap.xml with all published posts
+- **Structured Data**: JSON-LD schemas for Article and Person types
+- **Open Graph & Twitter Cards**: Social media preview optimization
+- **Language Declaration**: Proper `lang="ko"` for Korean content
+- **Canonical URLs**: Prevents duplicate content issues
+
+### Automatic Revalidation System
+
+**Webhook Endpoint**: `/api/revalidate` handles Strapi Cloud webhooks for automatic cache invalidation when content changes.
+
+**Setup Requirements**:
+1. Set `REVALIDATE_TOKEN` environment variable
+2. Configure Strapi webhook: `https://yemun.kr/api/revalidate` with Bearer token
+3. Enable events: `entry.create`, `entry.update`, `entry.delete`, `entry.publish`, `entry.unpublish`
+
+**Authentication**: Bearer token system with request validation and event filtering (only blog-related events processed).
+
+**Manual Revalidation**: Same endpoint supports manual cache clearing with proper token authentication.
+
+**Health Check**: `GET /api/revalidate` provides endpoint status monitoring.
+
+Detailed setup instructions available in `WEBHOOK_SETUP.md`.
 
 ## Code Quality & Build Requirements
 
@@ -265,19 +332,26 @@ The blog includes a comprehensive comment system with hybrid rendering:
 - **Client-side Interactions**: Forms, modals, and real-time updates handled client-side
 - **Email-based Authentication**: Users can edit/delete their own comments using email verification
 - **CRUD Operations**: Full create, read, update, delete functionality
-- **Performance Optimization**: Initial comments passed as props to avoid client-side loading
+- **Approval System**: Only approved comments are displayed to users
+- **Performance Optimization**: Dedicated `/api/comments/[blogId]` endpoint with 5-second timeout
 - **Modal UI**: Email verification modal for comment modifications
-- **Error Handling**: Retry functionality and clear error states
+- **Error Handling**: Retry functionality, clear error states, and graceful fallbacks
+- **Dual API Strategy**: documentId first, fallback to id for Strapi compatibility
 
 ### Comment Architecture
 
 ```typescript
-// Server Component (PostPage)
-const initialComments = await getComments(post.documentId);
+// Server Component (PostPage) - passes documentId for API calls
+<CommentSection blogId={post.documentId} />
 
-// Client Component (CommentSection)
-<CommentSection blogId={post.documentId} initialComments={initialComments} />;
+// Client Component loads via API route
+fetch(`/api/comments/${post.documentId}`) // Uses Blog relation for proper filtering
 ```
+
+**Key Implementation Details**:
+- Comments must be fetched via `/api/blogs/${documentId}?populate=comments` relation
+- API route filters approved comments and sorts by createdAt descending
+- Comment creation requires documentId lookup from slug for proper relation setup
 
 ## Color System
 
@@ -311,6 +385,8 @@ This project uses Tailwind CSS v4 with:
 - **No config file**: Uses `@import "tailwindcss"` and `@plugin` directives in CSS
 - **CSS-first approach**: Styles defined directly in `globals.css` with CSS variables
 - **Typography plugin**: Custom prose styles for markdown content
+- **PostCSS Configuration**: Uses `@tailwindcss/postcss` plugin in `postcss.config.js`
+- **Theme Configuration**: CSS variables defined with `@theme inline` directive
 
 ## Development Guidelines
 
@@ -332,11 +408,41 @@ Use `RelativeTime` component with the `absolute` prop for post detail pages:
 <RelativeTime dateString={post.publishedAt} />          // "2일 전"
 ```
 
+### Metadata Implementation
 
+When adding metadata to new pages, always use the shared utility:
+
+```typescript
+// For static metadata
+export const metadata = createMetadata({ title: "Page Title" });
+
+// For dynamic metadata
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const data = await fetchData(params.id);
+  return createMetadata({
+    title: data.title,
+    description: extractDescription(data.content),
+    type: "article"
+  });
+}
+```
+
+### SEO Schema Implementation
+
+For blog posts, use the Article schema helper:
+
+```typescript
+const articleSchema = createArticleSchema({
+  title: post.title,
+  description: extractDescription(post.content),
+  author: "Author Name",
+  publishedTime: post.publishedAt,
+  modifiedTime: post.updatedAt,
+  slug: post.slug
+});
+```
 
 ## Key Architectural Decisions
-
-
 
 ### Korean Localization Architecture
 

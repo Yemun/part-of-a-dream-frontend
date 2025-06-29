@@ -20,7 +20,7 @@ const setCache = <T>(key: string, data: T): void => {
 
 const strapi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337",
-  timeout: 30000, // 30초 타임아웃으로 증가
+  timeout: 10000, // 10초 타임아웃으로 단축 (30초 → 10초)
   headers: {
     "Content-Type": "application/json",
   },
@@ -122,10 +122,10 @@ export const getPostWithDetails = async (
   }
 
   try {
-    // 포스트 데이터와 모든 포스트 목록을 병렬로 가져오기 (안전한 방식)
+    // 포스트 데이터와 모든 포스트 목록을 병렬로 가져오기 (댓글 제외로 속도 최적화)
     const [postResponse, allPostsResponse] = await Promise.all([
       strapi.get<StrapiResponse<BlogPost[]>>(
-        `/api/blogs?filters[slug]=${slug}&populate=comments`
+        `/api/blogs?filters[slug]=${slug}`
       ),
       strapi.get<StrapiResponse<BlogPost[]>>(
         "/api/blogs?fields[0]=id&fields[1]=slug&fields[2]=title&fields[3]=publishedAt&sort[0]=publishedAt:desc"
@@ -148,14 +148,8 @@ export const getPostWithDetails = async (
       next: currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null,
     };
 
-    // 클라이언트 측에서 안전하게 댓글 처리
-    const rawComments = post.comments || [];
-    const comments = rawComments
-      .filter((comment) => comment.approved === true)
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+    // 댓글은 별도로 로드하므로 빈 배열로 설정 (성능 최적화)
+    const comments: Comment[] = [];
 
     const result = { post, adjacentPosts, comments };
     setCache(cacheKey, result);
@@ -180,40 +174,46 @@ export const getProfile = async (): Promise<Profile | null> => {
 };
 
 export const getComments = async (blogId: string): Promise<Comment[]> => {
+  const cacheKey = `comments-${blogId}`;
+  const cached = getCached<Comment[]>(cacheKey);
+  
+  if (cached) {
+    return cached;
+  }
+
   try {
-    // 먼저 간단한 방식으로 시도
-    const response = await strapi.get<{ data: BlogPost }>(
-      `/api/blogs/${blogId}?populate=comments`
+    // 직접 댓글 컬렉션에서 조회 (더 빠른 방법)
+    const response = await strapi.get<{ data: Comment[] }>(
+      `/api/comments?filters[blog][documentId][$eq]=${blogId}&filters[approved][$eq]=true&sort[0]=createdAt:desc&populate[blog][fields][0]=documentId`
     );
 
-    const blog = response.data.data;
-    const comments = blog?.comments || [];
-
-    // 클라이언트 측에서 필터링 및 정렬 (안전한 fallback)
-    return comments
-      .filter((comment) => comment.approved === true)
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+    const comments = response.data.data || [];
+    setCache(cacheKey, comments);
+    
+    return comments;
   } catch (error) {
-    console.error("Error fetching comments:", error);
+    console.error("Error fetching comments via comments endpoint:", error);
     
-    // 실패 시 더 간단한 방식으로 재시도
+    // Fallback: 기존 방식으로 재시도 (단축된 timeout으로)
     try {
-      const fallbackResponse = await strapi.get<{ data: BlogPost }>(
-        `/api/blogs/${blogId}`
+      const response = await strapi.get<{ data: BlogPost }>(
+        `/api/blogs/${blogId}?populate=comments`
       );
-      
-      // 댓글 없이도 정상 응답이면 빈 배열 반환
-      if (fallbackResponse.data.data) {
-        return [];
-      }
+
+      const blog = response.data.data;
+      const comments = (blog?.comments || [])
+        .filter((comment) => comment.approved === true)
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        
+      setCache(cacheKey, comments);
+      return comments;
     } catch (fallbackError) {
-      console.error("Fallback request also failed:", fallbackError);
+      console.error("Fallback comment request also failed:", fallbackError);
+      return [];
     }
-    
-    return [];
   }
 };
 
@@ -221,7 +221,7 @@ export const createComment = async (commentData: {
   author: string;
   email: string;
   content: string;
-  blog: string;
+  blog: string; // documentId를 받음
 }): Promise<Comment | null> => {
   try {
     console.log("Creating comment with data:", commentData);
