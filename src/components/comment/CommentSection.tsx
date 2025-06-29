@@ -58,14 +58,12 @@ export default function CommentSection({
     }
   }, [blogId]);
 
-  // 초기 데이터가 없을 때만 클라이언트 API 호출 (API 비용 최적화)
+  // 서버에서 가져온 초기 댓글 데이터 사용 (클라이언트 API 호출 없음)
   useEffect(() => {
-    // 초기 댓글이 없는 경우에만 클라이언트에서 로드 (API 비용 최적화)
-    if (initialComments.length === 0) {
-      fetchComments();
-    }
-    // 초기 댓글이 있으면 서버 데이터 사용하여 API 호출 생략
-  }, [fetchComments, initialComments.length]);
+    // 항상 서버에서 가져온 초기 댓글 사용 (API 비용 최적화)
+    setComments(initialComments);
+    console.log(`Using server-fetched comments: ${initialComments.length} comments`);
+  }, [initialComments]);
 
   const handleCommentAdded = useCallback(() => {
     fetchComments();
