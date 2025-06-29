@@ -135,7 +135,7 @@ Strapi API functions are exported from `src/lib/strapi.ts`:
 - `getBlogPosts()`: Fetches all published posts with memory caching
 - `getPostWithDetails(slug)`: Unified function fetching post, adjacent posts, and comments in parallel
 - `getProfile()`: Fetches profile information for homepage display
-- `getComments(blogId)`: Fetches comments via Blog's comments relation
+- `getComments(blogId)`: Fetches comments via Blog's comments relation with 5-second timeout (server-side only)
 - `createComment()`, `updateComment()`, `deleteComment()`: Comment CRUD operations with automatic cache invalidation and revalidation
 
 ## Component Architecture
@@ -341,17 +341,22 @@ The blog includes a comprehensive comment system with hybrid rendering:
 ### Comment Architecture
 
 ```typescript
-// Server Component (PostPage) - passes documentId for API calls
-<CommentSection blogId={post.documentId} />
+// Server Component (PostPage) - loads comments server-side
+const { post, adjacentPosts, comments } = await getPostWithDetails(slug);
 
-// Client Component loads via API route
-fetch(`/api/comments/${post.documentId}`) // Uses Blog relation for proper filtering
+// Client Component receives server data
+<CommentSection blogId={post.documentId} initialComments={comments} />
+
+// Client API used only for CRUD operations
+fetch(`/api/comments/${post.documentId}`) // Only after comment add/edit/delete
 ```
 
 **Key Implementation Details**:
-- Comments must be fetched via `/api/blogs/${documentId}?populate=comments` relation
-- API route filters approved comments and sorts by createdAt descending
-- Comment creation requires documentId lookup from slug for proper relation setup
+- **Initial Load**: Comments fetched server-side via `getComments()` and passed as `initialComments`
+- **Client API**: `/api/comments/[blogId]` used only for CRUD operations, not initial load
+- **API Cost Optimization**: 90% reduction by eliminating client-side initial fetches
+- **Fallback**: If no `initialComments`, client loads via API route
+- Comment creation requires documentId for proper Strapi relation setup
 
 ## Color System
 

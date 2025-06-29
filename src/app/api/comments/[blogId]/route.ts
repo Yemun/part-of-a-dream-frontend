@@ -28,7 +28,7 @@ export async function GET(
     
     // Blog에서 comments relation으로 가져오기
     const response = await quickStrapi.get(
-      `/api/blogs/${blogId}?populate[comments][fields][0]=id&populate[comments][fields][1]=author&populate[comments][fields][2]=content&populate[comments][fields][3]=createdAt&populate[comments][fields][4]=approved&populate[comments][sort][0]=createdAt:desc`
+      `/api/blogs/${blogId}?populate[comments][fields][0]=id&populate[comments][fields][1]=author&populate[comments][fields][2]=email&populate[comments][fields][3]=content&populate[comments][fields][4]=createdAt&populate[comments][fields][5]=approved&populate[comments][sort][0]=createdAt:desc`
     );
 
     const blog = response.data.data;

@@ -122,7 +122,7 @@ export const getPostWithDetails = async (
   }
 
   try {
-    // 포스트 데이터와 모든 포스트 목록을 병렬로 가져오기 (댓글 제외로 속도 최적화)
+    // 포스트 데이터와 모든 포스트 목록을 병렬로 가져오기
     const [postResponse, allPostsResponse] = await Promise.all([
       strapi.get<StrapiResponse<BlogPost[]>>(
         `/api/blogs?filters[slug]=${slug}`
@@ -148,8 +148,8 @@ export const getPostWithDetails = async (
       next: currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null,
     };
 
-    // 댓글은 별도로 로드하므로 빈 배열로 설정 (성능 최적화)
-    const comments: Comment[] = [];
+    // 서버에서 댓글도 함께 가져오기 (API 비용 최적화)
+    const comments = await getComments(post.documentId);
 
     const result = { post, adjacentPosts, comments };
     setCache(cacheKey, result);
@@ -182,38 +182,26 @@ export const getComments = async (blogId: string): Promise<Comment[]> => {
   }
 
   try {
-    // 직접 댓글 컬렉션에서 조회 (더 빠른 방법)
-    const response = await strapi.get<{ data: Comment[] }>(
-      `/api/comments?filters[blog][documentId][$eq]=${blogId}&filters[approved][$eq]=true&sort[0]=createdAt:desc&populate[blog][fields][0]=documentId`
+    // Blog relation을 통해 댓글 가져오기 (5초 타임아웃)
+    const response = await strapi.get<{ data: BlogPost }>(
+      `/api/blogs/${blogId}?populate[comments][fields][0]=id&populate[comments][fields][1]=author&populate[comments][fields][2]=email&populate[comments][fields][3]=content&populate[comments][fields][4]=createdAt&populate[comments][fields][5]=approved&populate[comments][sort][0]=createdAt:desc`,
+      { timeout: 5000 }
     );
 
-    const comments = response.data.data || [];
+    const blog = response.data.data;
+    const comments = (blog?.comments || [])
+      .filter((comment) => comment.approved === true)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      
     setCache(cacheKey, comments);
-    
     return comments;
   } catch (error) {
-    console.error("Error fetching comments via comments endpoint:", error);
-    
-    // Fallback: 기존 방식으로 재시도 (단축된 timeout으로)
-    try {
-      const response = await strapi.get<{ data: BlogPost }>(
-        `/api/blogs/${blogId}?populate=comments`
-      );
-
-      const blog = response.data.data;
-      const comments = (blog?.comments || [])
-        .filter((comment) => comment.approved === true)
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        
-      setCache(cacheKey, comments);
-      return comments;
-    } catch (fallbackError) {
-      console.error("Fallback comment request also failed:", fallbackError);
-      return [];
-    }
+    console.error("Error fetching comments:", error);
+    // 에러 시 빈 배열 반환 (댓글 없음 상태)
+    return [];
   }
 };
 

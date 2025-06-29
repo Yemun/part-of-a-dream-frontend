@@ -34,6 +34,12 @@ export default function CommentList({
     const comment = comments.find((c) => c.id === commentId);
     if (!comment || !authEmail) return;
 
+    console.log("Email verification:", { 
+      commentEmail: comment.email, 
+      authEmail, 
+      match: comment.email === authEmail 
+    });
+    
     if (comment.email !== authEmail) {
       alert("이메일이 일치하지 않습니다.");
       return;

@@ -53,19 +53,13 @@ export default function CommentSection({
     }
   }, [blogId]);
 
-  // 컴포넌트 마운트 시 댓글 로드 (초기 데이터가 없으므로)
+  // 초기 데이터가 없을 때만 클라이언트 API 호출 (API 비용 최적화)
   useEffect(() => {
+    // 초기 댓글이 없는 경우에만 클라이언트에서 로드 (API 비용 최적화)
     if (initialComments.length === 0) {
-      // 초기 데이터가 없으면 즉시 로드
       fetchComments();
-    } else {
-      // 초기 데이터가 있으면 조금 지연 후 업데이트 확인
-      const timer = setTimeout(() => {
-        fetchComments();
-      }, 500);
-
-      return () => clearTimeout(timer);
     }
+    // 초기 댓글이 있으면 서버 데이터 사용하여 API 호출 생략
   }, [fetchComments, initialComments.length]);
 
   const handleCommentAdded = useCallback(() => {
