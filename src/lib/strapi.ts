@@ -162,13 +162,24 @@ export const getPostWithDetails = async (
 };
 
 export const getProfile = async (): Promise<Profile | null> => {
+  const cacheKey = "profile";
+  const cached = getCached<Profile>(cacheKey);
+  
+  if (cached) {
+    return cached;
+  }
+
   try {
     const response = await strapi.get<{ data: Profile }>(
-      "/api/profile?populate=*"
+      "/api/profile?populate=*",
+      { timeout: 5000 } // 5초 타임아웃
     );
-    return response.data.data;
+    const profile = response.data.data;
+    setCache(cacheKey, profile);
+    return profile;
   } catch (error) {
     console.error("Error fetching profile:", error);
+    // 캐시된 데이터가 있더라도 만료되었다면 null 반환
     return null;
   }
 };
