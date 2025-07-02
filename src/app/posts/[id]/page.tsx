@@ -1,8 +1,8 @@
-import { getPostWithDetails } from "@/lib/strapi";
+import { getPostWithDetails } from "@/lib/content";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { createMetadata, extractDescription, createArticleSchema } from "@/lib/metadata";
-import MarkdownRenderer from "@/components/post/MarkdownRenderer";
+import MDXRenderer from "@/components/post/MDXRenderer";
 import RelativeTime from "@/components/common/RelativeTime";
 import PostNavigation from "@/components/post/PostNavigation";
 import CommentSection from "@/components/comment/CommentSection";
@@ -12,7 +12,7 @@ import CommentSection from "@/components/comment/CommentSection";
 // 정적 경로 생성 - 주요 포스트들을 미리 생성
 export async function generateStaticParams() {
   try {
-    const { getBlogPosts } = await import("@/lib/strapi");
+    const { getBlogPosts } = await import("@/lib/content");
     const posts = await getBlogPosts();
 
     return posts.map((post) => ({
@@ -48,7 +48,6 @@ export async function generateMetadata({
 
     const description = extractDescription(post.content);
     const publishedTime = new Date(post.publishedAt).toISOString();
-    const modifiedTime = new Date(post.updatedAt).toISOString();
 
     return createMetadata({
       title: post.title,
@@ -57,7 +56,6 @@ export async function generateMetadata({
       url: `https://yemun.kr/posts/${post.slug}`,
       type: "article",
       publishedTime,
-      modifiedTime,
       authors: ["예문"],
       tags: [post.title]
     });
@@ -87,7 +85,6 @@ export default async function PostPage({ params }: PageProps) {
     description: extractDescription(post.content),
     author: "예문",
     publishedTime: post.publishedAt,
-    modifiedTime: post.updatedAt,
     slug: post.slug
   });
 
@@ -109,7 +106,7 @@ export default async function PostPage({ params }: PageProps) {
         </div>
       </header>
 
-      <MarkdownRenderer content={post.content} />
+      <MDXRenderer code={post.body.code} />
 
       <PostNavigation
         previous={adjacentPosts.previous}
@@ -117,7 +114,7 @@ export default async function PostPage({ params }: PageProps) {
       />
 
       <CommentSection
-        blogId={post.documentId}
+        postSlug={post.slug}
         initialComments={comments}
       />
     </article>

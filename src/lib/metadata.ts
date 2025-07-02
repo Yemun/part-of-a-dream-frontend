@@ -22,7 +22,6 @@ interface MetadataOptions {
   url?: string;
   type?: "website" | "article" | "profile";
   publishedTime?: string;
-  modifiedTime?: string;
   authors?: string[];
   tags?: string[];
 }
@@ -35,7 +34,6 @@ export function createMetadata(options: MetadataOptions = {}): Metadata {
     url = baseConfig.baseUrl,
     type = "website",
     publishedTime,
-    modifiedTime,
     authors = [baseConfig.author],
     tags = []
   } = options;
@@ -68,7 +66,6 @@ export function createMetadata(options: MetadataOptions = {}): Metadata {
       type,
       ...(type === "article" && publishedTime && {
         publishedTime,
-        modifiedTime,
         authors,
         tags: [...baseConfig.keywords.base, ...tags]
       })
@@ -114,10 +111,9 @@ export function createArticleSchema(options: {
   description: string;
   author: string;
   publishedTime: string;
-  modifiedTime: string;
   slug: string;
 }) {
-  const { title, description, author, publishedTime, modifiedTime, slug } = options;
+  const { title, description, author, publishedTime, slug } = options;
   
   return {
     "@context": "https://schema.org",
@@ -135,7 +131,6 @@ export function createArticleSchema(options: {
       url: baseConfig.baseUrl
     },
     datePublished: publishedTime,
-    dateModified: modifiedTime,
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": `${baseConfig.baseUrl}/posts/${slug}`

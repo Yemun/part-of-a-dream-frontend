@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { createComment } from "@/lib/strapi";
+import { createComment, Comment } from "@/lib/content";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
 
 interface CommentFormProps {
-  blogId: string;
-  onCommentAdded: () => void;
+  postSlug: string;
+  onCommentAdded: (newComment?: Comment) => void;
 }
 
 export default function CommentForm({
-  blogId,
+  postSlug,
   onCommentAdded,
 }: CommentFormProps) {
   const [author, setAuthor] = useState("");
@@ -31,20 +31,27 @@ export default function CommentForm({
     setIsSubmitting(true);
 
     try {
-      await createComment({
-        author: author.trim(),
-        email: email.trim(),
+      const comment = await createComment({
+        postSlug,
+        authorName: author.trim(),
+        authorEmail: email.trim(),
         content: content.trim(),
-        blog: blogId,
       });
 
-      setAuthor("");
-      setEmail("");
-      setContent("");
-      onCommentAdded();
+      if (comment) {
+        setAuthor("");
+        setEmail("");
+        setContent("");
+        onCommentAdded(comment); // 생성된 댓글 객체를 전달하여 낙관적 업데이트
+        alert("댓글이 성공적으로 등록되었습니다!");
+      } else {
+        alert("댓글 등록에 실패했습니다. 다시 시도해주세요.");
+        onCommentAdded(); // 실패 시 전체 리페치
+      }
     } catch (error) {
       console.error("댓글 작성 실패:", error);
       alert("댓글 작성에 실패했습니다. 다시 시도해주세요.");
+      onCommentAdded(); // 에러 시에도 전체 리페치
     } finally {
       setIsSubmitting(false);
     }

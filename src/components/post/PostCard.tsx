@@ -1,6 +1,6 @@
 import Link from "next/link";
 import RelativeTime from "@/components/common/RelativeTime";
-import { BlogPost } from "@/lib/strapi";
+import { BlogPost } from "@/lib/content";
 
 interface PostCardProps {
   post?: BlogPost;
@@ -46,7 +46,7 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
             >
               <defs>
                 <path
-                  id={`circle-${post.id}`}
+                  id={`circle-${post.slug}`}
                   d="M52 22.5C68.2924 22.5 81.5 35.7076 81.5 52C81.5 68.2924 68.2924 81.5 52 81.5C35.7076 81.5 22.5 68.2924 22.5 52C22.5 35.7076 35.7076 22.5 52 22.5Z"
                 />
               </defs>
@@ -57,14 +57,14 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
                 className="stroke-red-500 dark:stroke-red-400"
               />
               <text className="text-base font-regular stroke-white dark:stroke-black stroke-6">
-                <textPath href={`#circle-${post.id}`}>
+                <textPath href={`#circle-${post.slug}`}>
                   {post.title.length > 25
                     ? post.title.substring(0, 23) + "..."
                     : post.title}
                 </textPath>
               </text>
               <text className="text-base font-regular fill-red-500 dark:fill-red-400">
-                <textPath href={`#circle-${post.id}`}>
+                <textPath href={`#circle-${post.slug}`}>
                   {post.title.length > 25
                     ? post.title.substring(0, 23) + "..."
                     : post.title}

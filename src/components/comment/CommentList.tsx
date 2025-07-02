@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Comment, updateComment, deleteComment } from "@/lib/strapi";
+import { Comment, updateComment, deleteComment } from "@/lib/content";
 import RelativeTime from "@/components/common/RelativeTime";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -16,19 +16,19 @@ export default function CommentList({
   comments,
   onCommentUpdated,
 }: CommentListProps) {
-  const [editingComment, setEditingComment] = useState<number | null>(null);
+  const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [editAuthor, setEditAuthor] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [authEmail, setAuthEmail] = useState("");
   const [showAuthModal, setShowAuthModal] = useState<{
-    commentId: number;
+    commentId: string;
     action: "edit" | "delete";
   } | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleAuthSubmit = async (
-    commentId: number,
+    commentId: string,
     action: "edit" | "delete"
   ) => {
     const comment = comments.find((c) => c.id === commentId);
@@ -56,9 +56,10 @@ export default function CommentList({
     } else if (action === "delete") {
       if (confirm("정말로 이 댓글을 삭제하시겠습니까?")) {
         setIsProcessing(true);
-        const success = await deleteComment(comment);
+        const success = await deleteComment(commentId);
         if (success) {
           onCommentUpdated();
+          alert("댓글이 삭제되었습니다.");
         } else {
           alert("댓글 삭제에 실패했습니다.");
         }
@@ -67,7 +68,7 @@ export default function CommentList({
     }
   };
 
-  const handleEditSubmit = async (commentId: number) => {
+  const handleEditSubmit = async (commentId: string) => {
     if (!editContent.trim() || !editAuthor.trim() || !editEmail.trim()) {
       alert("모든 필드를 입력해주세요.");
       return;
@@ -77,9 +78,9 @@ export default function CommentList({
     if (!comment) return;
 
     setIsProcessing(true);
-    const updatedComment = await updateComment(comment, {
-      author: editAuthor.trim(),
-      email: editEmail.trim(),
+    const updatedComment = await updateComment(commentId, {
+      author_name: editAuthor.trim(),
+      author_email: editEmail.trim(),
       content: editContent.trim(),
     });
 

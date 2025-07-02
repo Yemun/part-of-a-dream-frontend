@@ -1,7 +1,7 @@
-import { getProfile } from "@/lib/strapi";
-import MarkdownRenderer from "@/components/post/MarkdownRenderer";
+import { getProfile } from "@/lib/content";
 import { createMetadata, createPersonSchema } from "@/lib/metadata";
 import { Metadata } from "next";
+import MDXRenderer from "@/components/post/MDXRenderer";
 
 // Generate metadata for profile page
 export async function generateMetadata(): Promise<Metadata> {
@@ -77,7 +77,7 @@ export default async function Profile() {
                 경력
               </h2>
               <div className="text-gray-700 dark:text-gray-300">
-                <MarkdownRenderer content={profile.career} />
+                <MDXRenderer code={profile.body.code} />
               </div>
             </div>
           )}

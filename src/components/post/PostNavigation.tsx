@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BlogPost } from "@/lib/strapi";
+import { BlogPost } from "@/lib/content";
 
 interface PostNavigationProps {
   previous: BlogPost | null;

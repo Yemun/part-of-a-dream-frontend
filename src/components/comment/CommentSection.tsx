@@ -1,71 +1,75 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Comment } from "@/lib/strapi";
+import { Comment, getComments } from "@/lib/content";
 import CommentList from "@/components/comment/CommentList";
 import CommentForm from "@/components/comment/CommentForm";
 import CommentSkeleton from "@/components/comment/CommentSkeleton";
 
 interface CommentSectionProps {
-  blogId: string;
+  postSlug: string;
   initialComments?: Comment[];
 }
 
 export default function CommentSection({
-  blogId,
+  postSlug,
   initialComments = [],
 }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [, setLastFetchTime] = useState<number>(Date.now());
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const fetchComments = useCallback(async () => {
-    if (!blogId) return;
+    if (!postSlug) return;
 
     try {
       setError(null);
       setIsLoading(true);
 
-      // 새로운 API 엔드포인트 사용 (더 빠름)
-      const response = await fetch(`/api/comments/${blogId}`);
-
-      const data = await response.json();
-      
-      // API가 에러 응답이더라도 comments 배열이 있으면 사용
-      if (data.comments !== undefined) {
-        const fetchedComments = data.comments || [];
-        setComments(fetchedComments);
-        setLastFetchTime(Date.now());
-        console.log(
-          `Fetched ${
-            fetchedComments.length
-          } comments at ${new Date().toLocaleTimeString()}`
-        );
-        return;
-      }
-
-      // comments 배열이 없으면 에러로 처리
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+      const fetchedComments = await getComments(postSlug);
+      setComments(fetchedComments);
+      console.log(
+        `Fetched ${
+          fetchedComments.length
+        } comments at ${new Date().toLocaleTimeString()}`
+      );
     } catch (error) {
       console.error("댓글 로딩 실패:", error);
       setError("댓글을 불러오는 중 오류가 발생했습니다.");
-      // Fallback 제거 - 빠른 실패로 사용자 경험 향상
     } finally {
       setIsLoading(false);
     }
-  }, [blogId]);
+  }, [postSlug]);
 
-  // 서버에서 가져온 초기 댓글 데이터 사용 (클라이언트 API 호출 없음)
+  // 초기화는 한 번만 실행 - 중복 API 호출 방지
   useEffect(() => {
-    // 항상 서버에서 가져온 초기 댓글 사용 (API 비용 최적화)
-    setComments(initialComments);
-    console.log(`Using server-fetched comments: ${initialComments.length} comments`);
-  }, [initialComments]);
+    if (hasInitialized) return;
 
-  const handleCommentAdded = useCallback(() => {
+    if (initialComments.length > 0) {
+      setComments(initialComments);
+      console.log(`Using initial comments: ${initialComments.length} comments`);
+    } else {
+      fetchComments();
+    }
+    setHasInitialized(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postSlug]); // 의도적으로 의존성 제거하여 중복 API 호출 방지
+
+  // 낙관적 업데이트를 위한 댓글 추가 핸들러
+  const handleCommentAdded = useCallback((newComment?: Comment) => {
+    if (newComment) {
+      // 낙관적 업데이트: 즉시 UI에 반영
+      setComments(prev => [...prev, newComment]);
+      console.log('Comment added optimistically');
+    } else {
+      // fallback: API 재호출 (에러 발생 시)
+      fetchComments();
+    }
+  }, [fetchComments]);
+
+  // 댓글 업데이트 핸들러 (수정/삭제 후)
+  const handleCommentUpdated = useCallback(() => {
     fetchComments();
   }, [fetchComments]);
 
@@ -102,8 +106,8 @@ export default function CommentSection({
 
   return (
     <div className="pt-8">
-      <CommentList comments={comments} onCommentUpdated={handleCommentAdded} />
-      <CommentForm blogId={blogId} onCommentAdded={handleCommentAdded} />
+      <CommentList comments={comments} onCommentUpdated={handleCommentUpdated} />
+      <CommentForm postSlug={postSlug} onCommentAdded={handleCommentAdded} />
     </div>
   );
 }
