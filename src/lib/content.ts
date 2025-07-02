@@ -116,14 +116,17 @@ export const getPostWithDetails = async (
       next: currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null,
     };
 
-    // Supabase에서 댓글 가져오기 (빌드 시에는 스킵)
+    // Supabase에서 댓글 가져오기 (환경 변수가 있을 때만)
     let comments: Comment[] = [];
-    try {
-      comments = await getComments(slug);
-    } catch (error) {
-      // 빌드 시 환경 변수가 없으면 빈 배열 반환
-      console.log('Skipping comment loading during build:', error);
-      comments = [];
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      try {
+        comments = await getComments(slug);
+      } catch (error) {
+        console.error('Error loading comments:', error);
+        comments = [];
+      }
+    } else {
+      console.log('Supabase not configured, skipping comment loading');
     }
 
     return { post, adjacentPosts, comments };
