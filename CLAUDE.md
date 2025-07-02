@@ -35,6 +35,7 @@ npx contentlayer2 build
 - **TypeScript**: Strict type checking enabled with baseUrl configuration
 - **Content Management**: Contentlayer2 with MDX support
 - **Styling**: Tailwind CSS v4
+- **Database**: Supabase with PostgreSQL for comment system
 - **Markdown Enhancement**: 
   - `@mdx-js/react` and `@mdx-js/loader` for MDX processing
   - `rehype-pretty-code` with Shiki for syntax highlighting
@@ -108,7 +109,7 @@ interface Profile {
 
 **Key Content Functions** (exported from `src/lib/content.ts`):
 - `getBlogPosts()`: Returns all blog posts sorted by publication date
-- `getPostWithDetails(slug)`: Returns post, adjacent posts, and empty comments array
+- `getPostWithDetails(slug)`: Returns post, adjacent posts, and comments from Supabase
 - `getProfile()`: Returns profile information from profile.mdx
 
 ## Component Architecture
@@ -119,7 +120,7 @@ Components are organized by feature:
 src/components/
 ├── layout/           # Page layout and navigation
 ├── post/             # Blog post components (PostCard, MDXRenderer, PostNavigation)
-├── comment/          # Comment system components (currently disabled)
+├── comment/          # Supabase-powered comment system components
 ├── common/           # Shared utilities (RelativeTime)
 └── ui/               # Base UI components (Button, Input, Textarea) with shared formStyles
 ```
@@ -176,10 +177,16 @@ src/components/
 
 ## Environment Configuration
 
-**No environment variables required** for core functionality. Previous Strapi-related variables have been removed:
+**Required Environment Variables**:
 
 ```bash
-# Removed (no longer needed):
+# Supabase Configuration (required for comment system)
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+**Previous Variables** (no longer needed):
+```bash
 # NEXT_PUBLIC_STRAPI_URL
 # REVALIDATE_TOKEN
 ```
@@ -193,7 +200,7 @@ src/components/
 
 **Manual Vercel Deployment**:
 - Import GitHub repository at https://vercel.com/new
-- No environment variables required for basic functionality
+- Configure Supabase environment variables for comment functionality
 
 ## Code Quality & Build Requirements
 
@@ -213,14 +220,40 @@ npm run build   # Ensure production build succeeds
 - Contentlayer imports use `contentlayer/generated` alias (configured in `tsconfig.json`)
 - This eliminates Contentlayer import warnings about missing path aliases
 
-## Comment System Status
+## Comment System Architecture
 
-**Currently Disabled**: Comment functionality has been temporarily disabled after migration from Strapi. Functions in `src/lib/content.ts` return empty results:
+**Supabase-Powered Comment System**: Fully functional comment system with optimized API calls and real-time updates.
 
-- `getComments()`: Returns empty array
-- `createComment()`, `updateComment()`, `deleteComment()`: Return null/false
+### Database Schema
+Comments table structure:
+```sql
+CREATE TABLE comments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  post_slug VARCHAR(255) NOT NULL,
+  author_name VARCHAR(100) NOT NULL,
+  author_email VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
 
-Comment UI components remain but are non-functional. **Supabase integration is planned** for the comment system replacement.
+### Key Functions (`src/lib/content.ts`):
+- `getComments(postSlug)`: Retrieves comments for a specific post
+- `createComment(commentData)`: Creates new comment with optimistic updates
+- `updateComment(commentId, updates)`: Updates existing comment
+- `deleteComment(commentId)`: Deletes comment with email verification
+
+### Performance Optimizations:
+- **Optimistic Updates**: New comments appear immediately in UI
+- **Minimal API Calls**: Prevents duplicate fetching on component initialization
+- **Email Verification**: Edit/delete requires author email confirmation
+- **Error Handling**: Graceful fallbacks and user feedback
+
+### Component Architecture:
+- **CommentSection**: Main container with optimized state management
+- **CommentForm**: Form with optimistic update support
+- **CommentList**: Display and management with edit/delete functionality
 
 ## SEO & Metadata System
 
@@ -301,14 +334,14 @@ Use `RelativeTime` component for consistent Korean date formatting:
 
 ## Key Architectural Decisions
 
-### Migration from Strapi to Contentlayer
+### Migration from Strapi to Contentlayer + Supabase
 
 **Benefits Achieved**:
-- **Zero Runtime Dependencies**: No external API calls or CMS dependencies
-- **Enhanced Performance**: Static generation with no network requests
-- **Better Developer Experience**: Type-safe content with local file editing
-- **Cost Reduction**: Eliminated CMS hosting and API usage costs
-- **Improved Reliability**: No external service dependencies
+- **Hybrid Architecture**: Static content via Contentlayer + dynamic comments via Supabase
+- **Enhanced Performance**: Static generation for content, optimized API calls for comments
+- **Better Developer Experience**: Type-safe content with local file editing and PostgreSQL reliability
+- **Cost Optimization**: Reduced API calls through optimistic updates and smart caching
+- **Improved Reliability**: No CMS dependencies for content, robust database for user interactions
 
 ### Korean Localization Architecture
 
@@ -321,3 +354,31 @@ Use `RelativeTime` component for consistent Korean date formatting:
 - **Removed Computed URL Field**: Eliminated redundant `url` computed field from Contentlayer, using slug-based URL generation instead
 - **Image Optimization**: Next.js Image component with automatic format conversion and lazy loading
 - **Static Generation**: All content pre-rendered at build time with no runtime API dependencies
+- **Optimistic Updates**: Comments appear immediately in UI, reducing perceived loading time
+- **API Call Minimization**: Single initialization pattern prevents duplicate database queries
+- **Smart State Management**: useEffect dependencies optimized to prevent unnecessary re-renders
+
+### Comment System Implementation Patterns
+
+**Optimistic Update Pattern**:
+```typescript
+// Add comment immediately to UI, then sync with database
+const handleCommentAdded = (newComment?: Comment) => {
+  if (newComment) {
+    setComments(prev => [...prev, newComment]); // Immediate UI update
+  } else {
+    fetchComments(); // Fallback for errors
+  }
+};
+```
+
+**Initialization Guard Pattern**:
+```typescript
+// Prevent duplicate API calls during component initialization
+const [hasInitialized, setHasInitialized] = useState(false);
+useEffect(() => {
+  if (hasInitialized) return;
+  // initialization logic
+  setHasInitialized(true);
+}, [postSlug]);
+```

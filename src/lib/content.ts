@@ -1,5 +1,5 @@
 import { allBlogPosts, allProfiles, BlogPost as ContentlayerBlogPost, Profile as ContentlayerProfile } from "contentlayer/generated";
-import { supabase, Comment as SupabaseComment, CommentInsert, CommentUpdate } from "./supabase";
+import { getSupabaseClient, Comment as SupabaseComment, CommentInsert, CommentUpdate } from "./supabase";
 
 // BlogPost 인터페이스를 Contentlayer에 맞게 조정
 export interface BlogPost {
@@ -116,8 +116,15 @@ export const getPostWithDetails = async (
       next: currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null,
     };
 
-    // Supabase에서 댓글 가져오기
-    const comments = await getComments(slug);
+    // Supabase에서 댓글 가져오기 (빌드 시에는 스킵)
+    let comments: Comment[] = [];
+    try {
+      comments = await getComments(slug);
+    } catch (error) {
+      // 빌드 시 환경 변수가 없으면 빈 배열 반환
+      console.log('Skipping comment loading during build:', error);
+      comments = [];
+    }
 
     return { post, adjacentPosts, comments };
   } catch (error) {
@@ -157,6 +164,7 @@ const convertSupabaseComment = (comment: SupabaseComment): Comment => {
 // 특정 포스트의 댓글 가져오기
 export const getComments = async (postSlug: string): Promise<Comment[]> => {
   try {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('comments')
       .select('*')
@@ -168,7 +176,7 @@ export const getComments = async (postSlug: string): Promise<Comment[]> => {
       return [];
     }
 
-    return data.map(convertSupabaseComment);
+    return (data as unknown as SupabaseComment[]).map(convertSupabaseComment);
   } catch (error) {
     console.error('Error fetching comments:', error);
     return [];
@@ -183,6 +191,7 @@ export const createComment = async (commentData: {
   content: string;
 }): Promise<Comment | null> => {
   try {
+    const supabase = getSupabaseClient();
     const insertData: CommentInsert = {
       post_slug: commentData.postSlug,
       author_name: commentData.authorName,
@@ -201,7 +210,7 @@ export const createComment = async (commentData: {
       return null;
     }
 
-    return convertSupabaseComment(data);
+    return convertSupabaseComment(data as unknown as SupabaseComment);
   } catch (error) {
     console.error('Error creating comment:', error);
     return null;
@@ -214,6 +223,7 @@ export const updateComment = async (
   updates: CommentUpdate
 ): Promise<Comment | null> => {
   try {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('comments')
       .update(updates)
@@ -226,7 +236,7 @@ export const updateComment = async (
       return null;
     }
 
-    return convertSupabaseComment(data);
+    return convertSupabaseComment(data as unknown as SupabaseComment);
   } catch (error) {
     console.error('Error updating comment:', error);
     return null;
@@ -236,6 +246,7 @@ export const updateComment = async (
 // 댓글 삭제 함수
 export const deleteComment = async (commentId: string): Promise<boolean> => {
   try {
+    const supabase = getSupabaseClient();
     const { error } = await supabase
       .from('comments')
       .delete()
