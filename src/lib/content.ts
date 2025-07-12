@@ -21,7 +21,6 @@ export interface BlogPost {
 export interface Profile {
   title: string;
   biography: string;
-  career: string;
   contact:
     | {
         email?: string;
@@ -68,7 +67,6 @@ const convertContentlayerProfile = (profile: ContentlayerProfile): Profile => {
   return {
     title: profile.title,
     biography: profile.biography,
-    career: profile.career,
     contact: profile.contact,
     body: profile.body,
   };
