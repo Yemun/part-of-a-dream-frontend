@@ -92,3 +92,17 @@ body {
 .texture-filter {
   filter: url(#texture-filter);
 }
+
+/* Mobile fallback for texture filter */
+@media (max-width: 640px) {
+  .texture-filter {
+    filter: url(#texture-filter) brightness(0.98) contrast(1.02);
+  }
+}
+
+/* Ensure texture filter works on all browsers */
+@supports not (filter: url(#texture-filter)) {
+  .texture-filter {
+    filter: brightness(0.98) contrast(1.02) saturate(0.95);
+  }
+}
