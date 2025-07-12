@@ -93,15 +93,16 @@ body {
   filter: url(#texture-filter);
 }
 
-/* Mobile fallback for texture filter */
+/* Enhanced mobile support */
 @media (max-width: 640px) {
   .texture-filter {
-    filter: url(#texture-filter) brightness(0.98) contrast(1.02);
+    filter: url(#texture-filter);
+    /* Additional mobile-specific optimizations if needed */
   }
 }
 
-/* Ensure texture filter works on all browsers */
-@supports not (filter: url(#texture-filter)) {
+/* Fallback only for browsers that don't support SVG filters */
+@supports not (filter: url(#anything)) {
   .texture-filter {
     filter: brightness(0.98) contrast(1.02) saturate(0.95);
   }

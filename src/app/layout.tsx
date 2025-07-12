@@ -31,12 +31,11 @@ export default function RootLayout({
         <svg width="0" height="0" style={{ position: "absolute" }}>
           <filter
             id="texture-filter"
-            x="0%"
-            y="0%"
+            x="0"
+            y="0"
             width="100%"
             height="100%"
-            filterUnits="objectBoundingBox"
-            primitiveUnits="userSpaceOnUse"
+            filterUnits="userSpaceOnUse"
             colorInterpolationFilters="sRGB"
           >
             <feFlood floodOpacity="0" result="BackgroundImageFix" />
@@ -49,15 +48,14 @@ export default function RootLayout({
             <feTurbulence
               type="fractalNoise"
               baseFrequency="0.15"
-              numOctaves="2"
+              numOctaves="3"
               seed="476"
-              stitchTiles="stitch"
               result="turb"
             />
             <feDisplacementMap
               in="shape"
               in2="turb"
-              scale="0.8"
+              scale="1.2"
               xChannelSelector="R"
               yChannelSelector="G"
               result="displacedImage"
