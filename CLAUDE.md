@@ -32,7 +32,7 @@ npx contentlayer2 build
 
 - **Framework**: Next.js 15.3.3 with App Router
 - **React**: Version 19 with Server Components
-- **TypeScript**: Strict type checking enabled with baseUrl configuration
+- **TypeScript**: Strict type checking enabled with ES2020 target and baseUrl configuration
 - **Content Management**: Contentlayer2 with MDX support
 - **Styling**: Tailwind CSS v4
 - **Database**: Supabase with PostgreSQL for comment system
@@ -69,7 +69,7 @@ Defined in `contentlayer.config.js` with two document types:
 
 - **BlogPost**: Files in `posts/**/*.mdx` with required fields (title, publishedAt) and optional fields (description, tags)
   - **Computed Field**: `slug` - automatically generated from file path
-- **Profile**: Single `profile.mdx` file with title, biography, career, and contact information
+- **Profile**: Single `profile.mdx` file with title, biography, and contact information
 
 ## TypeScript Interfaces
 
@@ -94,7 +94,6 @@ interface BlogPost {
 interface Profile {
   title: string;
   biography: string;
-  career: string;
   contact: {
     email?: string;
     linkedin?: string;
@@ -173,7 +172,7 @@ src/components/
 
 - **Dynamic Route Params**: `params` must be awaited in page components
 - **Contentlayer Integration**: `withContentlayer()` wrapper in `next.config.ts`
-- **TypeScript Configuration**: `baseUrl: "."` required for Contentlayer imports
+- **TypeScript Configuration**: ES2020 target with `baseUrl: "."` required for Contentlayer imports
 
 ## Environment Configuration
 

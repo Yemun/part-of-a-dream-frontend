@@ -1,15 +1,12 @@
-name: CI/CD Pipeline
+name: Deploy to Vercel
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
-  build-and-test:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,17 +25,3 @@ jobs:
 
       - name: Build project
         run: npm run build
-
-      # Vercel auto-deploys from GitHub, so manual deployment step removed
-      # If you want to re-enable Vercel deployment via GitHub Actions:
-      # 1. Set VERCEL_TOKEN in GitHub Secrets (get from vercel.com/account/tokens)
-      # 2. Set ORG_ID and PROJECT_ID in GitHub Secrets (run: npx vercel link)
-      # 3. Uncomment the deployment step below
-      #
-      # - name: Deploy to Vercel
-      #   uses: amondnet/vercel-action@v25
-      #   with:
-      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-      #     vercel-org-id: ${{ secrets.ORG_ID }}
-      #     vercel-project-id: ${{ secrets.PROJECT_ID }}
-      #     vercel-args: "--prod"

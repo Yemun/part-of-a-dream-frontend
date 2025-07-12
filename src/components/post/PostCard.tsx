@@ -36,6 +36,11 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
           <Link
             href={`/posts/${post.slug}`}
             className="w-[106px] h-[106px] rounded-full border border-red-500 dark:border-red-400 block"
+            style={{
+              transform: `translate(${Math.random() * 10 - 5}px, ${
+                Math.random() * 10 - 5
+              }px) rotate(${(Math.random() * -180) / 2}deg)`,
+            }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

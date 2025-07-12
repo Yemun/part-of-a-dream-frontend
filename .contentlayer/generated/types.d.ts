@@ -35,8 +35,6 @@ export type Profile = {
   title: string
   /** Biography */
   biography: string
-  /** Career information */
-  career: string
   /** Contact information */
   contact?: any | undefined
   /** MDX file body */

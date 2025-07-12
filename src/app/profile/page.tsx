@@ -11,24 +11,25 @@ export async function generateMetadata(): Promise<Metadata> {
     if (!profile) {
       return createMetadata({
         title: "프로필",
-        keywords: ["프로필"]
+        keywords: ["프로필"],
       });
     }
 
-    const description = profile.biography || "사용자와 제품의 관계를 탐구하는 일지입니다.";
+    const description =
+      profile.biography || "사용자와 제품의 관계를 탐구하는 일지입니다.";
 
     return createMetadata({
       title: profile.title,
       description,
       keywords: ["서을", "프로필"],
       url: "https://yemun.kr/profile",
-      type: "profile"
+      type: "profile",
     });
   } catch (error) {
     console.error("Error generating profile metadata:", error);
     return createMetadata({
       title: "프로필",
-      keywords: ["프로필"]
+      keywords: ["프로필"],
     });
   }
 }
@@ -37,12 +38,19 @@ export default async function Profile() {
   const profile = await getProfile();
 
   // Person schema for profile page
-  const personSchema = profile ? createPersonSchema({
-    name: "예문",
-    alternateName: "서을",
-    description: profile.biography || "사용자와 제품의 관계를 탐구하는 일지를 작성합니다.",
-    contact: typeof profile.contact === "object" && profile.contact !== null ? profile.contact : undefined
-  }) : null;
+  const personSchema = profile
+    ? createPersonSchema({
+        name: "예문",
+        alternateName: "서을",
+        description:
+          profile.biography ||
+          "사용자와 제품의 관계를 탐구하는 일지를 작성합니다.",
+        contact:
+          typeof profile.contact === "object" && profile.contact !== null
+            ? profile.contact
+            : undefined,
+      })
+    : null;
 
   return (
     <>
@@ -71,16 +79,14 @@ export default async function Profile() {
             </div>
           )}
 
-          {profile.career && (
-            <div className="mb-4 sm:mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-3">
-                경력
-              </h2>
-              <div className="text-gray-700 dark:text-gray-300">
-                <MDXRenderer code={profile.body.code} />
-              </div>
+          <div className="mb-4 sm:mb-6">
+            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-3">
+              경력
+            </h2>
+            <div className="text-gray-700 dark:text-gray-300">
+              <MDXRenderer code={profile.body.code} />
             </div>
-          )}
+          </div>
 
           {profile.contact && (
             <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">

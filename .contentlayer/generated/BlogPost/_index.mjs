@@ -2,5 +2,6 @@
 
 import posts__financialLedgerMdx from './posts__financial-ledger.mdx.json' with { type: 'json' }
 import posts__introduceMdx from './posts__introduce.mdx.json' with { type: 'json' }
+import posts__myhobbyCoffeeMdx from './posts__myhobby-coffee.mdx.json' with { type: 'json' }
 
-export const allBlogPosts = [posts__financialLedgerMdx, posts__introduceMdx]
+export const allBlogPosts = [posts__financialLedgerMdx, posts__introduceMdx, posts__myhobbyCoffeeMdx]

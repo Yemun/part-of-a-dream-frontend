@@ -1,73 +1,68 @@
-import { defineDocumentType, makeSource } from 'contentlayer2/source-files'
-import rehypeSlug from 'rehype-slug'
-import rehypeAutolinkHeadings from 'rehype-autolink-headings'
-import rehypePrettyCode from 'rehype-pretty-code'
+import { defineDocumentType, makeSource } from "contentlayer2/source-files";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypePrettyCode from "rehype-pretty-code";
 
 export const BlogPost = defineDocumentType(() => ({
-  name: 'BlogPost',
+  name: "BlogPost",
   filePathPattern: `posts/**/*.mdx`,
-  contentType: 'mdx',
+  contentType: "mdx",
   fields: {
     title: {
-      type: 'string',
-      description: 'The title of the post',
+      type: "string",
+      description: "The title of the post",
       required: true,
     },
     publishedAt: {
-      type: 'date',
-      description: 'The date of the post',
+      type: "date",
+      description: "The date of the post",
       required: true,
     },
     description: {
-      type: 'string',
-      description: 'The description of the post',
+      type: "string",
+      description: "The description of the post",
       required: false,
     },
     tags: {
-      type: 'list',
-      of: { type: 'string' },
-      description: 'Tags for the post',
+      type: "list",
+      of: { type: "string" },
+      description: "Tags for the post",
       required: false,
     },
   },
   computedFields: {
     slug: {
-      type: 'string',
-      resolve: (doc) => doc._raw.flattenedPath.replace('posts/', ''),
+      type: "string",
+      resolve: (doc) => doc._raw.flattenedPath.replace("posts/", ""),
     },
   },
-}))
+}));
 
 export const Profile = defineDocumentType(() => ({
-  name: 'Profile',
+  name: "Profile",
   filePathPattern: `profile.mdx`,
-  contentType: 'mdx',
+  contentType: "mdx",
   fields: {
     title: {
-      type: 'string',
-      description: 'Profile title',
+      type: "string",
+      description: "Profile title",
       required: true,
     },
     biography: {
-      type: 'string',
-      description: 'Biography',
-      required: true,
-    },
-    career: {
-      type: 'string',
-      description: 'Career information',
+      type: "string",
+      description: "Biography",
       required: true,
     },
     contact: {
-      type: 'json',
-      description: 'Contact information',
+      type: "json",
+      description: "Contact information",
       required: false,
     },
   },
-}))
+}));
 
 export default makeSource({
-  contentDirPath: './content',
+  contentDirPath: "./content",
   documentTypes: [BlogPost, Profile],
   mdx: {
     rehypePlugins: [
@@ -76,8 +71,8 @@ export default makeSource({
         rehypePrettyCode,
         {
           theme: {
-            dark: 'github-dark',
-            light: 'github-light',
+            dark: "github-dark",
+            light: "github-light",
           },
           keepBackground: false,
         },
@@ -86,11 +81,11 @@ export default makeSource({
         rehypeAutolinkHeadings,
         {
           properties: {
-            className: ['subheading-anchor'],
-            ariaLabel: 'Link to section',
+            className: ["subheading-anchor"],
+            ariaLabel: "Link to section",
           },
         },
       ],
     ],
   },
-})
+});

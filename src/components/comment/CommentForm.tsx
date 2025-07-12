@@ -58,7 +58,7 @@ export default function CommentForm({
   };
 
   return (
-    <div className="mt-8 p-6 rounded-2xl border border-black dot-pattern dark:border-white">
+    <div className="mt-8 p-6 rounded-2xl border border-black dot-pattern texture-filter dark:border-white">
       <h3 className="text-lg font-semibold mb-4 text-stroke-effect dark:text-white">
         댓글 남기기
       </h3>
