@@ -33,50 +33,56 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
           <RelativeTime dateString={post.publishedAt} />
         </div>
         <div className="flex justify-center items-center py-4 sm:py-3">
-          <Link
-            href={`/posts/${post.slug}`}
-            className="w-[106px] h-[106px] rounded-full border border-red-500 dark:border-red-400 block"
+          <div
             style={{
               transform: `translate(${Math.random() * 12 - 6}px, ${
                 Math.random() * 12 - 6
               }px) rotate(${(Math.random() * -180) / 2}deg)`,
             }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="104"
-              height="104"
-              viewBox="0 0 104 104"
-              fill="none"
+            <Link
+              href={`/posts/${post.slug}`}
+              className="group w-[106px] h-[106px] rounded-full outline-2 outline-red-500 dark:outline-red-400 flex items-center justify-center bg-white dark:bg-black hover:bg-red-500 dark:hover:bg-red-400 transition-colors"
             >
-              <defs>
-                <path
-                  id={`circle-${post.slug}`}
-                  d="M52 22.5C68.2924 22.5 81.5 35.7076 81.5 52C81.5 68.2924 68.2924 81.5 52 81.5C35.7076 81.5 22.5 68.2924 22.5 52C22.5 35.7076 35.7076 22.5 52 22.5Z"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="104"
+                height="104"
+                viewBox="0 0 104 104"
+                fill="none"
+              >
+                <defs>
+                  <path
+                    id={`circle-${post.slug}`}
+                    d="M52 22.5C68.2924 22.5 81.5 35.7076 81.5 52C81.5 68.2924 68.2924 81.5 52 81.5C35.7076 81.5 22.5 68.2924 22.5 52C22.5 35.7076 35.7076 22.5 52 22.5Z"
+                  />
+                </defs>
+                <circle
+                  cx="52"
+                  cy="52"
+                  r="38"
+                  className="stroke-red-500 group-hover:stroke-white group-hover:stroke-2 dark:stroke-red-400 dark:group-hover:stroke-black trasnistion-all"
                 />
-              </defs>
-              <circle
-                cx="52"
-                cy="52"
-                r="36"
-                className="stroke-red-500 dark:stroke-red-400"
-              />
-              <text className="text-base font-regular stroke-white dark:stroke-black stroke-6">
-                <textPath href={`#circle-${post.slug}`}>
-                  {post.title.length > 25
-                    ? post.title.substring(0, 23) + "..."
-                    : post.title}
-                </textPath>
-              </text>
-              <text className="text-base font-regular fill-red-500 dark:fill-red-400">
-                <textPath href={`#circle-${post.slug}`}>
-                  {post.title.length > 25
-                    ? post.title.substring(0, 23) + "..."
-                    : post.title}
-                </textPath>
-              </text>
-            </svg>
-          </Link>
+                <text
+                  className="text-base font-semibold stroke-white dark:stroke-black stroke-6 group-hover:stroke-4 transition-all"
+                  strokeLinejoin="round"
+                >
+                  <textPath href={`#circle-${post.slug}`}>
+                    {post.title.length > 25
+                      ? post.title.substring(0, 23) + "..."
+                      : post.title}
+                  </textPath>
+                </text>
+                <text className="text-base font-semibold fill-red-500 dark:fill-red-400">
+                  <textPath href={`#circle-${post.slug}`}>
+                    {post.title.length > 25
+                      ? post.title.substring(0, 23) + "..."
+                      : post.title}
+                  </textPath>
+                </text>
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

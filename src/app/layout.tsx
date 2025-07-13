@@ -40,15 +40,13 @@ export default function RootLayout({
             >
               <feTurbulence
                 type="fractalNoise"
-                baseFrequency="0.15"
-                numOctaves="3"
-                seed="476"
+                baseFrequency="0.2"
                 result="turb"
               />
               <feDisplacementMap
                 in="SourceGraphic"
                 in2="turb"
-                scale="1.2"
+                scale="1.4"
                 xChannelSelector="R"
                 yChannelSelector="G"
               />
