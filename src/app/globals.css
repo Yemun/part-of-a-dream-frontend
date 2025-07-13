@@ -18,6 +18,7 @@
 .prose img {
   @apply rounded-2xl border-[0.5px] border-black mb-2 w-full max-h-[50vh] object-contain dark:border-white;
   background-image: var(--dot-pattern);
+  filter: url(#texture-filter);
 }
 
 @media (min-width: 640px) {
@@ -88,3 +89,6 @@ body {
     -1px 1px 0 var(--background), 1px 1px 0 var(--background);
 }
 
+.texture-filter {
+  filter: url(#texture-filter);
+}
