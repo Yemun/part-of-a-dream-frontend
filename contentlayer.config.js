@@ -2,6 +2,7 @@ import { defineDocumentType, makeSource } from "contentlayer2/source-files";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
+import rehypeUnwrapImages from "rehype-unwrap-images";
 
 export const BlogPost = defineDocumentType(() => ({
   name: "BlogPost",
@@ -66,6 +67,7 @@ export default makeSource({
   documentTypes: [BlogPost, Profile],
   mdx: {
     rehypePlugins: [
+      rehypeUnwrapImages, // 이미지를 p 태그에서 분리
       rehypeSlug,
       [
         rehypePrettyCode,

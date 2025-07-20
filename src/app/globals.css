@@ -1,6 +1,6 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
 :root {
   --background: oklch(100% 0 0);
@@ -15,25 +15,47 @@
 }
 
 /* Custom prose styles */
-.prose img {
-  @apply rounded-2xl border-[0.5px] border-black mb-2 w-full max-h-[50vh] object-contain dark:border-white;
+.prose figure {
+  @apply mb-6 w-full;
+}
+
+@media (min-width: 640px) {
+  .prose figure {
+    @apply mb-8;
+  }
+}
+
+.prose figure img {
+  @apply rounded-2xl border-[0.5px] border-black mb-2 w-full max-h-[50vh] dark:border-white;
   background-image: var(--dot-pattern);
   filter: url(#texture-filter);
 }
 
+.prose figure img.object-contain {
+  @apply object-contain;
+}
+
+.prose figure img.object-cover {
+  @apply object-cover;
+}
+
 @media (min-width: 640px) {
-  .prose img {
+  .prose figure img {
     @apply mb-4;
   }
 }
 
+.prose figcaption {
+  @apply text-sm sm:text-base text-gray-500 dark:text-gray-400 italic text-center;
+}
+
 .prose p {
-  @apply mb-8 leading-8 text-base whitespace-pre-wrap;
+  @apply mb-2 leading-8 text-base whitespace-pre-wrap;
 }
 
 @media (min-width: 640px) {
   .prose p {
-    @apply leading-9 mb-10 text-lg;
+    @apply leading-9 mb-3 text-lg;
   }
 }
 

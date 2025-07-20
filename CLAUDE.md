@@ -21,7 +21,7 @@ npm run start
 # Run ESLint checks
 npm run lint
 
-# Quick deploy command (lint, build, commit, push)
+# Quick deploy command (lint, build, commit, push with timestamp)
 npm run deploy
 
 # Generate Contentlayer files manually (if needed)
@@ -97,7 +97,9 @@ interface Profile {
   contact: {
     email?: string;
     linkedin?: string;
+    instagram?: string;
     github?: string;
+    [key: string]: string | undefined;
   } | string | null;
   body: {
     raw: string;
@@ -127,6 +129,10 @@ src/components/
 ### Key Components
 
 - **PostCard**: Unified component for blog posts and placeholder states
+  - **Dual Mode**: Handles both actual posts and placeholder content ("-" text)
+  - **Circular SVG Design**: Posts display as circles with curved text using `<textPath>`
+  - **Random Transform**: Each card gets random translation and rotation for organic feel
+  - **Interactive Effects**: Hover states with stroke width changes and color transitions
 - **MDXRenderer**: Renders pre-compiled MDX using `useMDXComponent` hook
 - **RelativeTime**: Korean date formatting with absolute/relative display options
 - **Form Components**: Consistent styling via `formStyles.ts` utility
@@ -167,6 +173,19 @@ src/components/
   - Mobile: `max-h-[1008px]` (6 × 168px per PostCard)
   - Desktop: `max-h-[960px]` (6 × 160px per PostCard)
   - Uses `flex-wrap` to maintain responsive column behavior
+
+### Visual Effects System
+
+**Texture Filter**: SVG-based texture effect for visual interest
+- **SVG Filter Definition**: Located in `layout.tsx` with `id="texture-filter"`
+- **CSS Class**: `.texture-filter` applies `filter: url(#texture-filter)`
+- **Usage**: Applied to homepage grid, comment forms, and images
+- **Browser Compatibility**: SVG filters work across modern browsers but may have performance considerations on mobile
+
+**Key Visual Components**:
+- **Dot Pattern**: CSS-based dot pattern background (`.dot-pattern`)
+- **Text Stroke Effect**: Multiple text-shadow for outlined text (`.text-stroke-effect`)  
+- **Random Positioning**: PostCard components use `Math.random()` for organic layout positioning
 
 ## Next.js 15 Compatibility
 
@@ -293,7 +312,7 @@ tags: ["tag1", "tag2"]
 ---
 ```
 
-**Profile Updates**: Edit `content/profile.mdx` with required fields (title, biography, career).
+**Profile Updates**: Edit `content/profile.mdx` with required fields (title, biography). Note: `career` field was removed - career information should be included in the MDX body content.
 
 ### MDX Content Guidelines
 
