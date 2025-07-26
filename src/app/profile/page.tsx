@@ -305,7 +305,7 @@ const ContactLink = ({
 
 // Contact section component
 const ContactSection = ({ contact }: { contact: ContactInfo }) => (
-  <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+  <div className="mt-6 sm:mt-7 pt-6 sm:pt-7 border-t border-gray-200 dark:border-gray-700">
     <SectionTitle>연락처</SectionTitle>
     <div className="space-y-1">
       <ContactLink
@@ -434,9 +434,7 @@ export default function Profile() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
       />
       <section>
-        <h1 className="font-bold text-gray-950 dark:text-white text-xl sm:text-2xl mb-2 sm:mb-3">
-          {profileData.title}
-        </h1>
+        <SectionTitle>{profileData.title}</SectionTitle>
 
         <div className="mb-8 sm:mb-10">
           <p>{profileData.biography}</p>
