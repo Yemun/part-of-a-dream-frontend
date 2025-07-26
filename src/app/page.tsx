@@ -19,7 +19,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="border-t border-l flex items-start content-start self-stretch flex-wrap overflow-hidden max-h-[1008px] sm:max-h-[960px]">
+    <div className="border-t border-l flex items-start content-start self-stretch flex-wrap overflow-hidden max-h-[1008px] sm:max-h-[960px] texture-filter">
       {posts
         .sort(
           (a, b) =>

@@ -47,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
 // Format date for display
 const formatDate = (dateStr: string) => {
   if (dateStr === "Now" || dateStr === "오늘") return "현재";
-  
+
   // YYYY-MM-DD 형식을 YYYY.MM로 변환
   const [year, month] = dateStr.split("-");
   return `${year}.${month}`;
@@ -255,7 +255,7 @@ const CareerGraph = ({ career }: { career: CareerEntry[] }) => {
               <div key={circleIndex} className="flex items-center">
                 {/* 12개월마다 연도 divider 추가 (첫 번째 제외) */}
                 {circleIndex > 0 && circleIndex % 12 === 0 && (
-                  <div className="w-px h-6 bg-gray-800 dark:bg-gray-200 mx-2"></div>
+                  <div className="w-px h-6 bg-gray-800 dark:bg-gray-200 mx-4.5"></div>
                 )}
                 <MonthCircle circle={circle} isCurrentJob={item.isCurrentJob} />
               </div>
