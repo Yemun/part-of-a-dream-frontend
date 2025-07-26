@@ -101,11 +101,13 @@ const getMonthsBetweenDates = (
   const totalMonthsNeeded = Math.ceil(totalDays / daysPerMonth);
 
   // 시작 월부터 생성
-  let current = new Date(start.getFullYear(), start.getMonth(), 1);
+  const startYear = start.getFullYear();
+  const startMonth = start.getMonth();
 
   for (let i = 0; i < totalMonthsNeeded; i++) {
-    const year = current.getFullYear();
-    const month = current.getMonth() + 1;
+    const currentDate = new Date(startYear, startMonth + i, 1);
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
 
     let fillPercentage = 100;
 
@@ -122,8 +124,6 @@ const getMonthsBetweenDates = (
       isWorked: true,
       fillPercentage,
     });
-
-    current.setMonth(current.getMonth() + 1);
   }
 
   return circles;
