@@ -15,7 +15,6 @@
     "@supabase/supabase-js": "^2.50.2",
     "@tailwindcss/typography": "^0.5.16",
     "contentlayer2": "^0.5.8",
-    "dayjs": "^1.11.13",
     "next": "15.3.3",
     "next-contentlayer2": "^0.5.8",
     "react": "^19.0.0",

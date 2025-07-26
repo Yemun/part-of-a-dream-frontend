@@ -32,7 +32,7 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
         <div className="border-b-[0.5px] flex justify-center leading-7 text-sm font-semibold text-stroke-effect dot-pattern">
           <RelativeTime dateString={post.publishedAt} />
         </div>
-        <div className="flex justify-center items-center py-4 sm:py-3">
+        <div className="flex justify-center items-center py-4 sm:py-3 texture-filter">
           <div
             style={{
               transform: `translate(${Math.random() * 12 - 6}px, ${

@@ -1,4 +1,4 @@
-import { allBlogPosts, allProfiles, BlogPost as ContentlayerBlogPost, Profile as ContentlayerProfile } from "contentlayer/generated";
+import { allBlogPosts, BlogPost as ContentlayerBlogPost } from "contentlayer/generated";
 import { getSupabaseClient, Comment as SupabaseComment, CommentInsert, CommentUpdate } from "./supabase";
 
 // BlogPost 인터페이스를 Contentlayer에 맞게 조정
@@ -17,25 +17,6 @@ export interface BlogPost {
   };
 }
 
-// Profile 인터페이스를 Contentlayer에 맞게 조정
-export interface Profile {
-  title: string;
-  biography: string;
-  contact:
-    | {
-        email?: string;
-        linkedin?: string;
-        instagram?: string;
-        github?: string;
-        [key: string]: string | undefined;
-      }
-    | string
-    | null;
-  body: {
-    raw: string;
-    code: string;
-  };
-}
 
 // Supabase Comment 인터페이스를 기존 Comment와 호환되도록 조정
 export interface Comment {
@@ -63,14 +44,6 @@ const convertContentlayerPost = (post: ContentlayerBlogPost): BlogPost => {
   };
 };
 
-const convertContentlayerProfile = (profile: ContentlayerProfile): Profile => {
-  return {
-    title: profile.title,
-    biography: profile.biography,
-    contact: profile.contact,
-    body: profile.body,
-  };
-};
 
 export const getBlogPosts = async (): Promise<BlogPost[]> => {
   try {
@@ -134,20 +107,6 @@ export const getPostWithDetails = async (
   }
 };
 
-export const getProfile = async (): Promise<Profile | null> => {
-  try {
-    const profile = allProfiles[0]; // profile.mdx 파일 하나만 있을 것으로 가정
-    
-    if (!profile) {
-      return null;
-    }
-
-    return convertContentlayerProfile(profile);
-  } catch (error) {
-    console.error("Error fetching profile:", error);
-    return null;
-  }
-};
 
 // Supabase Comment 변환 함수
 const convertSupabaseComment = (comment: SupabaseComment): Comment => {

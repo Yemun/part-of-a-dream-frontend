@@ -26,7 +26,7 @@
 }
 
 .prose figure img {
-  @apply rounded-2xl border-[0.5px] border-black mb-2 w-full max-h-[50vh] dark:border-white;
+  @apply rounded border-[0.5px] border-black mb-2 w-full max-h-[50vh] dark:border-white;
   background-image: var(--dot-pattern);
   filter: url(#texture-filter);
 }

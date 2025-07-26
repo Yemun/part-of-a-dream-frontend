@@ -1,12 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/ko";
-
-dayjs.extend(relativeTime);
-dayjs.locale("ko");
 
 interface RelativeTimeProps {
   dateString: string;
@@ -26,13 +20,22 @@ export default function RelativeTime({
     setIsClient(true);
 
     if (absolute) {
-      // 절대시간 표시 (6월 22일 (금) 형식)
-      const date = dayjs(dateString);
-      setDisplayTime(date.format("M월 D일 ddd요일"));
+      // 절대시간 표시 (6월 22일 금요일 형식)
+      const date = new Date(dateString);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+      const weekday = weekdays[date.getDay()];
+      setDisplayTime(`${month}월 ${day}일 ${weekday}`);
     } else {
-      // 상대시간 표시 (2일 전 형식)
+      // 상대시간 표시 (0일 전 형식)
       const updateTime = () => {
-        setDisplayTime(dayjs(dateString).fromNow());
+        const now = new Date();
+        const postDate = new Date(dateString);
+        const diffTime = now.getTime() - postDate.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        setDisplayTime(`${diffDays}일 전`);
       };
 
       updateTime();
@@ -43,8 +46,11 @@ export default function RelativeTime({
   }, [dateString, absolute]);
 
   if (!isClient) {
+    const date = new Date(dateString);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
     return (
-      <span className={className}>{dayjs(dateString).format("M월 D일")}</span>
+      <span className={className}>{month}월 {day}일</span>
     );
   }
 

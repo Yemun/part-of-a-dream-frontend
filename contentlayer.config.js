@@ -39,32 +39,10 @@ export const BlogPost = defineDocumentType(() => ({
   },
 }));
 
-export const Profile = defineDocumentType(() => ({
-  name: "Profile",
-  filePathPattern: `profile.mdx`,
-  contentType: "mdx",
-  fields: {
-    title: {
-      type: "string",
-      description: "Profile title",
-      required: true,
-    },
-    biography: {
-      type: "string",
-      description: "Biography",
-      required: true,
-    },
-    contact: {
-      type: "json",
-      description: "Contact information",
-      required: false,
-    },
-  },
-}));
 
 export default makeSource({
   contentDirPath: "./content",
-  documentTypes: [BlogPost, Profile],
+  documentTypes: [BlogPost],
   mdx: {
     rehypePlugins: [
       rehypeUnwrapImages, // 이미지를 p 태그에서 분리

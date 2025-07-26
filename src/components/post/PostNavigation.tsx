@@ -21,12 +21,12 @@ export default function PostNavigation({
           {previous && (
             <Link
               href={`/posts/${previous.slug}`}
-              className="group flex flex-col items-start dark:hover:bg-gray-800 transition-colors"
+              className="group flex flex-col items-start"
             >
-              <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+              <span className="text-sm text-gray-500 group-hover:text-red-600 dark:group-hover:text-red-300 dark:text-gray-400 mb-1">
                 이전 글
               </span>
-              <span className="text-gray-900 dark:text-white font-medium group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+              <span className="text-gray-900 dark:text-white font-medium group-hover:text-red-600 dark:group-hover:text-red-300 ">
                 {previous.title}
               </span>
             </Link>
@@ -37,12 +37,12 @@ export default function PostNavigation({
           {next && (
             <Link
               href={`/posts/${next.slug}`}
-              className="group flex flex-col items-end dark:hover:bg-gray-800 text-right"
+              className="group flex flex-col items-end text-right"
             >
-              <span className="text-sm text-gray-500 group-hover:text-blue-700 dark:group-hover:text-blue-400 dark:text-gray-400 mb-1">
+              <span className="text-sm text-gray-500 group-hover:text-red-600 dark:group-hover:text-red-300 dark:text-gray-400 mb-1">
                 다음 글
               </span>
-              <span className="text-gray-900 dark:text-white font-medium group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
+              <span className="text-gray-900 dark:text-white font-medium group-hover:text-red-600 dark:group-hover:text-red-300 ">
                 {next.title}
               </span>
             </Link>

@@ -41,7 +41,7 @@ npx contentlayer2 build
   - `rehype-pretty-code` with Shiki for syntax highlighting
   - `rehype-slug` and `rehype-autolink-headings` for enhanced navigation
 - **Image Optimization**: Next.js Image component with automatic WebP conversion and lazy loading
-- **Date Handling**: dayjs for Korean localization
+- **Date Handling**: Native JavaScript Date for Korean localization
 - **Font**: Pretendard Variable for Korean text optimization (loaded via CDN)
 
 ## Content Management Architecture
@@ -60,16 +60,14 @@ content/
 ├── posts/
 │   ├── hello-world.mdx
 │   └── nextjs-tips.mdx
-└── profile.mdx
 ```
 
 ### Contentlayer Configuration
 
-Defined in `contentlayer.config.js` with two document types:
+Defined in `contentlayer.config.js` with one document type:
 
 - **BlogPost**: Files in `posts/**/*.mdx` with required fields (title, publishedAt) and optional fields (description, tags)
   - **Computed Field**: `slug` - automatically generated from file path
-- **Profile**: Single `profile.mdx` file with title, biography, and contact information
 
 ## TypeScript Interfaces
 
@@ -91,27 +89,11 @@ interface BlogPost {
   };
 }
 
-interface Profile {
-  title: string;
-  biography: string;
-  contact: {
-    email?: string;
-    linkedin?: string;
-    instagram?: string;
-    github?: string;
-    [key: string]: string | undefined;
-  } | string | null;
-  body: {
-    raw: string;
-    code: string;
-  };
-}
 ```
 
 **Key Content Functions** (exported from `src/lib/content.ts`):
 - `getBlogPosts()`: Returns all blog posts sorted by publication date
 - `getPostWithDetails(slug)`: Returns post, adjacent posts, and comments from Supabase
-- `getProfile()`: Returns profile information from profile.mdx
 
 ## Component Architecture
 
@@ -312,7 +294,7 @@ tags: ["tag1", "tag2"]
 ---
 ```
 
-**Profile Updates**: Edit `content/profile.mdx` with required fields (title, biography). Note: `career` field was removed - career information should be included in the MDX body content.
+**Profile Updates**: Profile information is now handled directly in the `src/app/profile/page.tsx` component with static data. No separate profile.mdx file is used.
 
 ### MDX Content Guidelines
 
