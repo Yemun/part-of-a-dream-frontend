@@ -213,12 +213,12 @@ const MonthCircle = ({
 
   return (
     <div
-      className="w-8.5 h-8.5 flex items-center justify-center overflow-hidden"
+      className="flex items-center justify-center overflow-hidden"
       title={`${circle.year}년 ${circle.month}월 (${fillPercentage}%)`}
     >
       <svg
-        width="24"
-        height="24"
+        width="32"
+        height="32"
         viewBox="0 0 24 24"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -250,12 +250,12 @@ const CareerGraph = ({ career }: { career: CareerEntry[] }) => {
           </p>
 
           {/* 월별 원들 */}
-          <div className="inline-flex rounded border-[0.5px] flex-wrap gap-0.5 dot-pattern texture-filter p-1">
+          <div className="inline-flex rounded border-[0.5px] flex-wrap dot-pattern texture-filter p-1">
             {item.monthCircles.map((circle, circleIndex) => (
               <div key={circleIndex} className="flex items-center">
                 {/* 12개월마다 연도 divider 추가 (첫 번째 제외) */}
                 {circleIndex > 0 && circleIndex % 12 === 0 && (
-                  <div className="w-px h-6 bg-gray-800 dark:bg-gray-200 mx-4.5"></div>
+                  <div className="w-px h-6 bg-gray-800 dark:bg-gray-200 mx-4"></div>
                 )}
                 <MonthCircle circle={circle} isCurrentJob={item.isCurrentJob} />
               </div>
