@@ -34,7 +34,23 @@ export const BlogPost = defineDocumentType(() => ({
   computedFields: {
     slug: {
       type: "string",
+      resolve: (doc) => {
+        const path = doc._raw.flattenedPath.replace("posts/", "");
+        // 언어 접미사 제거하여 동일한 slug 생성 (댓글 통합용)
+        return path.replace(/-(?:ko|en)$/, "");
+      },
+    },
+    originalSlug: {
+      type: "string",
       resolve: (doc) => doc._raw.flattenedPath.replace("posts/", ""),
+    },
+    locale: {
+      type: "string",
+      resolve: (doc) => {
+        const path = doc._raw.flattenedPath.replace("posts/", "");
+        // 파일명에서 locale 추출: -en이면 'en', 그외는 'ko'
+        return path.endsWith('-en') ? 'en' : 'ko';
+      },
     },
   },
 }));

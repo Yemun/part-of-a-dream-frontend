@@ -10,6 +10,7 @@ export interface BlogPost {
   publishedAt: string;
   description?: string;
   tags?: string[];
+  locale?: string;
   comments?: Comment[];
   body: {
     raw: string;
@@ -39,17 +40,23 @@ const convertContentlayerPost = (post: ContentlayerBlogPost): BlogPost => {
     publishedAt: post.publishedAt,
     description: post.description,
     tags: post.tags,
+    locale: post.locale || 'ko', // 기본값은 한국어
     body: post.body,
     comments: [], // 댓글은 별도 처리
   };
 };
 
 
-export const getBlogPosts = async (): Promise<BlogPost[]> => {
+export const getBlogPosts = async (locale?: string): Promise<BlogPost[]> => {
   try {
-    const posts = allBlogPosts
+    let posts = allBlogPosts
       .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
       .map(convertContentlayerPost);
+    
+    // locale이 지정된 경우 해당 locale의 포스트만 필터링
+    if (locale) {
+      posts = posts.filter(post => post.locale === locale);
+    }
     
     return posts;
   } catch (error) {
@@ -59,15 +66,23 @@ export const getBlogPosts = async (): Promise<BlogPost[]> => {
 };
 
 export const getPostWithDetails = async (
-  slug: string
+  slug: string,
+  locale?: string
 ): Promise<{
   post: BlogPost | null;
   adjacentPosts: { previous: BlogPost | null; next: BlogPost | null };
   comments: Comment[];
 }> => {
   try {
-    // Contentlayer에서 포스트 찾기
-    const contentlayerPost = allBlogPosts.find(post => post.slug === slug);
+    // Contentlayer에서 포스트 찾기 - locale이 지정된 경우 해당 locale의 포스트 우선 선택
+    let contentlayerPost;
+    if (locale) {
+      contentlayerPost = allBlogPosts.find(post => post.slug === slug && (post.locale || 'ko') === locale);
+    }
+    // locale이 지정되지 않았거나 해당 locale의 포스트가 없으면 첫 번째 포스트 선택
+    if (!contentlayerPost) {
+      contentlayerPost = allBlogPosts.find(post => post.slug === slug);
+    }
     
     if (!contentlayerPost) {
       return { post: null, adjacentPosts: { previous: null, next: null }, comments: [] };
@@ -75,16 +90,21 @@ export const getPostWithDetails = async (
 
     const post = convertContentlayerPost(contentlayerPost);
     
-    // 모든 포스트를 날짜순으로 정렬
-    const allPosts = allBlogPosts
+    // 동일한 locale의 포스트들만 필터링하여 날짜순 정렬
+    let postsForAdjacent = allBlogPosts
       .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
       .map(convertContentlayerPost);
+    
+    // locale이 지정된 경우 해당 locale의 포스트만 사용
+    if (locale) {
+      postsForAdjacent = postsForAdjacent.filter(p => p.locale === locale);
+    }
 
-    // 인접 포스트 찾기
-    const currentIndex = allPosts.findIndex((p) => p.slug === slug);
+    // 인접 포스트 찾기 (같은 locale 내에서)
+    const currentIndex = postsForAdjacent.findIndex((p) => p.slug === slug);
     const adjacentPosts = {
-      previous: currentIndex > 0 ? allPosts[currentIndex - 1] : null,
-      next: currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null,
+      previous: currentIndex > 0 ? postsForAdjacent[currentIndex - 1] : null,
+      next: currentIndex < postsForAdjacent.length - 1 ? postsForAdjacent[currentIndex + 1] : null,
     };
 
     // Supabase에서 댓글 가져오기 (환경 변수가 있을 때만)

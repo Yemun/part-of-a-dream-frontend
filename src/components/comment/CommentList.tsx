@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Comment, updateComment, deleteComment } from "@/lib/content";
 import RelativeTime from "@/components/common/RelativeTime";
 import Button from "@/components/ui/Button";
@@ -16,6 +17,7 @@ export default function CommentList({
   comments,
   onCommentUpdated,
 }: CommentListProps) {
+  const t = useTranslations('comments');
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [editAuthor, setEditAuthor] = useState("");
@@ -33,15 +35,9 @@ export default function CommentList({
   ) => {
     const comment = comments.find((c) => c.id === commentId);
     if (!comment || !authEmail) return;
-
-    console.log("Email verification:", { 
-      commentEmail: comment.email, 
-      authEmail, 
-      match: comment.email === authEmail 
-    });
     
     if (comment.email !== authEmail) {
-      alert("이메일이 일치하지 않습니다.");
+      alert(t('emailRequired'));
       return;
     }
 
@@ -54,14 +50,14 @@ export default function CommentList({
       setEditAuthor(comment.author);
       setEditEmail(comment.email);
     } else if (action === "delete") {
-      if (confirm("정말로 이 댓글을 삭제하시겠습니까?")) {
+      if (confirm(t('confirmDelete'))) {
         setIsProcessing(true);
         const success = await deleteComment(commentId);
         if (success) {
           onCommentUpdated();
-          alert("댓글이 삭제되었습니다.");
+          alert(t('commentDeleted'));
         } else {
-          alert("댓글 삭제에 실패했습니다.");
+          alert(t('commentDeleted'));
         }
         setIsProcessing(false);
       }
@@ -70,7 +66,7 @@ export default function CommentList({
 
   const handleEditSubmit = async (commentId: string) => {
     if (!editContent.trim() || !editAuthor.trim() || !editEmail.trim()) {
-      alert("모든 필드를 입력해주세요.");
+      alert(t('emailRequired'));
       return;
     }
 
@@ -91,7 +87,7 @@ export default function CommentList({
       setEditEmail("");
       onCommentUpdated();
     } else {
-      alert("댓글 수정에 실패했습니다.");
+      alert(t('commentUpdated'));
     }
     setIsProcessing(false);
   };
@@ -129,17 +125,17 @@ export default function CommentList({
       >
         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-[90%]">
           <h3 className="text-lg font-semibold mb-2 dark:text-white">
-            {showAuthModal.action === "edit" ? "댓글 수정" : "댓글 삭제"}
+            {showAuthModal.action === "edit" ? t('edit') : t('delete')}
           </h3>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
-            작성 시 사용한 이메일을 입력해주세요.
+            {t('emailRequired')}
           </p>
           <Input
             type="email"
             value={authEmail}
             onChange={(e) => setAuthEmail(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="이메일 주소"
+            placeholder={t('email')}
             className="mb-4"
             autoFocus
             autoComplete="email"
@@ -152,7 +148,7 @@ export default function CommentList({
               disabled={!authEmail}
               className="flex-1"
             >
-              확인
+              {t('save')}
             </Button>
             <Button
               variant="secondary"
@@ -162,7 +158,7 @@ export default function CommentList({
               }}
               className="flex-1"
             >
-              취소
+              {t('cancel')}
             </Button>
           </div>
         </div>
@@ -174,10 +170,10 @@ export default function CommentList({
     return (
       <div className="mt-8">
         <h3 className="text-lg font-semibold mb-4 dark:text-white">
-          댓글 ({comments.length})
+          {t('title')} ({comments.length})
         </h3>
         <p className="text-gray-500 dark:text-gray-400 text-center py-12 sm:py-20">
-          아직 댓글이 없습니다. 첫 번째 댓글을 남겨보세요!
+          {t('noComments')}
         </p>
       </div>
     );
@@ -187,7 +183,7 @@ export default function CommentList({
     <>
       <div className="mt-8">
         <h3 className="text-lg font-semibold mb-4 dark:text-white">
-          댓글 ({comments.length})
+          {t('title')} ({comments.length})
         </h3>
         <div className="space-y-6">
           {comments.map((comment) => (
@@ -212,14 +208,14 @@ export default function CommentList({
                         type="text"
                         value={editAuthor}
                         onChange={(e) => setEditAuthor(e.target.value)}
-                        placeholder="별명"
+                        placeholder={t('name')}
                         className="text-sm"
                       />
                       <Input
                         type="email"
                         value={editEmail}
                         onChange={(e) => setEditEmail(e.target.value)}
-                        placeholder="이메일"
+                        placeholder={t('email')}
                         className="text-sm"
                       />
                     </div>
@@ -235,7 +231,7 @@ export default function CommentList({
                         disabled={isProcessing}
                         size="sm"
                       >
-                        {isProcessing ? "저장 중..." : "저장"}
+                        {isProcessing ? t('save') + '...' : t('save')}
                       </Button>
                       <Button
                         variant="secondary"
@@ -243,7 +239,7 @@ export default function CommentList({
                         disabled={isProcessing}
                         size="sm"
                       >
-                        취소
+                        {t('cancel')}
                       </Button>
                     </div>
                   </div>
@@ -263,7 +259,7 @@ export default function CommentList({
                         disabled={isProcessing}
                         className="cursor-pointer disabled:opacity-50"
                       >
-                        수정
+                        {t('edit')}
                       </button>
                       <span className="text-gray-300 dark:text-gray-600">
                         |
@@ -278,7 +274,7 @@ export default function CommentList({
                         disabled={isProcessing}
                         className="cursor-pointer disabled:opacity-50"
                       >
-                        삭제
+                        {t('delete')}
                       </button>
                     </div>
                   </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations, useLocale } from "next-intl";
 
 interface RelativeTimeProps {
   dateString: string;
@@ -15,18 +16,41 @@ export default function RelativeTime({
 }: RelativeTimeProps) {
   const [displayTime, setDisplayTime] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
+  const t = useTranslations("time");
+  const locale = useLocale();
+
+  // Helper function to get ordinal suffix for English
+  const getOrdinalSuffix = (day: number): string => {
+    if (day >= 11 && day <= 13) return "th";
+    switch (day % 10) {
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
+    }
+  };
 
   useEffect(() => {
     setIsClient(true);
 
     if (absolute) {
-      // 절대시간 표시 (6월 22일 금요일 형식)
+      // 절대시간 표시
       const date = new Date(dateString);
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-      const weekday = weekdays[date.getDay()];
-      setDisplayTime(`${month}월 ${day}일 ${weekday}`);
+      
+      if (locale === 'en') {
+        // English: "March 15th" format
+        const months = t.raw("months") as string[];
+        const monthName = months[date.getMonth()];
+        const dayOrdinal = `${day}${getOrdinalSuffix(day)}`;
+        setDisplayTime(t("absoluteFormat", { monthName, dayOrdinal }));
+      } else {
+        // Korean: "6월 22일 금요일" format
+        const weekdays = t.raw("weekdays") as string[];
+        const weekday = weekdays[date.getDay()];
+        setDisplayTime(t("absoluteFormat", { month, day, weekday }));
+      }
     } else {
       // 상대시간 표시 (0일 전 형식)
       const updateTime = () => {
@@ -34,8 +58,8 @@ export default function RelativeTime({
         const postDate = new Date(dateString);
         const diffTime = now.getTime() - postDate.getTime();
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        
-        setDisplayTime(`${diffDays}일 전`);
+
+        setDisplayTime(t("daysAgo", { days: diffDays }));
       };
 
       updateTime();
@@ -49,9 +73,23 @@ export default function RelativeTime({
     const date = new Date(dateString);
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    return (
-      <span className={className}>{month}월 {day}일</span>
-    );
+    
+    if (locale === 'en') {
+      const months = t.raw("months") as string[];
+      const monthName = months[date.getMonth()];
+      const dayOrdinal = `${day}${getOrdinalSuffix(day)}`;
+      return (
+        <span className={className}>
+          {t("shortFormat", { monthName, dayOrdinal })}
+        </span>
+      );
+    } else {
+      return (
+        <span className={className}>
+          {t("shortFormat", { month, day })}
+        </span>
+      );
+    }
   }
 
   return <span className={className}>{displayTime}</span>;

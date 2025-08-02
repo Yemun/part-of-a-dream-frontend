@@ -1,0 +1,95 @@
+{
+  "navigation": {
+    "blog": "Blog",
+    "profile": "Profile"
+  },
+  "common": {
+    "readMore": "Read more",
+    "loading": "Loading...",
+    "error": "Oops! Something went wrong",
+    "retry": "Try again"
+  },
+  "blog": {
+    "title": "Part of a Dream",
+    "description": "A journal exploring the relationship between users and products.",
+    "noPostsFound": "No posts found.",
+    "relatedPosts": "You might also like"
+  },
+  "profile": {
+    "title": "About Me",
+    "about": "About",
+    "contact": "Get in Touch",
+    "social": "Social",
+    "name": "Yemun",
+    "biography": "I'm a design systems creator based in Euljiro, Seoul.",
+    "career": "Work Experience",
+    "education": "Education",
+    "email": "Email",
+    "monthsUnit": " months",
+    "present": "Present"
+  },
+  "comments": {
+    "title": "Comments",
+    "writeComment": "Leave a comment",
+    "name": "Name",
+    "email": "Email",
+    "message": "Your comment",
+    "submit": "Post Comment",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "confirmDelete": "Are you sure you want to delete this comment?",
+    "emailRequired": "Please enter your email address to continue.",
+    "commentPosted": "Your comment has been posted successfully!",
+    "commentUpdated": "Your comment has been updated.",
+    "commentDeleted": "Comment has been deleted.",
+    "loadingComments": "Loading comments...",
+    "noComments": "No comments yet. Be the first to leave one!",
+    "errorLoadingComments": "We couldn't load the comments right now. Please try again."
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{minutes} minutes ago",
+    "hoursAgo": "{hours} hours ago",
+    "daysAgo": "{days} days ago",
+    "weeksAgo": "{weeks} weeks ago",
+    "monthsAgo": "{months} months ago",
+    "yearsAgo": "{years} years ago",
+    "weekdays": [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "absoluteFormat": "{monthName} {dayOrdinal}",
+    "shortFormat": "{monthName} {dayOrdinal}"
+  },
+  "post": {
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "meta": {
+    "defaultTitle": "Part of a Dream",
+    "defaultDescription": "A journal exploring the relationship between users and products."
+  }
+}

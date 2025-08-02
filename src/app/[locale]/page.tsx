@@ -1,19 +1,33 @@
 import { getBlogPosts, BlogPost } from "@/lib/content";
 import PostCard from "@/components/post/PostCard";
 import { createMetadata } from "@/lib/metadata";
+import { Metadata } from "next";
 
-// Metadata for homepage
-export const metadata = createMetadata({
-  keywords: ["사용자 경험", "제품 디자인"],
-  type: "website",
-});
+interface PageProps {
+  params: Promise<{
+    locale: string;
+  }>;
+}
 
-export default async function Home() {
+// Generate metadata for homepage
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  
+  return createMetadata({
+    keywords: locale === 'ko' ? ["사용자 경험", "제품 디자인"] : ["user experience", "product design"],
+    type: "website",
+    locale: locale as 'ko' | 'en',
+  });
+}
+
+export default async function Home({ params }: PageProps) {
+  const { locale } = await params;
   let posts: BlogPost[] = [];
 
   try {
-    posts = await getBlogPosts();
-    console.log(`Loaded ${posts.length} posts from Contentlayer`);
+    posts = await getBlogPosts(locale);
   } catch (error) {
     console.error("Failed to load posts:", error);
   }

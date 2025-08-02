@@ -1,5 +1,6 @@
-import { createMetadata, createPersonSchema } from "@/lib/metadata";
-import { Metadata } from "next";
+"use client";
+
+import { useTranslations, useLocale } from "next-intl";
 
 // Types
 interface RoleInfo {
@@ -30,26 +31,17 @@ interface ContactInfo {
   instagram: string;
 }
 
-// Generate metadata for profile page
-export async function generateMetadata(): Promise<Metadata> {
-  const title = "예문";
-  const description = "서울 을지로에서 디자인 시스템을 만들고 있습니다.";
-
-  return createMetadata({
-    title,
-    description,
-    keywords: ["서을", "프로필"],
-    url: "https://yemun.kr/profile",
-    type: "profile",
-  });
-}
-
 // Format date for display
-const formatDate = (dateStr: string) => {
-  if (dateStr === "Now" || dateStr === "오늘") return "현재";
+const formatDate = (dateStr: string, present: string, locale?: string) => {
+  if (dateStr === "Now" || dateStr === "오늘") return present;
 
-  // YYYY-MM-DD 형식을 YYYY.MM로 변환
+  // YYYY-MM-DD 형식을 locale에 따라 변환
   const [year, month] = dateStr.split("-");
+  
+  // 영어권에서는 MM/YYYY, 한국어에서는 YYYY.MM
+  if (locale === 'en') {
+    return `${month}/${year}`;
+  }
   return `${year}.${month}`;
 };
 
@@ -233,6 +225,8 @@ const MonthCircle = ({
 
 // 가로 원형 커리어 그래프
 const CareerGraph = ({ career }: { career: CareerEntry[] }) => {
+  const t = useTranslations("profile");
+  const locale = useLocale();
   const graphItems = processCareerToGraph(career);
 
   return (
@@ -243,10 +237,12 @@ const CareerGraph = ({ career }: { career: CareerEntry[] }) => {
         <div key={`${item.company}-${item.role}-${index}`} className="mb-5">
           {/* 커리어 정보 */}
           <p className="flex items-center gap-2 mb-1.5">
-            {item.company}, {item.role} <br className="sm:hidden" />
-            {formatDate(item.startDate)} - {formatDate(item.endDate)}
+            {item.company}, {item.role}, <br className="sm:hidden" />
+            {formatDate(item.startDate, t("present"), locale)} -{" "}
+            {formatDate(item.endDate, t("present"), locale)}
             {", "}
-            {item.totalMonths}개월
+            {item.totalMonths}
+            {t("monthsUnit")}
           </p>
 
           {/* 월별 원들 */}
@@ -268,16 +264,22 @@ const CareerGraph = ({ career }: { career: CareerEntry[] }) => {
 };
 
 // Education component
-const Education = ({ education }: { education: Education }) => (
-  <div>
-    <SectionTitle>학력</SectionTitle>
+const Education = ({ education }: { education: Education }) => {
+  const t = useTranslations("profile");
+  const locale = useLocale();
 
-    <p className="mb-4 gap-2 flex items-center ">
-      {education.university}, {education.degree} <br className="sm:hidden" />
-      {formatDate(education.startDate)} – {formatDate(education.endDate)}
-    </p>
-  </div>
-);
+  return (
+    <div>
+      <SectionTitle>{t("education")}</SectionTitle>
+
+      <p className="mb-4 gap-2 flex items-center ">
+        {education.university}, {education.degree}, <br className="sm:hidden" />
+        {formatDate(education.startDate, t("present"), locale)} –{" "}
+        {formatDate(education.endDate, t("present"), locale)}
+      </p>
+    </div>
+  );
+};
 
 // Contact link component
 const ContactLink = ({
@@ -304,153 +306,65 @@ const ContactLink = ({
 );
 
 // Contact section component
-const ContactSection = ({ contact }: { contact: ContactInfo }) => (
-  <div className="mt-6 sm:mt-7 pt-6 sm:pt-7 border-t border-gray-200 dark:border-gray-700">
-    <SectionTitle>연락처</SectionTitle>
-    <div className="space-y-1">
-      <ContactLink
-        label="이메일"
-        href={`mailto:${contact.email}`}
-        isEmail={true}
-      >
-        {contact.email}
-      </ContactLink>
-      <ContactLink label="Instagram" href={contact.instagram}>
-        {contact.instagram}
-      </ContactLink>
-      <ContactLink label="LinkedIn" href={contact.linkedin}>
-        {contact.linkedin}
-      </ContactLink>
-      <ContactLink label="GitHub" href={contact.github}>
-        {contact.github}
-      </ContactLink>
-    </div>
-  </div>
-);
-
-export default function Profile() {
-  // Static profile data
-  const profileData = {
-    title: "예문",
-    biography: "서울 을지로에서 디자인 시스템을 만들고 있습니다.",
-    contact: {
-      email: "ymcho111@gmail.com",
-      github: "https://github.com/yemun",
-      linkedin: "https://www.linkedin.com/in/yemun-cho-11852885",
-      instagram: "https://www.instagram.com/yemuncho",
-    },
-    career: [
-      {
-        company: "케이뱅크",
-        roles: [
-          {
-            role: "Design System Manager",
-            startDate: "2024-01-01",
-            endDate: "오늘",
-          },
-          {
-            role: "Product Designer",
-            startDate: "2022-06-27",
-            endDate: "2023-12-31",
-          },
-        ],
-      },
-      {
-        company: "두나무",
-        roles: [
-          {
-            role: "UX/UI Designer",
-            startDate: "2022-02-07",
-            endDate: "2022-06-06",
-          },
-        ],
-      },
-      {
-        company: "LINE Corp",
-        roles: [
-          {
-            role: "UI Designer",
-            startDate: "2021-04-01",
-            endDate: "2021-09-30",
-          },
-        ],
-      },
-      {
-        company: "롯데면세점",
-        roles: [
-          {
-            role: "UI Designer",
-            startDate: "2018-02-01",
-            endDate: "2021-01-29",
-          },
-          {
-            role: "Assistant Graphic Designer",
-            startDate: "2017-01-16",
-            endDate: "2018-01-31",
-          },
-        ],
-      },
-      {
-        company: "LINE Plus",
-        roles: [
-          {
-            role: "UI Designer",
-            startDate: "2016-08-01",
-            endDate: "2016-09-23",
-          },
-        ],
-      },
-      {
-        company: "amoeba",
-        roles: [
-          {
-            role: "Student Intern",
-            startDate: "2016-01-18",
-            endDate: "2016-02-19",
-          },
-        ],
-      },
-    ],
-    education: {
-      university: "세종대학교",
-      degree: "시각디자인 학사 전공",
-      startDate: "2010-03-02",
-      endDate: "2016-02-19",
-    },
-  };
-
-  // Person schema for profile page
-  const personSchema = createPersonSchema({
-    name: "예문",
-    alternateName: "서울",
-    description: "사용자와 제품의 관계를 탐구하는 일지를 작성합니다.",
-    contact: profileData.contact,
-  });
+const ContactSection = ({ contact }: { contact: ContactInfo }) => {
+  const t = useTranslations("profile");
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
-      />
-      <section>
-        <SectionTitle>{profileData.title}</SectionTitle>
+    <div className="mt-6 sm:mt-7 pt-6 sm:pt-7 border-t border-gray-200 dark:border-gray-700">
+      <SectionTitle>{t("contact")}</SectionTitle>
+      <div className="space-y-1">
+        <ContactLink
+          label={t("email")}
+          href={`mailto:${contact.email}`}
+          isEmail={true}
+        >
+          {contact.email}
+        </ContactLink>
+        <ContactLink label="Instagram" href={contact.instagram}>
+          {contact.instagram}
+        </ContactLink>
+        <ContactLink label="LinkedIn" href={contact.linkedin}>
+          {contact.linkedin}
+        </ContactLink>
+        <ContactLink label="GitHub" href={contact.github}>
+          {contact.github}
+        </ContactLink>
+      </div>
+    </div>
+  );
+};
 
-        <div className="mb-8 sm:mb-10">
-          <p>{profileData.biography}</p>
-        </div>
+interface ProfileData {
+  contact: ContactInfo;
+  career: CareerEntry[];
+  education: Education;
+}
 
-        <div className="mb-4 sm:mb-6">
-          <SectionTitle>경력</SectionTitle>
+export default function ProfileClient({
+  profileData,
+}: {
+  profileData: ProfileData;
+}) {
+  const t = useTranslations("profile");
 
-          <CareerGraph career={profileData.career} />
-        </div>
-        <div className="mt-8">
-          <Education education={profileData.education} />
-        </div>
+  return (
+    <section>
+      <SectionTitle>{t("name")}</SectionTitle>
 
-        <ContactSection contact={profileData.contact} />
-      </section>
-    </>
+      <div className="mb-8 sm:mb-10">
+        <p>{t("biography")}</p>
+      </div>
+
+      <div className="mb-4 sm:mb-6">
+        <SectionTitle>{t("career")}</SectionTitle>
+
+        <CareerGraph career={profileData.career} />
+      </div>
+      <div className="mt-8">
+        <Education education={profileData.education} />
+      </div>
+
+      <ContactSection contact={profileData.contact} />
+    </section>
   );
 }

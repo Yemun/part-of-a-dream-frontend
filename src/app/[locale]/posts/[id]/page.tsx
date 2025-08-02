@@ -15,11 +15,20 @@ import CommentSection from "@/components/comment/CommentSection";
 export async function generateStaticParams() {
   try {
     const { getBlogPosts } = await import("@/lib/content");
-    const posts = await getBlogPosts();
-
-    return posts.map((post) => ({
-      id: post.slug,
-    }));
+    const locales = ['ko', 'en'];
+    const params = [];
+    
+    for (const locale of locales) {
+      const posts = await getBlogPosts(locale);
+      for (const post of posts) {
+        params.push({
+          locale,
+          id: post.slug,
+        });
+      }
+    }
+    
+    return params;
   } catch (error) {
     console.error("Error generating static params:", error);
     return [];
@@ -28,6 +37,7 @@ export async function generateStaticParams() {
 
 interface PageProps {
   params: Promise<{
+    locale: string;
     id: string;
   }>;
 }
@@ -36,42 +46,48 @@ interface PageProps {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { id } = await params;
+  const { id, locale } = await params;
 
   try {
-    const { post } = await getPostWithDetails(id);
+    const { post } = await getPostWithDetails(id, locale);
 
     if (!post) {
+      const notFoundTitle = locale === 'ko' ? "포스트를 찾을 수 없습니다" : "Post not found";
+      const notFoundDesc = locale === 'ko' ? "요청하신 포스트를 찾을 수 없습니다." : "The requested post could not be found.";
+      
       return createMetadata({
-        title: "포스트를 찾을 수 없습니다",
-        description: "요청하신 포스트를 찾을 수 없습니다.",
+        title: notFoundTitle,
+        description: notFoundDesc,
+        locale: locale as 'ko' | 'en',
       });
     }
 
-    const description = extractDescription(post.content);
+    const description = post.description || extractDescription(post.content);
     const publishedTime = new Date(post.publishedAt).toISOString();
+    const localePrefix = locale === 'ko' ? '' : `/${locale}`;
 
     return createMetadata({
       title: post.title,
       description,
-      keywords: [post.title, "서을"],
-      url: `https://yemun.kr/posts/${post.slug}`,
+      keywords: locale === 'ko' ? [post.title, "서을"] : [post.title, "Seoul"],
+      url: `https://yemun.kr${localePrefix}/posts/${post.slug}`,
       type: "article",
       publishedTime,
-      authors: ["예문"],
+      authors: locale === 'ko' ? ["예문"] : ["Yemun"],
       tags: [post.title],
+      locale: locale as 'ko' | 'en',
     });
   } catch (error) {
     console.error("Error generating metadata:", error);
-    return createMetadata();
+    return createMetadata({ locale: locale as 'ko' | 'en' });
   }
 }
 
 export default async function PostPage({ params }: PageProps) {
-  const { id } = await params;
+  const { id, locale } = await params;
 
   // 포스트 데이터와 댓글을 서버에서 함께 가져오기 (API 비용 최적화)
-  const { post, adjacentPosts, comments } = await getPostWithDetails(id);
+  const { post, adjacentPosts, comments } = await getPostWithDetails(id, locale);
 
   if (!post) {
     notFound();
@@ -80,10 +96,11 @@ export default async function PostPage({ params }: PageProps) {
   // Article schema for rich snippets
   const articleSchema = createArticleSchema({
     title: post.title,
-    description: extractDescription(post.content),
-    author: "예문",
+    description: post.description || extractDescription(post.content),
+    author: locale === 'ko' ? "예문" : "Yemun",
     publishedTime: post.publishedAt,
     slug: post.slug,
+    locale: locale as 'ko' | 'en',
   });
 
   return (

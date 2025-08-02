@@ -1,15 +1,26 @@
 import { Metadata } from "next";
 
-// Base metadata configuration
+// Base metadata configuration with locale support
 const baseConfig = {
-  siteName: "꿈의 일환",
-  author: "예문",
-  baseUrl: "https://yemun.kr",
-  defaultDescription: "사용자와 제품의 관계를 탐구하는 일지입니다.",
-  keywords: {
-    base: ["꿈의 일환", "블로그", "디자인시스템", "예문"],
-    additional: ["사용자 경험", "제품 디자인", "서울", "프로필"],
+  ko: {
+    siteName: "꿈의 일환",
+    author: "예문",
+    defaultDescription: "사용자와 제품의 관계를 탐구하는 일지입니다.",
+    keywords: {
+      base: ["꿈의 일환", "블로그", "디자인시스템", "예문"],
+      additional: ["사용자 경험", "제품 디자인", "서울", "프로필"],
+    },
   },
+  en: {
+    siteName: "Part of a Dream",
+    author: "Yemun",
+    defaultDescription: "A journal exploring the relationship between users and products.",
+    keywords: {
+      base: ["Part of a Dream", "blog", "design system", "Yemun"],
+      additional: ["user experience", "product design", "Seoul", "profile"],
+    },
+  },
+  baseUrl: "https://yemun.kr",
   social: {
     twitter: "@seounplugged",
   },
@@ -24,32 +35,40 @@ interface MetadataOptions {
   publishedTime?: string;
   authors?: string[];
   tags?: string[];
+  locale?: 'ko' | 'en';
 }
 
 export function createMetadata(options: MetadataOptions = {}): Metadata {
   const {
     title,
-    description = baseConfig.defaultDescription,
+    description,
     keywords = [],
     url = baseConfig.baseUrl,
     type = "website",
     publishedTime,
-    authors = [baseConfig.author],
+    authors,
     tags = [],
+    locale = 'ko',
   } = options;
 
+  const config = baseConfig[locale];
+  const finalDescription = description || config.defaultDescription;
+  const finalAuthors = authors || [config.author];
+
   const fullTitle = title
-    ? `${title} | ${baseConfig.siteName}`
-    : baseConfig.siteName;
-  const allKeywords = [...baseConfig.keywords.base, ...keywords];
+    ? `${title} | ${config.siteName}`
+    : config.siteName;
+  const allKeywords = [...config.keywords.base, ...keywords];
+
+  const ogLocale = locale === 'ko' ? 'ko_KR' : 'en_US';
 
   const metadata: Metadata = {
     title: fullTitle,
-    description,
+    description: finalDescription,
     keywords: allKeywords,
-    authors: authors.map((name) => ({ name })),
-    creator: baseConfig.author,
-    publisher: baseConfig.siteName,
+    authors: finalAuthors.map((name) => ({ name })),
+    creator: config.author,
+    publisher: config.siteName,
     formatDetection: {
       email: false,
       address: false,
@@ -58,25 +77,29 @@ export function createMetadata(options: MetadataOptions = {}): Metadata {
     metadataBase: new URL(baseConfig.baseUrl),
     alternates: {
       canonical: url,
+      languages: {
+        'ko': `${baseConfig.baseUrl}`,
+        'en': `${baseConfig.baseUrl}/en`,
+      },
     },
     openGraph: {
-      title: title || baseConfig.siteName,
-      description,
+      title: title || config.siteName,
+      description: finalDescription,
       url,
-      siteName: baseConfig.siteName,
-      locale: "ko_KR",
+      siteName: config.siteName,
+      locale: ogLocale,
       type,
       ...(type === "article" &&
         publishedTime && {
           publishedTime,
-          authors,
-          tags: [...baseConfig.keywords.base, ...tags],
+          authors: finalAuthors,
+          tags: [...config.keywords.base, ...tags],
         }),
     },
     twitter: {
       card: "summary_large_image",
-      title: title || baseConfig.siteName,
-      description,
+      title: title || config.siteName,
+      description: finalDescription,
       creator: baseConfig.social.twitter,
       site: baseConfig.social.twitter,
     },
@@ -118,8 +141,11 @@ export function createArticleSchema(options: {
   author: string;
   publishedTime: string;
   slug: string;
+  locale?: 'ko' | 'en';
 }) {
-  const { title, description, author, publishedTime, slug } = options;
+  const { title, description, author, publishedTime, slug, locale = 'ko' } = options;
+  const config = baseConfig[locale];
+  const localePrefix = locale === 'ko' ? '' : `/${locale}`;
 
   return {
     "@context": "https://schema.org",
@@ -129,20 +155,20 @@ export function createArticleSchema(options: {
     author: {
       "@type": "Person",
       name: author,
-      url: `${baseConfig.baseUrl}/profile`,
+      url: `${baseConfig.baseUrl}${localePrefix}/profile`,
     },
     publisher: {
       "@type": "Organization",
-      name: baseConfig.siteName,
+      name: config.siteName,
       url: baseConfig.baseUrl,
     },
     datePublished: publishedTime,
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${baseConfig.baseUrl}/posts/${slug}`,
+      "@id": `${baseConfig.baseUrl}${localePrefix}/posts/${slug}`,
     },
-    url: `${baseConfig.baseUrl}/posts/${slug}`,
-    inLanguage: "ko-KR",
+    url: `${baseConfig.baseUrl}${localePrefix}/posts/${slug}`,
+    inLanguage: locale === 'ko' ? "ko-KR" : "en-US",
   };
 }
 
@@ -150,6 +176,7 @@ export function createPersonSchema(options: {
   name: string;
   alternateName?: string;
   description: string;
+  locale?: 'ko' | 'en';
   contact?: {
     email?: string;
     linkedin?: string;
@@ -157,7 +184,9 @@ export function createPersonSchema(options: {
     instagram?: string;
   };
 }) {
-  const { name, alternateName, description, contact } = options;
+  const { name, alternateName, description, contact, locale = 'ko' } = options;
+  const config = baseConfig[locale];
+  const localePrefix = locale === 'ko' ? '' : `/${locale}`;
 
   return {
     "@context": "https://schema.org",
@@ -165,14 +194,14 @@ export function createPersonSchema(options: {
     name,
     ...(alternateName && { alternateName }),
     description,
-    url: `${baseConfig.baseUrl}/profile`,
+    url: `${baseConfig.baseUrl}${localePrefix}/profile`,
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${baseConfig.baseUrl}/profile`,
+      "@id": `${baseConfig.baseUrl}${localePrefix}/profile`,
     },
     worksFor: {
       "@type": "Organization",
-      name: baseConfig.siteName,
+      name: config.siteName,
       url: baseConfig.baseUrl,
     },
     ...(contact && {

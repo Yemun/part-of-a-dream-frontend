@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createComment, Comment } from "@/lib/content";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -15,6 +16,7 @@ export default function CommentForm({
   postSlug,
   onCommentAdded,
 }: CommentFormProps) {
+  const t = useTranslations('comments');
   const [author, setAuthor] = useState("");
   const [email, setEmail] = useState("");
   const [content, setContent] = useState("");
@@ -24,7 +26,7 @@ export default function CommentForm({
     e.preventDefault();
 
     if (!author.trim() || !email.trim() || !content.trim()) {
-      alert("모든 필드를 입력해주세요.");
+      alert(t('emailRequired'));
       return;
     }
 
@@ -43,14 +45,14 @@ export default function CommentForm({
         setEmail("");
         setContent("");
         onCommentAdded(comment); // 생성된 댓글 객체를 전달하여 낙관적 업데이트
-        alert("댓글이 성공적으로 등록되었습니다!");
+        alert(t('commentPosted'));
       } else {
-        alert("댓글 등록에 실패했습니다. 다시 시도해주세요.");
+        alert(t('commentPosted'));
         onCommentAdded(); // 실패 시 전체 리페치
       }
     } catch (error) {
       console.error("댓글 작성 실패:", error);
-      alert("댓글 작성에 실패했습니다. 다시 시도해주세요.");
+      alert(t('commentPosted'));
       onCommentAdded(); // 에러 시에도 전체 리페치
     } finally {
       setIsSubmitting(false);
@@ -60,41 +62,38 @@ export default function CommentForm({
   return (
     <div className="mt-8 p-6 rounded-2xl border border-black dot-pattern texture-filter dark:border-white">
       <h3 className="text-lg font-semibold mb-4 text-stroke-effect dark:text-white">
-        댓글 남기기
+        {t('writeComment')}
       </h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             type="text"
             id="author"
-            // label="닉네임"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            placeholder="닉네임을 입력하세요"
+            placeholder={t('name')}
             disabled={isSubmitting}
           />
           <Input
             type="email"
             id="email"
-            // label="이메일"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="이메일을 입력하세요"
+            placeholder={t('email')}
             disabled={isSubmitting}
           />
         </div>
         <Textarea
           id="content"
-          // label="댓글"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={4}
-          placeholder="댓글을 입력하세요"
+          placeholder={t('message')}
           disabled={isSubmitting}
         />
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting} size="lg">
-            {isSubmitting ? "등록 중..." : "댓글 등록"}
+            {isSubmitting ? t('submit') + '...' : t('submit')}
           </Button>
         </div>
       </form>

@@ -64,7 +64,7 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
                   className="stroke-red-500 group-hover:stroke-white group-hover:stroke-2 dark:stroke-red-400 dark:group-hover:stroke-black trasnistion-all"
                 />
                 <text
-                  className="text-base font-semibold stroke-white dark:stroke-black stroke-6 group-hover:stroke-4 transition-all"
+                  className="text-base font-semibold uppercase stroke-white dark:stroke-black stroke-6 group-hover:stroke-4 transition-all"
                   strokeLinejoin="round"
                 >
                   <textPath href={`#circle-${post.slug}`}>
@@ -73,7 +73,7 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
                       : post.title}
                   </textPath>
                 </text>
-                <text className="text-base font-semibold fill-red-500 dark:fill-red-400">
+                <text className="text-base font-semibold uppercase fill-red-500 dark:fill-red-400">
                   <textPath href={`#circle-${post.slug}`}>
                     {post.title.length > 25
                       ? post.title.substring(0, 23) + "..."

@@ -24,6 +24,8 @@ export type BlogPost = {
   /** MDX file body */
   body: MDX
   slug: string
+  originalSlug: string
+  locale: string
 }  
 
 /** Nested types */

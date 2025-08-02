@@ -1,68 +1,68 @@
 ---
-title: "아내의 가계부를 써보자"
-publishedAt: "2025-06-14"
-description: "신혼 가계부 작성에 대한 일지"
-tags: ["결혼", "python", "tips"]
+title: Wife's ledger
+publishedAt: 2025-06-14
+description: A diary about writing a household account book for newlyweds
+tags: [“marriage”, ‘python’, “tips”]
 ---
 
-작년 10월, 사랑하는 사람을 만나 결혼을 하게 되었습니다. 그와 동시에 연애 시절에는 생각하지 않았던 현실적인 문제들이 쏟아졌는데요, 그중 하나가 바로 **가계부**였습니다.
+Last October, I met the love of my life and got married. At the same time, I was faced with practical issues that I hadn't thought about during our courtship, one of which was **household finances**.
 
-저는 9년 전 처음 취직한 뒤 다음 해에 독립을 했고, 그때부터 본격적으로 돈이 어디로 얼마나 빠져나가는지를 체감하게 되었습니다. 전기세, 가스비, 인터넷비 같은 고정 지출들이 눈앞에서 원화 단위로 빠져나가니 더는 무심할 수 없더라고요.
+Nine years ago, I got my first job, and I moved out the following year. From then on, I began to realize where my money was going and how much I was spending. Fixed expenses like electricity, gas, and internet bills were adding up, so I couldn’t ignore them anymore.
 
-### 대학 시절의 가계부는 체크카드 내역이 전부였어요
+### In college, my household budget consisted of my debit card statements.
 
-학식, 커피, 과제 재료비 등 카테고리가 단순했기에 체크카드 내역만으로 충분했어요. 하지만 소비가 늘어나고 복잡해지면서 ‘지출 항목에 이름 붙이기’가 어려워졌습니다. 친구들과 저녁 겸 술자리를 하면, 그건 **식비**일까요? **술값**일까요?
+Categories like meals, coffee, and school supplies were simple, so debit card statements were enough. However, as my spending increased and became more complex, it became difficult to categorize each expense. When hanging out with friends for dinner and drinks, is that **food expenses** or **drink expenses**?
 
-그때 등장한 서비스가 바로 **뱅크샐러드**였습니다.
+That’s when I started using the service **Bank Salad**.
 
-![내 가계부 작성을 도와준 당시 뱅크샐러드. 지금은 유전자 검사 오픈런으로 유명하다](/images/screenshot_banksalad.png)
+![Bank Salad helped me create my household budget back then. It's now famous for its genetic testing service.](/images/screenshot_banksalad.png)
 
-내 신용카드 내역을 긁어 자동으로 항목명을 붙여주는 뱅크샐러드 덕분에 지출 관리가 쉬워졌고, 예산 설정과 체크도 가능했죠.
+Thanks to Bank Salad, which automatically categorizes my credit card transactions, managing my expenses became easier. I could also set and check budgets.
 
-### 그런데 어느 날, 토스 체크카드가 나타났어요
+### Then one day, the Toss Check Card appeared
 
-![내 주력 카드였던 토스 체크카드](/images/toss-checkcard.png)
+![My main card, the Toss Check Card](/images/toss-checkcard.png)
 
-3년간 잘 쓰던 뱅크샐러드를 잠시 접게 된 계기는 **토스 체크카드**였습니다. 당시에는 실적 조건도, 연회비도 없고, 결제만 하면 300원씩 캐시백! 빅맥도 5,000원이 안 되는 가격에 먹을 수 있었죠. 하지만 한 가지 문제가 생겼습니다.
+I temporarily stopped using Bank Salad after three years because of the Toss Check Card. At the time, there were no performance conditions or annual fees, and you received 300 won in cash back for each payment. You could even eat a Big Mac for less than 5,000 won! However, one problem arose.
 
-> 토스에서 쓴 내역은 뱅크샐러드에서 보이지 않았어요.
+> The transactions made with Toss were not visible in Bank Salad.
 
-토스는 자사 앱 안에 "소비" 화면을 따로 제공했고, 캐시백 내역까지 정리해주는 편리한 구조였죠. 반면, 당시 뱅크샐러드는 타사 카드사 데이터를 스크래핑으로 받아오는 기술에 한계가 있었고, 토스는 정보를 외부에 공유하지 않았습니다. 그래서 어쩔수 없이 토스로 가계부를 옮겼지만, 제가 한 가지 간과한게 있었어요.
+Toss provided a separate "Spending" screen within its app with a convenient structure for organizing cashback details. At the time, however, Bank Salad had technical limitations when it came to scraping data from other card companies, and Toss did not share information externally. I had no choice but to move my household budget to Toss. However, there was one thing I overlooked.
 
-토스 소비 탭에는 뱅크샐러드에는 있던 **"파일로 받기" 기능이 없었습니다!** 전 매년 엑셀로 가계부를 정리하고 있어서 이 기능이 정말 필요했어요. 이 메뉴 저 메뉴 뒤져봤지만, 소비 내역 전체를 뽑을 수 있는 방법이 없었어요. ‘설마 안 될 리 없지’라는 저의 안일한 믿음이 문제였죠.
+The Toss Consumption tab did not have the "Download as File" feature that Bank Salad had. I needed this feature because I organize my household budget in Excel every year. I searched through various menus but could not find a way to extract the entire consumption history. My complacent belief that "it must be possible" was the problem.
 
-### 그래서 결국 ‘편한가계부’로 정착했습니다
+### So I eventually settled on “Easy Ledger”
 
-![가계부에 진심인 앱, 편한가계부](/images/screenshot_easy-ledger.png)
+![The app that takes household budgets seriously, Easy Ledger](/images/screenshot_easy-ledger.png)
 
-이 서비스는 단순합니다. **카드사에서 온 문자를 복사해 앱에 붙여넣기만 하면**, 자동으로 이름을 붙여줍니다. 캐시백도, 항목 분류도 수작업이 필요 없어요. 아이폰의 단축어 기능을 이용하면 이 과정조차 자동화할 수 있습니다.
+This service is simple. **Just copy the text message from the card company and paste it into the app,** and it automatically assigns a name. No manual work is needed for cashback or item classification. You can even automate this process using the iPhone’s shortcut feature.
 
-## 그리고 결혼 후, 새로운 카테고리가 생겼어요: "아내의 소비"
+## And after marriage, a new category emerged: “Wife's spending.”
 
-이 내역은 마이데이터로도, 카드 문자로도 받아볼 수 없습니다. 가장 큰 문제는, 받아본다 해도 왜 그 소비를 했는지는 직접 물어보지 않으면 절대 알 수 없다는 거예요. 만약 결제 때마다 아내에게 “왜 샀어?“라고 묻는다면… 아마 저는 지금쯤 다시 솔로로 돌아가 있겠죠. 아내에게 반복 질문은 금물이거든요. 그래서 저희는 약속을 했습니다.
+This transaction history cannot be accessed via MyData or credit card texts. The biggest issue is that even if you receive the information, you can never know why the spending occurred unless you ask directly. If I were to ask my wife, “Why did you buy that?” every time she made a purchase… I might be single again by now. Repeated questions are off-limits with my wife. So we made a deal.
 
-> **투자**는 아내가, **소비 관리**는 내가
+> **Investments** are handled by my wife, and **spending management** is handled by me.
 
-아내는 코로나 시절에 저점의 엔비디아를 매수한 화려한 이력이 있고, 저는 같은 시기에 고점의 지방 아파트를 매수해 -10%를 맞았습니다. 자연스러운 결정이였어요.
+My wife bought NVIDIA at the bottom during the pandemic, while I bought a local apartment at the peak and ended up with a 10% loss. It was a natural decision.
 
-### 본격적인 아내 가계부 작성
+### Starting the wife's household budget book
 
-아내는 5개 은행과 4개 신용카드를 돌려가며 혜택을 챙깁니다. 저는 각 금융사 사이트에서 실적과 내역을 다운로드해 **9개 금융사의 데이터를 엑셀로 취합**했죠. 무려 **385개의 항목**이 나왔습니다.
+She rotates between five banks and four credit cards to maximize benefits. I downloaded transaction histories and statements from each financial institution’s website and compiled data from nine institutions into Excel. There were 385 items in total.
 
-각 항목을 제가 만든 11개 대분류, 42개 소분류에 맞춰 분류하려니 머리가 아찔했어요.
-“내가 왜 이걸 하고 있지?”라는 생각이 들 무렵, **Claude**를 만났습니다.
+Categorizing each item into the 11 major categories and 42 subcategories I created was overwhelming.
+Just as I was wondering, "Why am I doing this?" , I encountered Claude.
 
-### AI에게 가계부를 맡겨봤습니다
+### I entrusted my household budget to AI
 
-최근 회사에서도 많은 업무를 자동화하고 있어서, 자연스럽게 Claude에게도 프롬프트를 작성해보았어요. 대학 시절 파이썬으로 데이터를 다뤘던 기억이 있어 명령어 작성이 어렵진 않았습니다.
+Since my company has been automating many tasks recently, I naturally tried writing a prompt for Claude. I remembered handling data with Python in college, so writing the command wasn’t difficult.
 
-![“소비 내역을 내 분류 기준 파일에 맞게 정리해줘.”로 생성된 코드](/images/screenshot_vsc-consumption.png)
+![Code generated from “Organize the consumption records according to my classification criteria file.”](/images/screenshot_vsc-consumption.png)
 
-결과는 놀라웠습니다. 제 파이썬 화면엔 220줄짜리 코드가 펼쳐졌고, 그 안엔 500개가 넘는 키워드 매칭 테이블이 객체 형태로 정리되어 있었습니다.
+The results were astonishing. My Python screen displayed 220 lines of code containing over 500 keyword-matching tables organized in object form.
 
-Claude 덕분에 저는 아내에게 매일 결제 내역을 묻지 않아도 되는 남편이 되었고, 이제 분기별로 소득과 지출을 한눈에 볼 수 있는 온전한 **가계부**가 완성됐습니다.
+Thanks to Claude, I no longer have to ask my wife about daily payment details. Now, I have a complete household budget that allows me to view income and expenses at a glance on a quarterly basis.
 
-마지막으로 Claude가 작성한 파이썬 코드를 공유할게요. 이 코드가 많은 가정에 평화를 가져다주길 바랍니다.
+Finally, I’ll share the Python code written by Claude. I hope it brings peace to many households.
 
 ```
 import pandas as pd
