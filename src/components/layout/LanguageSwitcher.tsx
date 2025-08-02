@@ -29,11 +29,12 @@ export default function LanguageSwitcher() {
       path = "/";
     }
 
-    // Build new URL
+    // Build new URL with explicit host handling for production
     let newUrl: string;
     if (newLocale === "ko") {
       // Korean (default) gets no prefix
       const newPath = path === "/" ? "/" : path;
+      // Force reload for production environment
       newUrl = `${url.protocol}//${url.host}${newPath}${url.search}`;
     } else {
       // English gets /en prefix
@@ -41,8 +42,8 @@ export default function LanguageSwitcher() {
       newUrl = `${url.protocol}//${url.host}${newPath}${url.search}`;
     }
 
-    // Navigate to new URL
-    window.location.href = newUrl;
+    // Use location.replace for better reliability
+    window.location.replace(newUrl);
   };
 
   const toggleLocale = () => {

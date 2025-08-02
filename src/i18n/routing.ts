@@ -1,15 +1,16 @@
-import { defineRouting } from 'next-intl/routing';
-import { createNavigation } from 'next-intl/navigation';
+import { defineRouting } from "next-intl/routing";
+import { createNavigation } from "next-intl/navigation";
 
 export const routing = defineRouting({
   // A list of all locales that are supported
-  locales: ['ko', 'en'],
+  locales: ["ko", "en"],
 
   // Used when no locale matches
-  defaultLocale: 'ko',
-  
+  defaultLocale: "ko",
+
   // Use 'as-needed' to avoid prefix for default locale (better performance)
-  localePrefix: 'as-needed',
+  localePrefix: "as-needed",
+  localeDetection: false,
 
   // Optional: Set different pathnames based on locale
   // Removing pathnames to use the same paths for all locales
