@@ -3,34 +3,34 @@ import Script from "next/script";
 import Navigation from "@/components/layout/Navigation";
 import { createMetadata } from "@/lib/metadata";
 import "../globals.css";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
-import { routing } from '@/i18n/routing';
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { routing } from "@/i18n/routing";
 
 export const metadata: Metadata = createMetadata();
 
 export function generateStaticParams() {
-  return routing.locales.map((locale) => ({locale}));
+  return routing.locales.map((locale) => ({ locale }));
 }
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
-  params: Promise<{locale: string}>;
+  params: Promise<{ locale: string }>;
 }
 
 export default async function LocaleLayout({
   children,
-  params
+  params,
 }: LocaleLayoutProps) {
-  const {locale} = await params;
-  
+  const { locale } = await params;
+
   // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as 'ko' | 'en')) {
+  if (!routing.locales.includes(locale as "ko" | "en")) {
     notFound();
   }
- 
-  // Provide only essential messages to reduce bundle size
+
+  // Optimized message loading - load essential messages only
   const messages = await getMessages();
 
   return (

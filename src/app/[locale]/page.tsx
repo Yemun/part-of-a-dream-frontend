@@ -41,12 +41,12 @@ export default async function Home({ params }: PageProps) {
             new Date(a.publishedAt).getTime()
         )
         .map((post: BlogPost) => (
-          <PostCard key={post.slug} post={post} />
+          <PostCard key={post.slug} post={post} locale={locale} />
         ))}
 
       {/* 30개의 "작업 중" 링크 추가 */}
       {Array.from({ length: 48 }, (_, index) => {
-        return <PostCard key={`placeholder-${index}`} text="-" />;
+        return <PostCard key={`placeholder-${index}`} text="-" locale={locale} />;
       })}
     </div>
   );

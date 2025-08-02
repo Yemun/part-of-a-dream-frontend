@@ -6,9 +6,10 @@ interface PostCardProps {
   post?: BlogPost;
   text?: string;
   opacity?: number;
+  locale?: string; // 로케일을 props로 받기
 }
 
-export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
+export default function PostCard({ post, text, opacity = 1, locale }: PostCardProps) {
   // Placeholder 모드 (post가 없는 경우)
   if (!post) {
     return (
@@ -42,6 +43,8 @@ export default function PostCard({ post, text, opacity = 1 }: PostCardProps) {
           >
             <Link
               href={`/posts/${post.slug}`}
+              locale={locale}
+              prefetch={true}
               className="group w-[106px] h-[106px] rounded-full outline-2 outline-red-500 dark:outline-red-400 flex items-center justify-center bg-white dark:bg-black hover:bg-red-500 dark:hover:bg-red-400 transition-colors"
             >
               <svg
