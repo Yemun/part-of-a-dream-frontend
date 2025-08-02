@@ -1,5 +1,13 @@
-import { allBlogPosts, BlogPost as ContentlayerBlogPost } from "contentlayer/generated";
-import { getSupabaseClient, Comment as SupabaseComment, CommentInsert, CommentUpdate } from "./supabase";
+import {
+  allBlogPosts,
+  BlogPost as ContentlayerBlogPost,
+} from "contentlayer/generated";
+import {
+  getSupabaseClient,
+  Comment as SupabaseComment,
+  CommentInsert,
+  CommentUpdate,
+} from "./supabase";
 
 // BlogPost 인터페이스를 Contentlayer에 맞게 조정
 export interface BlogPost {
@@ -17,7 +25,6 @@ export interface BlogPost {
     code: string;
   };
 }
-
 
 // Supabase Comment 인터페이스를 기존 Comment와 호환되도록 조정
 export interface Comment {
@@ -40,24 +47,26 @@ const convertContentlayerPost = (post: ContentlayerBlogPost): BlogPost => {
     publishedAt: post.publishedAt,
     description: post.description,
     tags: post.tags,
-    locale: post.locale || 'ko', // 기본값은 한국어
+    locale: post.locale || "ko", // 기본값은 한국어
     body: post.body,
     comments: [], // 댓글은 별도 처리
   };
 };
 
-
 export const getBlogPosts = async (locale?: string): Promise<BlogPost[]> => {
   try {
     let posts = allBlogPosts
-      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      )
       .map(convertContentlayerPost);
-    
+
     // locale이 지정된 경우 해당 locale의 포스트만 필터링
     if (locale) {
-      posts = posts.filter(post => post.locale === locale);
+      posts = posts.filter((post) => post.locale === locale);
     }
-    
+
     return posts;
   } catch (error) {
     console.error("Error fetching blog posts:", error);
@@ -74,67 +83,77 @@ export const getPostWithDetails = async (
   comments: Comment[];
 }> => {
   try {
-    // Contentlayer에서 포스트 찾기 - locale이 지정된 경우 해당 locale의 포스트만 선택
+    // Contentlayer에서 포스트 찾기 - locale이 지정된 경우 해당 locale의 포스트 우선 선택
     let contentlayerPost;
     if (locale) {
-      // 지정된 locale의 포스트만 찾기
-      contentlayerPost = allBlogPosts.find(post => {
-        const postSlug = post._raw.flattenedPath.replace("posts/", "").replace(/-(?:ko|en)$/, "");
-        const postLocale = post._raw.flattenedPath.replace("posts/", "").endsWith('-en') ? 'en' : 'ko';
-        return postSlug === slug && postLocale === locale;
-      });
-    } else {
-      // locale이 지정되지 않으면 기본 locale(ko) 포스트 찾기
-      contentlayerPost = allBlogPosts.find(post => {
-        const postSlug = post._raw.flattenedPath.replace("posts/", "").replace(/-(?:ko|en)$/, "");
-        const postLocale = post._raw.flattenedPath.replace("posts/", "").endsWith('-en') ? 'en' : 'ko';
-        return postSlug === slug && postLocale === 'ko';
-      });
+      contentlayerPost = allBlogPosts.find(
+        (post) => post.slug === slug && (post.locale || "ko") === locale
+      );
     }
-    
+    // locale이 지정되지 않았거나 해당 locale의 포스트가 없으면 첫 번째 포스트 선택
     if (!contentlayerPost) {
-      return { post: null, adjacentPosts: { previous: null, next: null }, comments: [] };
+      contentlayerPost = allBlogPosts.find((post) => post.slug === slug);
+    }
+
+    if (!contentlayerPost) {
+      return {
+        post: null,
+        adjacentPosts: { previous: null, next: null },
+        comments: [],
+      };
     }
 
     const post = convertContentlayerPost(contentlayerPost);
-    
+
     // 동일한 locale의 포스트들만 필터링하여 날짜순 정렬
     let postsForAdjacent = allBlogPosts
-      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+      )
       .map(convertContentlayerPost);
-    
+
     // locale이 지정된 경우 해당 locale의 포스트만 사용
     if (locale) {
-      postsForAdjacent = postsForAdjacent.filter(p => p.locale === locale);
+      postsForAdjacent = postsForAdjacent.filter((p) => p.locale === locale);
     }
 
     // 인접 포스트 찾기 (같은 locale 내에서)
     const currentIndex = postsForAdjacent.findIndex((p) => p.slug === slug);
     const adjacentPosts = {
       previous: currentIndex > 0 ? postsForAdjacent[currentIndex - 1] : null,
-      next: currentIndex < postsForAdjacent.length - 1 ? postsForAdjacent[currentIndex + 1] : null,
+      next:
+        currentIndex < postsForAdjacent.length - 1
+          ? postsForAdjacent[currentIndex + 1]
+          : null,
     };
 
     // Supabase에서 댓글 가져오기 (환경 변수가 있을 때만)
     let comments: Comment[] = [];
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (
+      process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
       try {
         comments = await getComments(slug);
       } catch (error) {
-        console.error('Error loading comments:', error);
+        console.error("Error loading comments:", error);
         comments = [];
       }
     } else {
-      console.log('Supabase not configured, skipping comment loading');
+      console.log("Supabase not configured, skipping comment loading");
     }
 
     return { post, adjacentPosts, comments };
   } catch (error) {
     console.error("Error fetching post with details:", error);
-    return { post: null, adjacentPosts: { previous: null, next: null }, comments: [] };
+    return {
+      post: null,
+      adjacentPosts: { previous: null, next: null },
+      comments: [],
+    };
   }
 };
-
 
 // Supabase Comment 변환 함수
 const convertSupabaseComment = (comment: SupabaseComment): Comment => {
@@ -154,19 +173,19 @@ export const getComments = async (postSlug: string): Promise<Comment[]> => {
   try {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
-      .from('comments')
-      .select('*')
-      .eq('post_slug', postSlug)
-      .order('created_at', { ascending: true });
+      .from("comments")
+      .select("*")
+      .eq("post_slug", postSlug)
+      .order("created_at", { ascending: true });
 
     if (error) {
-      console.error('Error fetching comments:', error);
+      console.error("Error fetching comments:", error);
       return [];
     }
 
     return (data as unknown as SupabaseComment[]).map(convertSupabaseComment);
   } catch (error) {
-    console.error('Error fetching comments:', error);
+    console.error("Error fetching comments:", error);
     return [];
   }
 };
@@ -188,19 +207,19 @@ export const createComment = async (commentData: {
     };
 
     const { data, error } = await supabase
-      .from('comments')
+      .from("comments")
       .insert(insertData)
       .select()
       .single();
 
     if (error) {
-      console.error('Error creating comment:', error);
+      console.error("Error creating comment:", error);
       return null;
     }
 
     return convertSupabaseComment(data as unknown as SupabaseComment);
   } catch (error) {
-    console.error('Error creating comment:', error);
+    console.error("Error creating comment:", error);
     return null;
   }
 };
@@ -213,20 +232,20 @@ export const updateComment = async (
   try {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
-      .from('comments')
+      .from("comments")
       .update(updates)
-      .eq('id', commentId)
+      .eq("id", commentId)
       .select()
       .single();
 
     if (error) {
-      console.error('Error updating comment:', error);
+      console.error("Error updating comment:", error);
       return null;
     }
 
     return convertSupabaseComment(data as unknown as SupabaseComment);
   } catch (error) {
-    console.error('Error updating comment:', error);
+    console.error("Error updating comment:", error);
     return null;
   }
 };
@@ -236,18 +255,18 @@ export const deleteComment = async (commentId: string): Promise<boolean> => {
   try {
     const supabase = getSupabaseClient();
     const { error } = await supabase
-      .from('comments')
+      .from("comments")
       .delete()
-      .eq('id', commentId);
+      .eq("id", commentId);
 
     if (error) {
-      console.error('Error deleting comment:', error);
+      console.error("Error deleting comment:", error);
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Error deleting comment:', error);
+    console.error("Error deleting comment:", error);
     return false;
   }
 };

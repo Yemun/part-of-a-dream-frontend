@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import RelativeTime from "@/components/common/RelativeTime";
 import { BlogPost } from "@/lib/content";
 
