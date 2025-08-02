@@ -5,9 +5,9 @@ export default createMiddleware({
   locales: ["ko", "en"],
   // Used when no locale matches
   defaultLocale: "ko",
-  // Use 'as-needed' to avoid prefix for default locale (better performance)
-  localePrefix: "as-needed",
-  localeDetection: false,
+  // Use 'always' for consistent URLs and better UX with auto-detection
+  localePrefix: "always",
+  localeDetection: true,
 });
 
 export const config = {

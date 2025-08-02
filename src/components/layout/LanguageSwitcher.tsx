@@ -6,7 +6,7 @@ export default function LanguageSwitcher() {
   const pathname = usePathname();
 
   // Determine actual current locale from URL
-  // According to routing config: Korean (default) = no prefix, English = /en prefix
+  // With localePrefix: "always", both locales have prefixes: /ko and /en
   const actualLocale = pathname.startsWith("/en") ? "en" : "ko";
   const locale = actualLocale;
 
@@ -22,25 +22,19 @@ export default function LanguageSwitcher() {
     let path = url.pathname;
 
     // Clean the path by removing any existing locale prefix
-    // With localePrefix: 'as-needed', only non-default locales get prefixes
-    if (path.startsWith("/en/")) {
+    // With localePrefix: 'always', both locales have prefixes (/ko and /en)
+    if (path.startsWith("/ko/")) {
       path = path.substring(3);
-    } else if (path === "/en") {
+    } else if (path.startsWith("/en/")) {
+      path = path.substring(3);
+    } else if (path === "/ko" || path === "/en") {
       path = "/";
     }
 
     // Build new URL with explicit host handling for production
-    let newUrl: string;
-    if (newLocale === "ko") {
-      // Korean (default) gets no prefix
-      const newPath = path === "/" ? "/" : path;
-      // Force reload for production environment
-      newUrl = `${url.protocol}//${url.host}${newPath}${url.search}`;
-    } else {
-      // English gets /en prefix
-      const newPath = path === "/" ? "/en" : `/en${path}`;
-      newUrl = `${url.protocol}//${url.host}${newPath}${url.search}`;
-    }
+    // Both locales now get prefixes
+    const newPath = path === "/" ? `/${newLocale}` : `/${newLocale}${path}`;
+    const newUrl = `${url.protocol}//${url.host}${newPath}${url.search}`;
 
     // Use location.replace for better reliability
     window.location.replace(newUrl);
