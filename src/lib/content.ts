@@ -74,14 +74,22 @@ export const getPostWithDetails = async (
   comments: Comment[];
 }> => {
   try {
-    // Contentlayer에서 포스트 찾기 - locale이 지정된 경우 해당 locale의 포스트 우선 선택
+    // Contentlayer에서 포스트 찾기 - locale이 지정된 경우 해당 locale의 포스트만 선택
     let contentlayerPost;
     if (locale) {
-      contentlayerPost = allBlogPosts.find(post => post.slug === slug && (post.locale || 'ko') === locale);
-    }
-    // locale이 지정되지 않았거나 해당 locale의 포스트가 없으면 첫 번째 포스트 선택
-    if (!contentlayerPost) {
-      contentlayerPost = allBlogPosts.find(post => post.slug === slug);
+      // 지정된 locale의 포스트만 찾기
+      contentlayerPost = allBlogPosts.find(post => {
+        const postSlug = post._raw.flattenedPath.replace("posts/", "").replace(/-(?:ko|en)$/, "");
+        const postLocale = post._raw.flattenedPath.replace("posts/", "").endsWith('-en') ? 'en' : 'ko';
+        return postSlug === slug && postLocale === locale;
+      });
+    } else {
+      // locale이 지정되지 않으면 기본 locale(ko) 포스트 찾기
+      contentlayerPost = allBlogPosts.find(post => {
+        const postSlug = post._raw.flattenedPath.replace("posts/", "").replace(/-(?:ko|en)$/, "");
+        const postLocale = post._raw.flattenedPath.replace("posts/", "").endsWith('-en') ? 'en' : 'ko';
+        return postSlug === slug && postLocale === 'ko';
+      });
     }
     
     if (!contentlayerPost) {
