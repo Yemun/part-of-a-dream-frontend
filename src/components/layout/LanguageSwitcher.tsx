@@ -22,22 +22,18 @@ export default function LanguageSwitcher() {
     let path = url.pathname;
 
     // Clean the path by removing any existing locale prefix
-    // With localePrefix: 'always', all locales get prefixes
+    // With localePrefix: 'as-needed', only non-default locales get prefixes
     if (path.startsWith("/en/")) {
       path = path.substring(3);
     } else if (path === "/en") {
-      path = "/";
-    } else if (path.startsWith("/ko/")) {
-      path = path.substring(3);
-    } else if (path === "/ko") {
       path = "/";
     }
 
     // Build new URL
     let newUrl: string;
     if (newLocale === "ko") {
-      // Korean gets explicit /ko prefix
-      const newPath = path === "/" ? "/ko" : `/ko${path}`;
+      // Korean (default) gets no prefix
+      const newPath = path === "/" ? "/" : path;
       newUrl = `${url.protocol}//${url.host}${newPath}${url.search}`;
     } else {
       // English gets /en prefix

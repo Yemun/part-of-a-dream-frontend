@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   
   // Static pages for each locale
   for (const locale of routing.locales) {
-    const localePrefix = `/${locale}` // All locales get prefixes with 'always' setting
+    const localePrefix = locale === routing.defaultLocale ? '' : `/${locale}` // Only non-default locales get prefixes
     
     // Get posts for this specific locale
     const posts = await getBlogPosts(locale)
@@ -26,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           languages: Object.fromEntries(
             routing.locales.map(loc => [
               loc,
-              `${baseUrl}/${loc}` // All locales get prefixes
+              loc === routing.defaultLocale ? baseUrl : `${baseUrl}/${loc}` // Only non-default locales get prefixes
             ])
           )
         }
@@ -40,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           languages: Object.fromEntries(
             routing.locales.map(loc => [
               loc,
-              `${baseUrl}/${loc}/profile` // All locales get prefixes
+              loc === routing.defaultLocale ? `${baseUrl}/profile` : `${baseUrl}/${loc}/profile` // Only non-default locales get prefixes
             ])
           )
         }
@@ -58,7 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           languages: Object.fromEntries(
             routing.locales.map(loc => [
               loc,
-              `${baseUrl}/${loc}/posts/${post.slug}` // All locales get prefixes
+              loc === routing.defaultLocale ? `${baseUrl}/posts/${post.slug}` : `${baseUrl}/${loc}/posts/${post.slug}` // Only non-default locales get prefixes
             ])
           )
         }
