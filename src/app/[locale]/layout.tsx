@@ -30,8 +30,7 @@ export default async function LocaleLayout({
     notFound();
   }
  
-  // Providing all messages to the client
-  // side is the easiest way to get started
+  // Provide only essential messages to reduce bundle size
   const messages = await getMessages();
 
   return (

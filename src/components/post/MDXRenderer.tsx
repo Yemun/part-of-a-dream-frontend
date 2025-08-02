@@ -1,5 +1,10 @@
 import { useMDXComponent } from "next-contentlayer2/hooks";
-import Image from "next/image";
+import dynamic from "next/dynamic";
+
+// Image 컴포넌트를 동적 로딩으로 최적화
+const Image = dynamic(() => import("next/image"), {
+  loading: () => <div className="bg-gray-200 dark:bg-gray-700 animate-pulse h-[400px] w-full rounded" />,
+});
 
 interface MDXRendererProps {
   code: string;

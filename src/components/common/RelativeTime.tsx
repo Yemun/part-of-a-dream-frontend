@@ -14,8 +14,8 @@ export default function RelativeTime({
   className = "",
   absolute = false,
 }: RelativeTimeProps) {
-  const [displayTime, setDisplayTime] = useState<string>("");
   const [isClient, setIsClient] = useState(false);
+  const [displayTime, setDisplayTime] = useState<string>("");
   const t = useTranslations("time");
   const locale = useLocale();
 

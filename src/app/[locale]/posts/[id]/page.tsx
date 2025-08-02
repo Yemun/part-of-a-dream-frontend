@@ -11,24 +11,21 @@ import RelativeTime from "@/components/common/RelativeTime";
 import PostNavigation from "@/components/post/PostNavigation";
 import CommentSection from "@/components/comment/CommentSection";
 
-// 정적 경로 생성 - 모든 포스트를 빌드타임에 미리 생성
+// 정적 경로 생성 - 최적화된 버전
 export async function generateStaticParams() {
   try {
-    const { getBlogPosts } = await import("@/lib/content");
-    const locales = ['ko', 'en'];
-    const params = [];
+    const { allBlogPosts } = await import("contentlayer/generated");
     
-    for (const locale of locales) {
-      const posts = await getBlogPosts(locale);
-      for (const post of posts) {
-        params.push({
-          locale,
-          id: post.slug,
-        });
-      }
-    }
-    
-    return params;
+    // 더 간단한 방식으로 파라미터 생성
+    return allBlogPosts.flatMap(post => {
+      const isEnglish = post._raw.flattenedPath.endsWith('-en');
+      const locale = isEnglish ? 'en' : 'ko';
+      
+      return {
+        locale,
+        id: post.slug,
+      };
+    });
   } catch (error) {
     console.error("Error generating static params:", error);
     return [];
