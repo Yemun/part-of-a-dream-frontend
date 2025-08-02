@@ -4,11 +4,13 @@ import { routing } from './i18n/routing';
 export default createMiddleware(routing);
 
 export const config = {
-  // Match only internationalized pathnames
+  // More specific matcher for production performance
   matcher: [
     // Match root
     '/',
-    // Match all paths except static files and api routes
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)' 
+    // Match specific routes only (avoid processing static files)
+    '/(ko|en)/:path*',
+    // Match non-localized routes that need processing
+    '/((?!api|_next|_vercel|favicon|icon|sitemap|robots|.*\\.).*)'
   ]
 };
