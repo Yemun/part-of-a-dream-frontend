@@ -172,6 +172,13 @@ const convertSupabaseComment = (comment: SupabaseComment): Comment => {
 export const getComments = async (postSlug: string): Promise<Comment[]> => {
   try {
     const supabase = getSupabaseClient();
+    
+    // Environment variables check
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.error("Missing Supabase environment variables");
+      return [];
+    }
+    
     const { data, error } = await supabase
       .from("comments")
       .select("*")
@@ -179,13 +186,23 @@ export const getComments = async (postSlug: string): Promise<Comment[]> => {
       .order("created_at", { ascending: true });
 
     if (error) {
-      console.error("Error fetching comments:", error);
+      console.error("Supabase error fetching comments:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       return [];
     }
 
     return (data as unknown as SupabaseComment[]).map(convertSupabaseComment);
   } catch (error) {
-    console.error("Error fetching comments:", error);
+    console.error("Error fetching comments:", {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      details: error instanceof Error ? error.stack : String(error),
+      hint: 'Check network connectivity and Supabase configuration',
+      code: ''
+    });
     return [];
   }
 };
