@@ -16,12 +16,12 @@ import CommentSection from "@/components/comment/CommentSection";
 export async function generateStaticParams() {
   try {
     const { allBlogPosts } = await import("contentlayer/generated");
-    
+
     // 더 간단한 방식으로 파라미터 생성
-    return allBlogPosts.flatMap(post => {
-      const isEnglish = post._raw.flattenedPath.endsWith('-en');
-      const locale = isEnglish ? 'en' : 'ko';
-      
+    return allBlogPosts.flatMap((post) => {
+      const isEnglish = post._raw.flattenedPath.endsWith("-en");
+      const locale = isEnglish ? "en" : "ko";
+
       return {
         locale,
         id: post.slug,
@@ -53,26 +53,29 @@ export async function generateMetadata({
     const { post } = await getPostWithDetails(id, locale);
 
     if (!post) {
-      const notFoundData = locale === 'ko' ? {
-        title: "게시글을 찾을 수 없습니다",
-        description: "요청하신 게시글이 존재하지 않습니다."
-      } : {
-        title: "Post Not Found",
-        description: "The requested post does not exist."
-      };
-      
+      const notFoundData =
+        locale === "ko"
+          ? {
+              title: "게시글을 찾을 수 없습니다",
+              description: "요청하신 게시글이 존재하지 않습니다.",
+            }
+          : {
+              title: "Post Not Found",
+              description: "The requested post does not exist.",
+            };
+
       return createMetadata({
         title: notFoundData.title,
         description: notFoundData.description,
-        locale: locale as 'ko' | 'en',
+        locale: locale as "ko" | "en",
       });
     }
 
     const description = post.description || extractDescription(post.content);
     const publishedTime = new Date(post.publishedAt).toISOString();
-    const localePrefix = locale === 'ko' ? '' : `/${locale}`;
-    const authorName = locale === 'ko' ? '예문' : 'Yemun';
-    const seoulKeyword = locale === 'ko' ? '서울' : 'Seoul';
+    const localePrefix = locale === "ko" ? "" : `/${locale}`;
+    const authorName = locale === "ko" ? "예문" : "Yemun";
+    const seoulKeyword = locale === "ko" ? "서울" : "Seoul";
 
     return createMetadata({
       title: post.title,
@@ -83,11 +86,11 @@ export async function generateMetadata({
       publishedTime,
       authors: [authorName],
       tags: [post.title],
-      locale: locale as 'ko' | 'en',
+      locale: locale as "ko" | "en",
     });
   } catch (error) {
     console.error("Error generating metadata:", error);
-    return createMetadata({ locale: locale as 'ko' | 'en' });
+    return createMetadata({ locale: locale as "ko" | "en" });
   }
 }
 
@@ -98,22 +101,25 @@ export default async function PostPage({ params }: PageProps) {
   setRequestLocale(locale);
 
   // 포스트 데이터와 댓글을 서버에서 함께 가져오기 (API 비용 최적화)
-  const { post, adjacentPosts, comments } = await getPostWithDetails(id, locale);
+  const { post, adjacentPosts, comments } = await getPostWithDetails(
+    id,
+    locale
+  );
 
   if (!post) {
     notFound();
   }
 
   // Article schema for rich snippets
-  const authorName = locale === 'ko' ? '예문' : 'Yemun';
-  
+  const authorName = locale === "ko" ? "예문" : "Yemun";
+
   const articleSchema = createArticleSchema({
     title: post.title,
     description: post.description || extractDescription(post.content),
     author: authorName,
     publishedTime: post.publishedAt,
     slug: post.slug,
-    locale: locale as 'ko' | 'en',
+    locale: locale as "ko" | "en",
   });
 
   return (

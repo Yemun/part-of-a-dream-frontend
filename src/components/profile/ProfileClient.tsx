@@ -37,9 +37,9 @@ const formatDate = (dateStr: string, present: string, locale?: string) => {
 
   // YYYY-MM-DD 형식을 locale에 따라 변환
   const [year, month] = dateStr.split("-");
-  
+
   // 영어권에서는 MM/YYYY, 한국어에서는 YYYY.MM
-  if (locale === 'en') {
+  if (locale === "en") {
     return `${month}/${year}`;
   }
   return `${year}.${month}`;
@@ -47,7 +47,7 @@ const formatDate = (dateStr: string, present: string, locale?: string) => {
 
 // Section heading component
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-3">
+  <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-3">
     {children}
   </h2>
 );
@@ -349,10 +349,12 @@ export default function ProfileClient({
 
   return (
     <section>
-      <SectionTitle>{t("name")}</SectionTitle>
+      <h1 className="font-bold text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-4 sm:mb-4">
+        {t("name")}
+      </h1>
 
       <div className="mb-8 sm:mb-10">
-        <p>{t("biography")}</p>
+        <p className="text-base sm:text-lg">{t("biography")}</p>
       </div>
 
       <div className="mb-4 sm:mb-6">

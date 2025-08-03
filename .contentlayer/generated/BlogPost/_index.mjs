@@ -5,8 +5,8 @@ import posts__figmaConfig_2025KoMdx from './posts__figma-config-2025-ko.mdx.json
 import posts__introduceEnMdx from './posts__introduce-en.mdx.json' with { type: 'json' }
 import posts__introduceKoMdx from './posts__introduce-ko.mdx.json' with { type: 'json' }
 import posts__memoryOfCoffeeEnMdx from './posts__memory-of-coffee-en.mdx.json' with { type: 'json' }
-import posts__memoryOfKoMdx from './posts__memory-of-ko.mdx.json' with { type: 'json' }
+import posts__memoryOfCoffeeKoMdx from './posts__memory-of-coffee-ko.mdx.json' with { type: 'json' }
 import posts__wifesLedgerEnMdx from './posts__wifes-ledger-en.mdx.json' with { type: 'json' }
 import posts__wifesLedgerKoMdx from './posts__wifes-ledger-ko.mdx.json' with { type: 'json' }
 
-export const allBlogPosts = [posts__figmaConfig_2025EnMdx, posts__figmaConfig_2025KoMdx, posts__introduceEnMdx, posts__introduceKoMdx, posts__memoryOfCoffeeEnMdx, posts__memoryOfKoMdx, posts__wifesLedgerEnMdx, posts__wifesLedgerKoMdx]
+export const allBlogPosts = [posts__figmaConfig_2025EnMdx, posts__figmaConfig_2025KoMdx, posts__introduceEnMdx, posts__introduceKoMdx, posts__memoryOfCoffeeEnMdx, posts__memoryOfCoffeeKoMdx, posts__wifesLedgerEnMdx, posts__wifesLedgerKoMdx]
