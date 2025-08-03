@@ -8,7 +8,10 @@ interface NavigationClientProps {
   profileText: string;
 }
 
-export default function NavigationClient({ blogText, profileText }: NavigationClientProps) {
+export default function NavigationClient({
+  blogText,
+  profileText,
+}: NavigationClientProps) {
   const pathname = usePathname();
   const locale = useLocale();
 

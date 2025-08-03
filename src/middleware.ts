@@ -5,8 +5,8 @@ export default createMiddleware({
   locales: ["ko", "en"],
   // Used when no locale matches
   defaultLocale: "ko",
-  // Use 'always' for consistent URLs and better UX with auto-detection
-  localePrefix: "always",
+  // Use 'as-needed' for better prefetch performance (no /ko prefix for default)
+  localePrefix: "as-needed",
   localeDetection: true,
 });
 

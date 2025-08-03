@@ -8,8 +8,8 @@ export const routing = defineRouting({
   // Used when no locale matches
   defaultLocale: "ko",
 
-  // Use 'always' for consistent URLs across all locales
-  localePrefix: "always",
+  // Use 'as-needed' to avoid /ko prefix for default locale
+  localePrefix: "as-needed",
   localeDetection: true,
 
   // Optional: Set different pathnames based on locale
