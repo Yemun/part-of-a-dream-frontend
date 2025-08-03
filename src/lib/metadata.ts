@@ -14,7 +14,8 @@ const baseConfig = {
   en: {
     siteName: "Part of a Dream",
     author: "Yemun",
-    defaultDescription: "A journal exploring the relationship between users and products.",
+    defaultDescription:
+      "A journal exploring the relationship between users and products.",
     keywords: {
       base: ["Part of a Dream", "blog", "design system", "Yemun"],
       additional: ["user experience", "product design", "Seoul", "profile"],
@@ -35,7 +36,7 @@ interface MetadataOptions {
   publishedTime?: string;
   authors?: string[];
   tags?: string[];
-  locale?: 'ko' | 'en';
+  locale?: "ko" | "en";
 }
 
 export function createMetadata(options: MetadataOptions = {}): Metadata {
@@ -48,19 +49,29 @@ export function createMetadata(options: MetadataOptions = {}): Metadata {
     publishedTime,
     authors,
     tags = [],
-    locale = 'ko',
+    locale = "ko",
   } = options;
 
   const config = baseConfig[locale];
   const finalDescription = description || config.defaultDescription;
   const finalAuthors = authors || [config.author];
 
-  const fullTitle = title
-    ? `${title} | ${config.siteName}`
+  // HTML 엔티티 처리를 위한 헬퍼 함수
+  const escapeHtml = (str: string) =>
+    str
+      .replace(/'/g, "&apos;")
+      .replace(/"/g, "&quot;")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+  const safeTitle = title ? escapeHtml(title) : title;
+  const fullTitle = safeTitle
+    ? `${safeTitle} | ${config.siteName}`
     : config.siteName;
   const allKeywords = [...config.keywords.base, ...keywords];
 
-  const ogLocale = locale === 'ko' ? 'ko_KR' : 'en_US';
+  const ogLocale = locale === "ko" ? "ko_KR" : "en_US";
 
   const metadata: Metadata = {
     title: fullTitle,
@@ -78,12 +89,12 @@ export function createMetadata(options: MetadataOptions = {}): Metadata {
     alternates: {
       canonical: url,
       languages: {
-        'ko': `${baseConfig.baseUrl}`,
-        'en': `${baseConfig.baseUrl}/en`,
+        ko: `${baseConfig.baseUrl}`,
+        en: `${baseConfig.baseUrl}/en`,
       },
     },
     openGraph: {
-      title: title || config.siteName,
+      title: safeTitle || config.siteName,
       description: finalDescription,
       url,
       siteName: config.siteName,
@@ -98,7 +109,7 @@ export function createMetadata(options: MetadataOptions = {}): Metadata {
     },
     twitter: {
       card: "summary_large_image",
-      title: title || config.siteName,
+      title: safeTitle || config.siteName,
       description: finalDescription,
       creator: baseConfig.social.twitter,
       site: baseConfig.social.twitter,
@@ -141,11 +152,18 @@ export function createArticleSchema(options: {
   author: string;
   publishedTime: string;
   slug: string;
-  locale?: 'ko' | 'en';
+  locale?: "ko" | "en";
 }) {
-  const { title, description, author, publishedTime, slug, locale = 'ko' } = options;
+  const {
+    title,
+    description,
+    author,
+    publishedTime,
+    slug,
+    locale = "ko",
+  } = options;
   const config = baseConfig[locale];
-  const localePrefix = locale === 'ko' ? '' : `/${locale}`;
+  const localePrefix = locale === "ko" ? "" : `/${locale}`;
 
   return {
     "@context": "https://schema.org",
@@ -168,7 +186,7 @@ export function createArticleSchema(options: {
       "@id": `${baseConfig.baseUrl}${localePrefix}/posts/${slug}`,
     },
     url: `${baseConfig.baseUrl}${localePrefix}/posts/${slug}`,
-    inLanguage: locale === 'ko' ? "ko-KR" : "en-US",
+    inLanguage: locale === "ko" ? "ko-KR" : "en-US",
   };
 }
 
@@ -176,7 +194,7 @@ export function createPersonSchema(options: {
   name: string;
   alternateName?: string;
   description: string;
-  locale?: 'ko' | 'en';
+  locale?: "ko" | "en";
   contact?: {
     email?: string;
     linkedin?: string;
@@ -184,9 +202,9 @@ export function createPersonSchema(options: {
     instagram?: string;
   };
 }) {
-  const { name, alternateName, description, contact, locale = 'ko' } = options;
+  const { name, alternateName, description, contact, locale = "ko" } = options;
   const config = baseConfig[locale];
-  const localePrefix = locale === 'ko' ? '' : `/${locale}`;
+  const localePrefix = locale === "ko" ? "" : `/${locale}`;
 
   return {
     "@context": "https://schema.org",

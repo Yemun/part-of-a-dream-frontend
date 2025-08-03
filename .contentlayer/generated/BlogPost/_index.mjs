@@ -2,11 +2,10 @@
 
 import posts__figmaConfig_2025EnMdx from './posts__figma-config-2025-en.mdx.json' with { type: 'json' }
 import posts__figmaConfig_2025KoMdx from './posts__figma-config-2025-ko.mdx.json' with { type: 'json' }
-import posts__financialLedgerEnMdx from './posts__financial-ledger-en.mdx.json' with { type: 'json' }
 import posts__financialLedgerKoMdx from './posts__financial-ledger-ko.mdx.json' with { type: 'json' }
 import posts__introduceEnMdx from './posts__introduce-en.mdx.json' with { type: 'json' }
 import posts__introduceKoMdx from './posts__introduce-ko.mdx.json' with { type: 'json' }
 import posts__myhobbyCoffeeEnMdx from './posts__myhobby-coffee-en.mdx.json' with { type: 'json' }
 import posts__myhobbyCoffeeKoMdx from './posts__myhobby-coffee-ko.mdx.json' with { type: 'json' }
 
-export const allBlogPosts = [posts__figmaConfig_2025EnMdx, posts__figmaConfig_2025KoMdx, posts__financialLedgerEnMdx, posts__financialLedgerKoMdx, posts__introduceEnMdx, posts__introduceKoMdx, posts__myhobbyCoffeeEnMdx, posts__myhobbyCoffeeKoMdx]
+export const allBlogPosts = [posts__figmaConfig_2025EnMdx, posts__figmaConfig_2025KoMdx, posts__financialLedgerKoMdx, posts__introduceEnMdx, posts__introduceKoMdx, posts__myhobbyCoffeeEnMdx, posts__myhobbyCoffeeKoMdx]
