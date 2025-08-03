@@ -26,11 +26,18 @@ export default function LanguageSwitcher() {
   return (
     <button
       onClick={toggleLocale}
-      className="flex items-center justify-center rounded hover:scale-120 transition-transform"
+      className="flex items-center justify-center hover:rotate-360 transition-transform cursor-pointer group"
       type="button"
       title={locale === "ko" ? "Switch to English" : "한국어로 변경"}
     >
-      <span className="text-3xl">{locale === "ko" ? "🇬🇧" : "🇰🇷"}</span>
+      <span className="text-3xl">
+        <span className="group-hover:hidden">
+          {locale === "ko" ? "🇰🇷" : "🇬🇧"}
+        </span>
+        <span className="hidden group-hover:inline">
+          {locale === "ko" ? "🇬🇧" : "🇰🇷"}
+        </span>
+      </span>
     </button>
   );
 }
