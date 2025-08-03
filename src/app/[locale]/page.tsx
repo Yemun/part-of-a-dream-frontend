@@ -1,7 +1,8 @@
 import { getBlogPosts, BlogPost } from "@/lib/content";
 import PostCard from "@/components/post/PostCard";
-import { createMetadata } from "@/lib/metadata";
+import { createMetadataWithMessages } from "@/lib/metadata";
 import { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 
 interface PageProps {
   params: Promise<{
@@ -15,15 +16,22 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   
-  return createMetadata({
-    keywords: locale === 'ko' ? ["사용자 경험", "제품 디자인"] : ["user experience", "product design"],
-    type: "website",
+  // Enable static rendering
+  setRequestLocale(locale);
+  
+  return createMetadataWithMessages({
     locale: locale as 'ko' | 'en',
+    page: 'home',
+    type: "website",
   });
 }
 
 export default async function Home({ params }: PageProps) {
   const { locale } = await params;
+  
+  // Enable static rendering
+  setRequestLocale(locale);
+  
   let posts: BlogPost[] = [];
 
   try {

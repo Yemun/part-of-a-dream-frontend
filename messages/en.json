@@ -90,6 +90,27 @@
   },
   "meta": {
     "defaultTitle": "Part of a Dream",
-    "defaultDescription": "A journal exploring the relationship between users and products."
+    "defaultDescription": "A journal exploring the relationship between users and products.",
+    "keywords": {
+      "userExperience": "user experience",
+      "productDesign": "product design",
+      "seoul": "Seoul"
+    },
+    "pages": {
+      "home": {
+        "keywords": ["user experience", "product design"]
+      },
+      "profile": {
+        "title": "Yemun",
+        "description": "I'm a design systems creator based in Euljiro, Seoul.",
+        "keywords": ["Seoul", "profile"],
+        "biography": "I write about the relationship between users and products.",
+        "alternateName": "Seoul"
+      },
+      "post": {
+        "notFoundTitle": "Post not found",
+        "notFoundDescription": "The requested post could not be found."
+      }
+    }
   }
 }

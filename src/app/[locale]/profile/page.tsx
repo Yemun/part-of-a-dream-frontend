@@ -1,6 +1,7 @@
-import { createMetadata, createPersonSchema } from "@/lib/metadata";
+import { createMetadataWithMessages, createPersonSchemaWithMessages } from "@/lib/metadata";
 import { Metadata } from "next";
 import ProfileClient from "@/components/profile/ProfileClient";
+import { setRequestLocale } from "next-intl/server";
 
 interface PageProps {
   params: Promise<{
@@ -13,27 +14,25 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-
-  const title = locale === "ko" ? "예문" : "Yemun";
-  const description =
-    locale === "ko"
-      ? "서울 을지로에서 디자인 시스템을 만들고 있습니다."
-      : "I'm a design systems creator based in Euljiro, Seoul.";
-  const keywords = locale === "ko" ? ["서을", "프로필"] : ["Seoul", "profile"];
+  
+  // Enable static rendering
+  setRequestLocale(locale);
+  
   const localePrefix = locale === "ko" ? "" : `/${locale}`;
 
-  return createMetadata({
-    title,
-    description,
-    keywords,
+  return createMetadataWithMessages({
+    locale: locale as "ko" | "en",
+    page: 'profile',
     url: `https://yemun.kr${localePrefix}/profile`,
     type: "profile",
-    locale: locale as "ko" | "en",
   });
 }
 
 export default async function Profile({ params }: PageProps) {
   const { locale } = await params;
+  
+  // Enable static rendering
+  setRequestLocale(locale);
 
   // Static profile data
   const profileData = {
@@ -124,15 +123,9 @@ export default async function Profile({ params }: PageProps) {
   };
 
   // Person schema for profile page
-  const personSchema = createPersonSchema({
-    name: locale === "ko" ? "예문" : "Yemun",
-    alternateName: locale === "ko" ? "서울" : "Seoul",
-    description:
-      locale === "ko"
-        ? "사용자와 제품의 관계를 탐구하는 일지를 작성합니다."
-        : "I write about the relationship between users and products.",
-    contact: profileData.contact,
+  const personSchema = await createPersonSchemaWithMessages({
     locale: locale as "ko" | "en",
+    contact: profileData.contact,
   });
 
   return (

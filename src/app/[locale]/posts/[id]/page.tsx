@@ -6,6 +6,25 @@ import {
   extractDescription,
   createArticleSchema,
 } from "@/lib/metadata";
+import { getMessages, setRequestLocale } from "next-intl/server";
+
+// Message types for type safety
+interface MetaMessages {
+  meta: {
+    keywords: {
+      seoul: string;
+    };
+    pages: {
+      profile: {
+        title: string;
+      };
+      post: {
+        notFoundTitle: string;
+        notFoundDescription: string;
+      };
+    };
+  };
+}
 import MDXRenderer from "@/components/post/MDXRenderer";
 import RelativeTime from "@/components/common/RelativeTime";
 import PostNavigation from "@/components/post/PostNavigation";
@@ -45,16 +64,19 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { id, locale } = await params;
 
+  // Enable static rendering
+  setRequestLocale(locale);
+
   try {
     const { post } = await getPostWithDetails(id, locale);
+    const messages = await getMessages() as MetaMessages;
 
     if (!post) {
-      const notFoundTitle = locale === 'ko' ? "포스트를 찾을 수 없습니다" : "Post not found";
-      const notFoundDesc = locale === 'ko' ? "요청하신 포스트를 찾을 수 없습니다." : "The requested post could not be found.";
+      const postMessages = messages.meta.pages.post;
       
       return createMetadata({
-        title: notFoundTitle,
-        description: notFoundDesc,
+        title: postMessages.notFoundTitle,
+        description: postMessages.notFoundDescription,
         locale: locale as 'ko' | 'en',
       });
     }
@@ -62,15 +84,16 @@ export async function generateMetadata({
     const description = post.description || extractDescription(post.content);
     const publishedTime = new Date(post.publishedAt).toISOString();
     const localePrefix = locale === 'ko' ? '' : `/${locale}`;
+    const profileMessages = messages.meta.pages.profile;
 
     return createMetadata({
       title: post.title,
       description,
-      keywords: locale === 'ko' ? [post.title, "서을"] : [post.title, "Seoul"],
+      keywords: [post.title, messages.meta.keywords.seoul],
       url: `https://yemun.kr${localePrefix}/posts/${post.slug}`,
       type: "article",
       publishedTime,
-      authors: locale === 'ko' ? ["예문"] : ["Yemun"],
+      authors: [profileMessages.title],
       tags: [post.title],
       locale: locale as 'ko' | 'en',
     });
@@ -83,6 +106,9 @@ export async function generateMetadata({
 export default async function PostPage({ params }: PageProps) {
   const { id, locale } = await params;
 
+  // Enable static rendering
+  setRequestLocale(locale);
+
   // 포스트 데이터와 댓글을 서버에서 함께 가져오기 (API 비용 최적화)
   const { post, adjacentPosts, comments } = await getPostWithDetails(id, locale);
 
@@ -91,10 +117,13 @@ export default async function PostPage({ params }: PageProps) {
   }
 
   // Article schema for rich snippets
+  const messages = await getMessages() as MetaMessages;
+  const profileMessages = messages.meta.pages.profile;
+  
   const articleSchema = createArticleSchema({
     title: post.title,
     description: post.description || extractDescription(post.content),
-    author: locale === 'ko' ? "예문" : "Yemun",
+    author: profileMessages.title,
     publishedTime: post.publishedAt,
     slug: post.slug,
     locale: locale as 'ko' | 'en',
