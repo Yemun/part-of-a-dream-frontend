@@ -38,7 +38,7 @@ export default function CommentSection({
     } finally {
       setIsLoading(false);
     }
-  }, [postSlug]);
+  }, [postSlug, t]);
 
   // 초기화는 한 번만 실행 - 중복 API 호출 방지
   useEffect(() => {

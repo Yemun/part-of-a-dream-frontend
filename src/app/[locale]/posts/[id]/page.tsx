@@ -6,25 +6,7 @@ import {
   extractDescription,
   createArticleSchema,
 } from "@/lib/metadata";
-import { getMessages, setRequestLocale } from "next-intl/server";
-
-// Message types for type safety
-interface MetaMessages {
-  meta: {
-    keywords: {
-      seoul: string;
-    };
-    pages: {
-      profile: {
-        title: string;
-      };
-      post: {
-        notFoundTitle: string;
-        notFoundDescription: string;
-      };
-    };
-  };
-}
+import { setRequestLocale } from "next-intl/server";
 import MDXRenderer from "@/components/post/MDXRenderer";
 import RelativeTime from "@/components/common/RelativeTime";
 import PostNavigation from "@/components/post/PostNavigation";
@@ -69,14 +51,19 @@ export async function generateMetadata({
 
   try {
     const { post } = await getPostWithDetails(id, locale);
-    const messages = await getMessages() as MetaMessages;
 
     if (!post) {
-      const postMessages = messages.meta.pages.post;
+      const notFoundData = locale === 'ko' ? {
+        title: "게시글을 찾을 수 없습니다",
+        description: "요청하신 게시글이 존재하지 않습니다."
+      } : {
+        title: "Post Not Found",
+        description: "The requested post does not exist."
+      };
       
       return createMetadata({
-        title: postMessages.notFoundTitle,
-        description: postMessages.notFoundDescription,
+        title: notFoundData.title,
+        description: notFoundData.description,
         locale: locale as 'ko' | 'en',
       });
     }
@@ -84,16 +71,17 @@ export async function generateMetadata({
     const description = post.description || extractDescription(post.content);
     const publishedTime = new Date(post.publishedAt).toISOString();
     const localePrefix = locale === 'ko' ? '' : `/${locale}`;
-    const profileMessages = messages.meta.pages.profile;
+    const authorName = locale === 'ko' ? '예문' : 'Yemun';
+    const seoulKeyword = locale === 'ko' ? '서울' : 'Seoul';
 
     return createMetadata({
       title: post.title,
       description,
-      keywords: [post.title, messages.meta.keywords.seoul],
+      keywords: [post.title, seoulKeyword],
       url: `https://yemun.kr${localePrefix}/posts/${post.slug}`,
       type: "article",
       publishedTime,
-      authors: [profileMessages.title],
+      authors: [authorName],
       tags: [post.title],
       locale: locale as 'ko' | 'en',
     });
@@ -117,13 +105,12 @@ export default async function PostPage({ params }: PageProps) {
   }
 
   // Article schema for rich snippets
-  const messages = await getMessages() as MetaMessages;
-  const profileMessages = messages.meta.pages.profile;
+  const authorName = locale === 'ko' ? '예문' : 'Yemun';
   
   const articleSchema = createArticleSchema({
     title: post.title,
     description: post.description || extractDescription(post.content),
-    author: profileMessages.title,
+    author: authorName,
     publishedTime: post.publishedAt,
     slug: post.slug,
     locale: locale as 'ko' | 'en',

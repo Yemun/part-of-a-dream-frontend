@@ -1,34 +1,4 @@
 import { Metadata } from "next";
-import { getMessages, setRequestLocale } from "next-intl/server";
-
-// Message types for type safety
-interface MetaMessages {
-  meta: {
-    defaultTitle: string;
-    defaultDescription: string;
-    keywords: {
-      userExperience: string;
-      productDesign: string;
-      seoul: string;
-    };
-    pages: {
-      home: {
-        keywords: string[];
-      };
-      profile: {
-        title: string;
-        description: string;
-        keywords: string[];
-        biography: string;
-        alternateName: string;
-      };
-      post: {
-        notFoundTitle: string;
-        notFoundDescription: string;
-      };
-    };
-  };
-}
 
 // Base metadata configuration with locale support
 const baseConfig = {
@@ -53,7 +23,9 @@ const baseConfig = {
   },
   baseUrl: "https://yemun.kr",
   social: {
-    twitter: "@seounplugged",
+    instagram: "https://www.instagram.com/yemuncho",
+    linkedin: "https://www.linkedin.com/in/yemun-cho-11852885",
+    github: "https://github.com/yemun",
   },
 };
 
@@ -141,8 +113,6 @@ export function createMetadata(options: MetadataOptions = {}): Metadata {
       card: "summary_large_image",
       title: safeTitle || config.siteName,
       description: finalDescription,
-      creator: baseConfig.social.twitter,
-      site: baseConfig.social.twitter,
     },
     robots: {
       index: true,
@@ -220,66 +190,6 @@ export function createArticleSchema(options: {
   };
 }
 
-// Messages-based metadata creation helpers
-export async function createMetadataWithMessages(options: {
-  locale: 'ko' | 'en';
-  page: 'home' | 'profile' | 'post';
-  title?: string;
-  description?: string;
-  keywords?: string[];
-  url?: string;
-  type?: "website" | "article" | "profile";
-  publishedTime?: string;
-  authors?: string[];
-  tags?: string[];
-}) {
-  const {
-    locale,
-    page,
-    title,
-    description,
-    keywords = [],
-    url = baseConfig.baseUrl,
-    type = "website",
-    publishedTime,
-    authors,
-    tags = [],
-  } = options;
-
-  // Enable static rendering
-  setRequestLocale(locale);
-  
-  const messages = await getMessages() as MetaMessages;
-  const pageMessages = messages.meta.pages[page];
-  
-  // Type-safe access to page-specific metadata
-  let finalTitle = title;
-  let finalDescription = description || messages.meta.defaultDescription;
-  let pageKeywords: string[] = [];
-
-  if (page === 'profile' && 'title' in pageMessages) {
-    finalTitle = finalTitle || pageMessages.title;
-    finalDescription = finalDescription || pageMessages.description;
-    pageKeywords = pageMessages.keywords;
-  } else if (page === 'home' && 'keywords' in pageMessages) {
-    pageKeywords = pageMessages.keywords;
-  }
-
-  const allKeywords = [...keywords, ...pageKeywords];
-
-  return createMetadata({
-    title: finalTitle,
-    description: finalDescription,
-    keywords: allKeywords,
-    url,
-    type,
-    publishedTime,
-    authors,
-    tags,
-    locale,
-  });
-}
-
 export function createPersonSchema(options: {
   name: string;
   alternateName?: string;
@@ -325,31 +235,4 @@ export function createPersonSchema(options: {
       ].filter(Boolean),
     }),
   };
-}
-
-// Helper to create person schema with messages
-export async function createPersonSchemaWithMessages(options: {
-  locale: 'ko' | 'en';
-  contact?: {
-    email?: string;
-    linkedin?: string;
-    github?: string;
-    instagram?: string;
-  };
-}) {
-  const { locale, contact } = options;
-  
-  // Enable static rendering
-  setRequestLocale(locale);
-  
-  const messages = await getMessages() as MetaMessages;
-  const profileMessages = messages.meta.pages.profile;
-
-  return createPersonSchema({
-    name: profileMessages.title,
-    alternateName: profileMessages.alternateName,
-    description: profileMessages.biography,
-    locale,
-    contact,
-  });
 }

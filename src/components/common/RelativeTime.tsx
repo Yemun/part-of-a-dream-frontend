@@ -67,7 +67,7 @@ export default function RelativeTime({
 
       return () => clearInterval(interval);
     }
-  }, [dateString, absolute]);
+  }, [dateString, absolute, locale, t]);
 
   if (!isClient) {
     const date = new Date(dateString);

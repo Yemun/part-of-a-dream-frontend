@@ -1,4 +1,4 @@
-import { createMetadataWithMessages, createPersonSchemaWithMessages } from "@/lib/metadata";
+import { createMetadata, createPersonSchema } from "@/lib/metadata";
 import { Metadata } from "next";
 import ProfileClient from "@/components/profile/ProfileClient";
 import { setRequestLocale } from "next-intl/server";
@@ -19,10 +19,22 @@ export async function generateMetadata({
   setRequestLocale(locale);
   
   const localePrefix = locale === "ko" ? "" : `/${locale}`;
+  
+  const profileData = locale === 'ko' ? {
+    title: "예문",
+    description: "사용자와 제품의 관계를 탐구하는 디자인 시스템 매니저입니다.",
+    keywords: ["예문", "디자인 시스템", "프로덕트 디자이너", "서울", "UX/UI", "케이뱅크"]
+  } : {
+    title: "Yemun",
+    description: "Design System Manager exploring the relationship between users and products.",
+    keywords: ["Yemun", "design system", "product designer", "Seoul", "UX/UI", "Kbank"]
+  };
 
-  return createMetadataWithMessages({
+  return createMetadata({
+    title: profileData.title,
+    description: profileData.description,
+    keywords: profileData.keywords,
     locale: locale as "ko" | "en",
-    page: 'profile',
     url: `https://yemun.kr${localePrefix}/profile`,
     type: "profile",
   });
@@ -123,7 +135,20 @@ export default async function Profile({ params }: PageProps) {
   };
 
   // Person schema for profile page
-  const personSchema = await createPersonSchemaWithMessages({
+  const profileMetadata = locale === 'ko' ? {
+    name: "예문",
+    alternateName: "Yemun Cho",
+    description: "사용자와 제품의 관계를 탐구하는 디자인 시스템 매니저입니다."
+  } : {
+    name: "Yemun",
+    alternateName: "예문",
+    description: "Design System Manager exploring the relationship between users and products."
+  };
+  
+  const personSchema = createPersonSchema({
+    name: profileMetadata.name,
+    alternateName: profileMetadata.alternateName,
+    description: profileMetadata.description,
     locale: locale as "ko" | "en",
     contact: profileData.contact,
   });
