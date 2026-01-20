@@ -103,7 +103,7 @@ export default async function PostPage({ params }: PageProps) {
   // 포스트 데이터와 댓글을 서버에서 함께 가져오기 (API 비용 최적화)
   const { post, adjacentPosts, comments } = await getPostWithDetails(
     id,
-    locale
+    locale,
   );
 
   if (!post) {
@@ -135,7 +135,7 @@ export default async function PostPage({ params }: PageProps) {
           </h1>
           <div className="font-normal text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-5 sm:leading-6">
             <time dateTime={post.publishedAt}>
-              <RelativeTime dateString={post.publishedAt} absolute />
+              <RelativeTime dateString={post.publishedAt} showWeekday />
             </time>
           </div>
         </header>

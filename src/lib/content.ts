@@ -5,7 +5,6 @@ import {
 import {
   getSupabaseClient,
   Comment as SupabaseComment,
-  CommentInsert,
   CommentUpdate,
 } from "./supabase";
 
@@ -216,16 +215,15 @@ export const createComment = async (commentData: {
 }): Promise<Comment | null> => {
   try {
     const supabase = getSupabaseClient();
-    const insertData: CommentInsert = {
-      post_slug: commentData.postSlug,
-      author_name: commentData.authorName,
-      author_email: commentData.authorEmail,
-      content: commentData.content,
-    };
 
     const { data, error } = await supabase
       .from("comments")
-      .insert(insertData)
+      .insert({
+        post_slug: commentData.postSlug,
+        author_name: commentData.authorName,
+        author_email: commentData.authorEmail,
+        content: commentData.content,
+      })
       .select()
       .single();
 
@@ -248,6 +246,7 @@ export const updateComment = async (
 ): Promise<Comment | null> => {
   try {
     const supabase = getSupabaseClient();
+
     const { data, error } = await supabase
       .from("comments")
       .update(updates)

@@ -1,6 +1,7 @@
 import { Link } from "@/i18n/routing";
 import RelativeTime from "@/components/common/RelativeTime";
 import { BlogPost } from "@/lib/content";
+import { useMemo } from "react";
 
 interface PostCardProps {
   post?: BlogPost;
@@ -9,7 +10,34 @@ interface PostCardProps {
   locale?: string; // 로케일을 props로 받기
 }
 
-export default function PostCard({ post, text, opacity = 1, locale }: PostCardProps) {
+// Generate stable random transform based on slug
+function getStableTransform(slug: string): string {
+  // Simple hash function to generate consistent random values from slug
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    hash = (hash << 5) - hash + slug.charCodeAt(i);
+    hash |= 0;
+  }
+
+  // Use hash to generate pseudo-random but stable values
+  const x = (hash % 12) - 6;
+  const y = ((hash >> 8) % 12) - 6;
+  const rotate = (hash >> 16) % 90;
+
+  return `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
+}
+
+export default function PostCard({
+  post,
+  text,
+  opacity = 1,
+  locale,
+}: PostCardProps) {
+  // Generate stable transform from slug
+  const randomTransform = useMemo(() => {
+    if (!post) return "";
+    return getStableTransform(post.slug);
+  }, [post]);
   // Placeholder 모드 (post가 없는 경우)
   if (!post) {
     return (
@@ -36,9 +64,7 @@ export default function PostCard({ post, text, opacity = 1, locale }: PostCardPr
         <div className="flex justify-center items-center py-4 sm:py-3">
           <div
             style={{
-              transform: `translate(${Math.random() * 12 - 6}px, ${
-                Math.random() * 12 - 6
-              }px) rotate(${(Math.random() * -180) / 2}deg)`,
+              transform: randomTransform,
             }}
           >
             <Link

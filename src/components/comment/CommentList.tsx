@@ -99,71 +99,21 @@ export default function CommentList({
     setEditEmail("");
   };
 
-  const AuthModal = () => {
-    if (!showAuthModal) return null;
+  const handleModalBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      setShowAuthModal(null);
+      setAuthEmail("");
+    }
+  };
 
-    const handleBackdropClick = (e: React.MouseEvent) => {
-      if (e.target === e.currentTarget) {
-        setShowAuthModal(null);
-        setAuthEmail("");
-      }
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setShowAuthModal(null);
-        setAuthEmail("");
-      } else if (e.key === "Enter" && authEmail) {
-        handleAuthSubmit(showAuthModal.commentId, showAuthModal.action);
-      }
-    };
-
-    return (
-      <div
-        className="fixed inset-0 flex items-center justify-center z-50 bg-black/50"
-        onClick={handleBackdropClick}
-      >
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-[90%]">
-          <h3 className="text-lg font-semibold mb-2 dark:text-white">
-            {showAuthModal.action === "edit" ? t('edit') : t('delete')}
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">
-            {t('emailRequired')}
-          </p>
-          <Input
-            type="email"
-            value={authEmail}
-            onChange={(e) => setAuthEmail(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={t('email')}
-            className="mb-4"
-            autoFocus
-            autoComplete="email"
-          />
-          <div className="flex space-x-3">
-            <Button
-              onClick={() =>
-                handleAuthSubmit(showAuthModal.commentId, showAuthModal.action)
-              }
-              disabled={!authEmail}
-              className="flex-1"
-            >
-              {t('save')}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setShowAuthModal(null);
-                setAuthEmail("");
-              }}
-              className="flex-1"
-            >
-              {t('cancel')}
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
+  const handleModalKeyDown = (e: React.KeyboardEvent) => {
+    if (!showAuthModal) return;
+    if (e.key === "Escape") {
+      setShowAuthModal(null);
+      setAuthEmail("");
+    } else if (e.key === "Enter" && authEmail) {
+      handleAuthSubmit(showAuthModal.commentId, showAuthModal.action);
+    }
   };
 
   if (comments.length === 0) {
@@ -284,7 +234,52 @@ export default function CommentList({
           ))}
         </div>
       </div>
-      <AuthModal />
+      {showAuthModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50 bg-black/50"
+          onClick={handleModalBackdropClick}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-[90%]">
+            <h3 className="text-lg font-semibold mb-2 dark:text-white">
+              {showAuthModal.action === "edit" ? t('edit') : t('delete')}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              {t('emailRequired')}
+            </p>
+            <Input
+              type="email"
+              value={authEmail}
+              onChange={(e) => setAuthEmail(e.target.value)}
+              onKeyDown={handleModalKeyDown}
+              placeholder={t('email')}
+              className="mb-4"
+              autoFocus
+              autoComplete="email"
+            />
+            <div className="flex space-x-3">
+              <Button
+                onClick={() =>
+                  handleAuthSubmit(showAuthModal.commentId, showAuthModal.action)
+                }
+                disabled={!authEmail}
+                className="flex-1"
+              >
+                {t('save')}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setShowAuthModal(null);
+                  setAuthEmail("");
+                }}
+                className="flex-1"
+              >
+                {t('cancel')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
