@@ -54,7 +54,7 @@ export function createMetadata(options: MetadataOptions = {}): Metadata {
     locale = "ko",
   } = options;
 
-  const config = baseConfig[locale];
+  const config = baseConfig[locale] ?? baseConfig.ko;
   const finalDescription = description || config.defaultDescription;
   const finalAuthors = authors || [config.author];
 
@@ -162,7 +162,7 @@ export function createArticleSchema(options: {
     slug,
     locale = "ko",
   } = options;
-  const config = baseConfig[locale];
+  const config = baseConfig[locale] ?? baseConfig.ko;
   const localePrefix = locale === "ko" ? "" : `/${locale}`;
 
   return {
@@ -203,7 +203,7 @@ export function createPersonSchema(options: {
   };
 }) {
   const { name, alternateName, description, contact, locale = "ko" } = options;
-  const config = baseConfig[locale];
+  const config = baseConfig[locale] ?? baseConfig.ko;
   const localePrefix = locale === "ko" ? "" : `/${locale}`;
 
   return {
