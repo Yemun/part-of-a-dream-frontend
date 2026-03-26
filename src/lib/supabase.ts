@@ -35,6 +35,82 @@ export interface Database {
           content?: string
         }
       }
+      bingo_locations: {
+        Row: {
+          id: string
+          name: string
+          name_en: string | null
+          latitude: number
+          longitude: number
+          cell_index: number
+          created_at: string
+        }
+        Insert: {
+          name: string
+          name_en?: string | null
+          latitude: number
+          longitude: number
+          cell_index: number
+        }
+        Update: {
+          name?: string
+          name_en?: string | null
+          latitude?: number
+          longitude?: number
+          cell_index?: number
+        }
+      }
+      bingo_players: {
+        Row: {
+          id: string
+          name: string
+          board_layout: number[]
+          created_at: string
+        }
+        Insert: {
+          name: string
+          board_layout: number[]
+        }
+        Update: {
+          name?: string
+          board_layout?: number[]
+        }
+      }
+      bingo_checks: {
+        Row: {
+          id: string
+          player_id: string
+          location_id: string
+          checked_at: string
+          latitude: number
+          longitude: number
+        }
+        Insert: {
+          player_id: string
+          location_id: string
+          latitude: number
+          longitude: number
+        }
+        Update: {
+          latitude?: number
+          longitude?: number
+        }
+      }
+      bingo_lines: {
+        Row: {
+          id: string
+          player_id: string
+          line_type: string
+          completed_at: string
+        }
+        Insert: {
+          player_id: string
+          line_type: string
+        }
+        Update: {
+          line_type?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

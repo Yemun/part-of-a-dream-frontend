@@ -8,9 +8,10 @@ export default function Navigation() {
   return (
     <nav className="w-full max-w-5xl">
       <div className="flex flex-row items-center justify-between w-full">
-        <NavigationClient 
-          blogText={t('blog')} 
-          profileText={t('profile')} 
+        <NavigationClient
+          blogText={t('blog')}
+          profileText={t('profile')}
+          sideProjectText={t('sideProject')}
         />
         <LanguageSwitcher />
       </div>

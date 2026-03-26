@@ -1,7 +1,8 @@
 {
   "navigation": {
     "blog": "Blog",
-    "profile": "Profile"
+    "profile": "Profile",
+    "sideProject": "Side Project"
   },
   "common": {
     "readMore": "Read more",
@@ -87,5 +88,35 @@
       "previous": "Previous",
       "next": "Next"
     }
+  },
+  "bingo": {
+    "title": "GPS Bingo",
+    "enterName": "Enter your name",
+    "join": "Join",
+    "notRegistered": "Name not found. Please check with the organizer.",
+    "noActiveEvent": "No active event at the moment.",
+    "board": "Bingo Board",
+    "leaderboard": "Leaderboard",
+    "rank": "Rank",
+    "player": "Player",
+    "lines": "Bingo",
+    "time": "Time",
+    "checked": "Visited",
+    "unchecked": "Not visited",
+    "nearby": "You're nearby!",
+    "tapToCheck": "Tap to check in",
+    "metersAway": "{meters}m away",
+    "gpsActive": "GPS Active",
+    "gpsRequesting": "Requesting GPS...",
+    "gpsDenied": "GPS permission denied.",
+    "gpsUnavailable": "GPS unavailable.",
+    "bingoLine": "Bingo!",
+    "cellsChecked": "{count}/9 visited",
+    "pauseTracking": "Pause Tracking",
+    "resumeTracking": "Resume Tracking",
+    "loading": "Loading...",
+    "changeName": "Change Name",
+    "toastCheckIn": "{player} visited {location}",
+    "toastBingoLine": "{player} completed a bingo line!"
   }
 }
