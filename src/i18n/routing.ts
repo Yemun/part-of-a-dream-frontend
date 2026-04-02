@@ -20,3 +20,7 @@ export const routing = defineRouting({
 // that will consider the routing configuration
 export const { Link, redirect, usePathname, useRouter } =
   createNavigation(routing);
+
+export function getLocalePrefix(locale: string): string {
+  return locale === routing.defaultLocale ? "" : `/${locale}`;
+}

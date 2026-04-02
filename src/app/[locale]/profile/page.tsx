@@ -2,6 +2,7 @@ import { createMetadata, createPersonSchema } from "@/lib/metadata";
 import { Metadata } from "next";
 import ProfileClient from "@/components/profile/ProfileClient";
 import { setRequestLocale } from "next-intl/server";
+import { getLocalePrefix } from "@/i18n/routing";
 
 interface PageProps {
   params: Promise<{
@@ -18,7 +19,7 @@ export async function generateMetadata({
   // Enable static rendering
   setRequestLocale(locale);
   
-  const localePrefix = locale === "ko" ? "" : `/${locale}`;
+  const localePrefix = getLocalePrefix(locale);
   
   const profileData = locale === 'ko' ? {
     title: "예문",

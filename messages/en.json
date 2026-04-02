@@ -47,7 +47,10 @@
     "commentDeleted": "Comment has been deleted.",
     "loadingComments": "Loading comments...",
     "noComments": "No comments yet. Be the first to leave one!",
-    "errorLoadingComments": "We couldn't load the comments right now. Please try again."
+    "errorLoadingComments": "We couldn't load the comments right now. Please try again.",
+    "errorPostingComment": "Failed to post your comment. Please try again.",
+    "errorUpdatingComment": "Failed to update the comment. Please try again.",
+    "errorDeletingComment": "Failed to delete the comment. Please try again."
   },
   "time": {
     "justNow": "just now",

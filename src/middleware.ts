@@ -1,14 +1,7 @@
 import createMiddleware from "next-intl/middleware";
+import { routing } from "@/i18n/routing";
 
-export default createMiddleware({
-  // A list of all locales that are supported
-  locales: ["ko", "en"],
-  // Used when no locale matches
-  defaultLocale: "ko",
-  // Use 'as-needed' for better prefetch performance (no /ko prefix for default)
-  localePrefix: "as-needed",
-  localeDetection: true,
-});
+export default createMiddleware(routing);
 
 export const config = {
   // Match only internationalized pathnames - exclude all Next.js internals

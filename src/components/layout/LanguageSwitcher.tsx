@@ -8,25 +8,15 @@ export default function LanguageSwitcher() {
   const router = useRouter();
   const locale = useLocale();
 
-  const handleLanguageChange = (newLocale: "ko" | "en") => {
-    if (newLocale === locale) {
-      return; // Don't switch to the same locale
-    }
-
-    // Use next-intl's router for proper locale switching
-    // This handles the as-needed prefix logic automatically
-    router.replace(pathname, { locale: newLocale });
-  };
-
   const toggleLocale = () => {
     const newLocale: "ko" | "en" = locale === "ko" ? "en" : "ko";
-    handleLanguageChange(newLocale);
+    router.replace(pathname, { locale: newLocale });
   };
 
   return (
     <button
       onClick={toggleLocale}
-      className="flex items-center justify-center hover:rotate-360 transition-transform cursor-pointer group"
+      className="flex items-center justify-center cursor-pointer group"
       type="button"
       title={locale === "ko" ? "Switch to English" : "한국어로 변경"}
     >

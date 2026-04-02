@@ -105,17 +105,7 @@ export const getPostWithDetails = async (
     const post = convertContentlayerPost(contentlayerPost);
 
     // 동일한 locale의 포스트들만 필터링하여 날짜순 정렬
-    let postsForAdjacent = allBlogPosts
-      .sort(
-        (a, b) =>
-          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-      )
-      .map(convertContentlayerPost);
-
-    // locale이 지정된 경우 해당 locale의 포스트만 사용
-    if (locale) {
-      postsForAdjacent = postsForAdjacent.filter((p) => p.locale === locale);
-    }
+    const postsForAdjacent = await getBlogPosts(locale);
 
     // 인접 포스트 찾기 (같은 locale 내에서)
     const currentIndex = postsForAdjacent.findIndex((p) => p.slug === slug);
@@ -171,13 +161,6 @@ const convertSupabaseComment = (comment: SupabaseComment): Comment => {
 export const getComments = async (postSlug: string): Promise<Comment[]> => {
   try {
     const supabase = getSupabaseClient();
-    
-    // Environment variables check
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      console.error("Missing Supabase environment variables");
-      return [];
-    }
-    
     const { data, error } = await supabase
       .from("comments")
       .select("*")

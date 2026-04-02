@@ -1,6 +1,7 @@
 import { createMetadata } from "@/lib/metadata";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
+import { getLocalePrefix } from "@/i18n/routing";
 import BingoEntry from "@/components/bingo/BingoEntry";
 
 interface PageProps {
@@ -15,7 +16,7 @@ export async function generateMetadata({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const localePrefix = locale === "ko" ? "" : `/${locale}`;
+  const localePrefix = getLocalePrefix(locale);
 
   const meta =
     locale === "ko"

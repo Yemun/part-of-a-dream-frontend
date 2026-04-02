@@ -57,7 +57,7 @@ export default function CommentList({
           onCommentUpdated();
           alert(t('commentDeleted'));
         } else {
-          alert(t('commentDeleted'));
+          alert(t('errorDeletingComment'));
         }
         setIsProcessing(false);
       }
@@ -87,7 +87,7 @@ export default function CommentList({
       setEditEmail("");
       onCommentUpdated();
     } else {
-      alert(t('commentUpdated'));
+      alert(t('errorUpdatingComment'));
     }
     setIsProcessing(false);
   };

@@ -3,6 +3,7 @@ import PostCard from "@/components/post/PostCard";
 import { createMetadata } from "@/lib/metadata";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
+import { getLocalePrefix } from "@/i18n/routing";
 
 interface PageProps {
   params: Promise<{
@@ -19,8 +20,8 @@ export async function generateMetadata({
   // Enable static rendering
   setRequestLocale(locale);
   
-  const localePrefix = locale === 'ko' ? '' : `/${locale}`;
-  const homeKeywords = locale === 'ko' 
+  const localePrefix = getLocalePrefix(locale);
+  const homeKeywords = locale === 'ko'
     ? ["사용자 경험", "제품 디자인", "서울", "개발 블로그", "디자인 시스템"]
     : ["user experience", "product design", "Seoul", "development blog", "design system"];
   

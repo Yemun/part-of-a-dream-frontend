@@ -47,7 +47,10 @@
     "commentDeleted": "댓글이 삭제되었습니다.",
     "loadingComments": "댓글을 불러오는 중...",
     "noComments": "아직 댓글이 없습니다.",
-    "errorLoadingComments": "댓글을 불러오는 중 오류가 발생했습니다."
+    "errorLoadingComments": "댓글을 불러오는 중 오류가 발생했습니다.",
+    "errorPostingComment": "댓글 게시에 실패했습니다.",
+    "errorUpdatingComment": "댓글 수정에 실패했습니다.",
+    "errorDeletingComment": "댓글 삭제에 실패했습니다."
   },
   "time": {
     "justNow": "방금 전",

@@ -7,6 +7,7 @@ import {
   createArticleSchema,
 } from "@/lib/metadata";
 import { setRequestLocale } from "next-intl/server";
+import { getLocalePrefix } from "@/i18n/routing";
 import MDXRenderer from "@/components/post/MDXRenderer";
 import RelativeTime from "@/components/common/RelativeTime";
 import PostNavigation from "@/components/post/PostNavigation";
@@ -73,7 +74,7 @@ export async function generateMetadata({
 
     const description = post.description || extractDescription(post.content);
     const publishedTime = new Date(post.publishedAt).toISOString();
-    const localePrefix = locale === "ko" ? "" : `/${locale}`;
+    const localePrefix = getLocalePrefix(locale);
     const authorName = locale === "ko" ? "예문" : "Yemun";
     const seoulKeyword = locale === "ko" ? "서울" : "Seoul";
 

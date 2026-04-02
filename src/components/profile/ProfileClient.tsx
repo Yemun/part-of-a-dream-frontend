@@ -52,8 +52,8 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
   </h2>
 );
 
-// 월별 원 인터페이스
-interface MonthCircle {
+// 월별 원 데이터
+interface MonthCircleData {
   year: number;
   month: number;
   isWorked: boolean;
@@ -68,7 +68,7 @@ interface CareerGraphItem {
   role: string;
   startDate: string;
   endDate: string;
-  monthCircles: MonthCircle[];
+  monthCircles: MonthCircleData[];
   totalMonths: number;
   isCurrentJob: boolean;
 }
@@ -77,8 +77,8 @@ interface CareerGraphItem {
 const getMonthsBetweenDates = (
   startDate: string,
   endDate: string
-): MonthCircle[] => {
-  const circles: MonthCircle[] = [];
+): MonthCircleData[] => {
+  const circles: MonthCircleData[] = [];
   const start = new Date(startDate);
   const end = endDate === "오늘" ? new Date() : new Date(endDate);
 
@@ -161,7 +161,7 @@ const MonthCircle = ({
   circle,
   isCurrentJob,
 }: {
-  circle: MonthCircle;
+  circle: MonthCircleData;
   isCurrentJob: boolean;
 }) => {
   const fillPercentage = circle.fillPercentage;

@@ -44,16 +44,16 @@ export default function CommentForm({
         setAuthor("");
         setEmail("");
         setContent("");
-        onCommentAdded(comment); // 생성된 댓글 객체를 전달하여 낙관적 업데이트
+        onCommentAdded(comment);
         alert(t('commentPosted'));
       } else {
-        alert(t('commentPosted'));
-        onCommentAdded(); // 실패 시 전체 리페치
+        alert(t('errorPostingComment'));
+        onCommentAdded();
       }
     } catch (error) {
       console.error("댓글 작성 실패:", error);
-      alert(t('commentPosted'));
-      onCommentAdded(); // 에러 시에도 전체 리페치
+      alert(t('errorPostingComment'));
+      onCommentAdded();
     } finally {
       setIsSubmitting(false);
     }

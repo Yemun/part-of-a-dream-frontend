@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { getLocalePrefix } from "@/i18n/routing";
 
 // Base metadata configuration with locale support
 const baseConfig = {
@@ -61,9 +62,9 @@ export function createMetadata(options: MetadataOptions = {}): Metadata {
   // HTML 엔티티 처리를 위한 헬퍼 함수
   const escapeHtml = (str: string) =>
     str
+      .replace(/&/g, "&amp;")
       .replace(/'/g, "&apos;")
       .replace(/"/g, "&quot;")
-      .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
@@ -163,7 +164,7 @@ export function createArticleSchema(options: {
     locale = "ko",
   } = options;
   const config = baseConfig[locale] ?? baseConfig.ko;
-  const localePrefix = locale === "ko" ? "" : `/${locale}`;
+  const localePrefix = getLocalePrefix(locale);
 
   return {
     "@context": "https://schema.org",
@@ -204,7 +205,7 @@ export function createPersonSchema(options: {
 }) {
   const { name, alternateName, description, contact, locale = "ko" } = options;
   const config = baseConfig[locale] ?? baseConfig.ko;
-  const localePrefix = locale === "ko" ? "" : `/${locale}`;
+  const localePrefix = getLocalePrefix(locale);
 
   return {
     "@context": "https://schema.org",
