@@ -16,17 +16,24 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
-  
+
   // Enable static rendering
   setRequestLocale(locale);
-  
+
   const localePrefix = getLocalePrefix(locale);
-  const homeKeywords = locale === 'ko'
-    ? ["사용자 경험", "제품 디자인", "서울", "개발 블로그", "디자인 시스템"]
-    : ["user experience", "product design", "Seoul", "development blog", "design system"];
-  
+  const homeKeywords =
+    locale === "ko"
+      ? ["사용자 경험", "제품 디자인", "서울", "개발 블로그", "디자인 시스템"]
+      : [
+          "user experience",
+          "product design",
+          "Seoul",
+          "development blog",
+          "design system",
+        ];
+
   return createMetadata({
-    locale: locale as 'ko' | 'en',
+    locale: locale as "ko" | "en",
     keywords: homeKeywords,
     url: `https://yemun.kr${localePrefix}`,
     type: "website",
@@ -35,10 +42,10 @@ export async function generateMetadata({
 
 export default async function Home({ params }: PageProps) {
   const { locale } = await params;
-  
+
   // Enable static rendering
   setRequestLocale(locale);
-  
+
   let posts: BlogPost[] = [];
 
   try {
@@ -47,22 +54,36 @@ export default async function Home({ params }: PageProps) {
     console.error("Failed to load posts:", error);
   }
 
-  return (
-    <div className="border-t border-l flex items-start content-start self-stretch flex-wrap overflow-hidden max-h-[1008px] sm:max-h-[960px] texture-filter">
-      {posts
-        .sort(
-          (a, b) =>
-            new Date(b.publishedAt).getTime() -
-            new Date(a.publishedAt).getTime()
-        )
-        .map((post: BlogPost) => (
-          <PostCard key={post.slug} post={post} locale={locale} />
-        ))}
+  const sorted = posts.sort(
+    (a, b) =>
+      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+  );
 
-      {/* 30개의 "작업 중" 링크 추가 */}
-      {Array.from({ length: 48 }, (_, index) => {
-        return <PostCard key={`placeholder-${index}`} text="-" locale={locale} />;
-      })}
+  const postsByYear = new Map<number, BlogPost[]>();
+  for (const post of sorted) {
+    const year = new Date(post.publishedAt).getFullYear();
+    const group = postsByYear.get(year);
+    if (group) {
+      group.push(post);
+    } else {
+      postsByYear.set(year, [post]);
+    }
+  }
+
+  return (
+    <div className="flex flex-col">
+      {[...postsByYear.entries()].map(([year, yearPosts]) => (
+        <div key={year}>
+          <div className="text-sm font-semibold text-stroke-effect mb-1">
+            {year}
+          </div>
+          <div className="flex border-l flex-wrap items-start content-start overflow-hidden texture-filter">
+            {yearPosts.map((post) => (
+              <PostCard key={post.slug} post={post} locale={locale} />
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

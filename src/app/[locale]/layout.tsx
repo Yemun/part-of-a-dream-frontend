@@ -3,7 +3,7 @@ import Script from "next/script";
 import Navigation from "@/components/layout/Navigation";
 import NavigationVisibility from "@/components/layout/NavigationVisibility";
 import { createMetadata } from "@/lib/metadata";
-import "../globals.css";
+import "@/app/globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
