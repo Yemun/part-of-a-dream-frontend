@@ -1,9 +1,10 @@
 import { getBlogPosts, BlogPost } from "@/lib/content";
 import PostCard from "@/components/post/PostCard";
+import { PostCardAnimationProvider } from "@/components/post/PostCardAnimationProvider";
 import { createMetadata } from "@/lib/metadata";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
-import { getLocalePrefix } from "@/i18n/routing";
+import { getLocalePrefix, type Locale } from "@/i18n/routing";
 
 interface PageProps {
   params: Promise<{
@@ -33,7 +34,7 @@ export async function generateMetadata({
         ];
 
   return createMetadata({
-    locale: locale as "ko" | "en",
+    locale: locale as Locale,
     keywords: homeKeywords,
     url: `https://yemun.kr${localePrefix}`,
     type: "website",
@@ -73,7 +74,7 @@ export default async function Home({ params }: PageProps) {
   let globalIndex = 0;
 
   return (
-    <>
+    <PostCardAnimationProvider>
       {[...postsByYear.entries()].map(([year, yearPosts]) => (
         <div key={year}>
           <div className="inline-flex text-sm font-semibold px-1 -ml-px border ">
@@ -95,6 +96,6 @@ export default async function Home({ params }: PageProps) {
           </div>
         </div>
       ))}
-    </>
+    </PostCardAnimationProvider>
   );
 }

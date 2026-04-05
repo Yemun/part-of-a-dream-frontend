@@ -4,6 +4,7 @@ import { Link } from "@/i18n/routing";
 import RelativeTime from "@/components/common/RelativeTime";
 import { BlogPost } from "@/lib/content";
 import { useState, useEffect, useRef } from "react";
+import { usePostCardAnimation } from "./PostCardAnimationProvider";
 
 interface PostCardProps {
   post: BlogPost;
@@ -11,21 +12,15 @@ interface PostCardProps {
   index?: number;
 }
 
-let hasAnimatedPostCards = false;
-const savedTransforms = new Map<string, { transform: string; x: number }>();
-
 export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
+  const { isFirstLoad, getTransform, setTransform } = usePostCardAnimation();
   const [randomTransform, setRandomTransform] = useState("");
   const [translateX, setTranslateX] = useState(0);
-  const isFirstLoad = useRef(!hasAnimatedPostCards);
+  const firstLoad = useRef(isFirstLoad);
   const circleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    hasAnimatedPostCards = true;
-  }, []);
-
-  useEffect(() => {
-    const saved = savedTransforms.get(post.slug);
+    const saved = getTransform(post.slug);
     if (saved) {
       setRandomTransform(saved.transform);
       setTranslateX(saved.x);
@@ -42,16 +37,17 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
     const radius = circleRect.width / 2;
     const rotate = Math.round((x / (2 * Math.PI * radius)) * 360);
     const transform = `translate(${x}px, 0px) rotate(${rotate}deg)`;
-    savedTransforms.set(post.slug, { transform, x });
+    setTransform(post.slug, { transform, x });
 
-    if (isFirstLoad.current) {
+    if (firstLoad.current) {
       const delay = index * 100;
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         requestAnimationFrame(() => {
           setTranslateX(x);
           setRandomTransform(transform);
         });
       }, delay);
+      return () => clearTimeout(timeoutId);
     } else {
       setTranslateX(x);
       setRandomTransform(transform);
@@ -64,7 +60,7 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
         className="text-sm text-center font-medium"
         style={{
           transform: `translateX(${translateX}px)`,
-          ...(isFirstLoad.current && {
+          ...(firstLoad.current && {
             transition: "transform 2s cubic-bezier(0.215, 0.61, 0.355, 1)",
           }),
         }}
@@ -76,7 +72,7 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
           ref={circleRef}
           style={{
             transform: randomTransform || "translate(0px, 0px) rotate(0deg)",
-            ...(isFirstLoad.current && {
+            ...(firstLoad.current && {
               transition: "transform 2s cubic-bezier(0.215, 0.61, 0.355, 1)",
             }),
           }}

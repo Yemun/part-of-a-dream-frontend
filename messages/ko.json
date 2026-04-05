@@ -27,7 +27,9 @@
     "education": "학력",
     "email": "이메일",
     "monthsUnit": "개월",
+    "monthsUnitPlural": "개월",
     "yearsUnit": "년",
+    "yearsUnitPlural": "년",
     "present": "현재"
   },
   "comments": {

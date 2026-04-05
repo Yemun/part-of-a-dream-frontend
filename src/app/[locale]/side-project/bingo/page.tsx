@@ -1,7 +1,7 @@
 import { createMetadata } from "@/lib/metadata";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
-import { getLocalePrefix } from "@/i18n/routing";
+import { getLocalePrefix, type Locale } from "@/i18n/routing";
 import BingoEntry from "@/components/bingo/BingoEntry";
 
 interface PageProps {
@@ -32,7 +32,7 @@ export async function generateMetadata({
   return createMetadata({
     title: meta.title,
     description: meta.description,
-    locale: locale as "ko" | "en",
+    locale: locale as Locale,
     url: `https://yemun.kr${localePrefix}/side-project/bingo`,
   });
 }

@@ -7,7 +7,7 @@ import {
   createArticleSchema,
 } from "@/lib/metadata";
 import { setRequestLocale } from "next-intl/server";
-import { getLocalePrefix } from "@/i18n/routing";
+import { getLocalePrefix, type Locale } from "@/i18n/routing";
 import MDXRenderer from "@/components/post/MDXRenderer";
 import RelativeTime from "@/components/common/RelativeTime";
 import PostNavigation from "@/components/post/PostNavigation";
@@ -68,7 +68,7 @@ export async function generateMetadata({
       return createMetadata({
         title: notFoundData.title,
         description: notFoundData.description,
-        locale: locale as "ko" | "en",
+        locale: locale as Locale,
       });
     }
 
@@ -87,11 +87,11 @@ export async function generateMetadata({
       publishedTime,
       authors: [authorName],
       tags: [post.title],
-      locale: locale as "ko" | "en",
+      locale: locale as Locale,
     });
   } catch (error) {
     console.error("Error generating metadata:", error);
-    return createMetadata({ locale: locale as "ko" | "en" });
+    return createMetadata({ locale: locale as Locale });
   }
 }
 
@@ -120,7 +120,7 @@ export default async function PostPage({ params }: PageProps) {
     author: authorName,
     publishedTime: post.publishedAt,
     slug: post.slug,
-    locale: locale as "ko" | "en",
+    locale: locale as Locale,
   });
 
   return (

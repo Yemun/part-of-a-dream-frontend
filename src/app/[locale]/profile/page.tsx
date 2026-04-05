@@ -2,7 +2,8 @@ import { createMetadata, createPersonSchema } from "@/lib/metadata";
 import { Metadata } from "next";
 import ProfileClient from "@/components/profile/ProfileClient";
 import { setRequestLocale } from "next-intl/server";
-import { getLocalePrefix } from "@/i18n/routing";
+import { getLocalePrefix, type Locale } from "@/i18n/routing";
+import { getProfileData } from "@/data/profile";
 
 interface PageProps {
   params: Promise<{
@@ -21,7 +22,7 @@ export async function generateMetadata({
 
   const localePrefix = getLocalePrefix(locale);
 
-  const profileData =
+  const metaData =
     locale === "ko"
       ? {
           title: "예문",
@@ -51,10 +52,10 @@ export async function generateMetadata({
         };
 
   return createMetadata({
-    title: profileData.title,
-    description: profileData.description,
-    keywords: profileData.keywords,
-    locale: locale as "ko" | "en",
+    title: metaData.title,
+    description: metaData.description,
+    keywords: metaData.keywords,
+    locale: locale as Locale,
     url: `https://yemun.kr${localePrefix}/profile`,
     type: "profile",
   });
@@ -66,100 +67,7 @@ export default async function Profile({ params }: PageProps) {
   // Enable static rendering
   setRequestLocale(locale);
 
-  // Static profile data
-  const profileData = {
-    contact: {
-      email: "ymcho111@gmail.com",
-      github: "https://github.com/yemun",
-      linkedin: "https://www.linkedin.com/in/yemun-cho-11852885",
-      instagram: "https://www.instagram.com/yemuncho",
-    },
-    career: [
-      {
-        company: locale === "ko" ? "케이뱅크" : "Kbank",
-        roles: [
-          {
-            role:
-              locale === "ko"
-                ? "디자인 시스템 매니저"
-                : "Design System Manager",
-            startDate: "2024-01-01",
-            endDate: "오늘",
-          },
-          {
-            role: locale === "ko" ? "제품 디자이너" : "Product Designer",
-            startDate: "2022-06-27",
-            endDate: "2023-12-31",
-          },
-        ],
-      },
-      {
-        company: locale === "ko" ? "두나무" : "Donamu",
-        roles: [
-          {
-            role: locale === "ko" ? "UX/UI 디자이너" : "UX/UI Designer",
-            startDate: "2022-02-07",
-            endDate: "2022-06-06",
-          },
-        ],
-      },
-      {
-        company: locale === "ko" ? "(주)라인" : "LINE Corp",
-        roles: [
-          {
-            role: locale === "ko" ? "UI 디자이너" : "UI Designer",
-            startDate: "2021-04-01",
-            endDate: "2021-09-30",
-          },
-        ],
-      },
-      {
-        company: locale === "ko" ? "롯데면세점" : "Lotte Duty Free",
-        roles: [
-          {
-            role: locale === "ko" ? "UI 디자이너" : "UI Designer",
-            startDate: "2018-02-01",
-            endDate: "2021-01-29",
-          },
-          {
-            role:
-              locale === "ko"
-                ? "그래픽 디자이너 보조"
-                : "Assistant Graphic Designer",
-            startDate: "2017-01-16",
-            endDate: "2018-01-31",
-          },
-        ],
-      },
-      {
-        company: locale === "ko" ? "라인 플러스" : "LINE Plus",
-        roles: [
-          {
-            role: locale === "ko" ? "UI 디자이너" : "UI Designer",
-            startDate: "2016-08-01",
-            endDate: "2016-09-23",
-          },
-        ],
-      },
-      {
-        company: locale === "ko" ? "아메바" : "amoeba",
-        roles: [
-          {
-            role: locale === "ko" ? "학생 인턴" : "Student Intern",
-            startDate: "2016-01-18",
-            endDate: "2016-02-19",
-          },
-        ],
-      },
-    ],
-    education: {
-      university: locale === "ko" ? "세종대학교" : "Sejong University",
-      degree:
-        locale === "ko" ? "시각디자인 학사 전공" : "Bachelor of Visual Design",
-      startDate: "2010-03-02",
-      endDate: "2016-02-19",
-    },
-  };
+  const profileData = getProfileData(locale);
 
   // Person schema for profile page
   const profileMetadata =
@@ -181,7 +89,7 @@ export default async function Profile({ params }: PageProps) {
     name: profileMetadata.name,
     alternateName: profileMetadata.alternateName,
     description: profileMetadata.description,
-    locale: locale as "ko" | "en",
+    locale: locale as Locale,
     contact: profileData.contact,
   });
 
