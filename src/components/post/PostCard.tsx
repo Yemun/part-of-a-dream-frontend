@@ -24,17 +24,17 @@ export default function PostCard({ post, locale }: PostCardProps) {
   }, [post]);
 
   return (
-    <div className="w-38 border-b border-r border-t flex flex-col">
-      <div className="border-b-[0.5px] flex justify-center leading-7 text-sm font-semibold text-stroke-effect dot-pattern">
+    <div className="-ml-px -mt-px border flex flex-col">
+      <div className="border-b-[0.5px] text-sm text-center font-medium">
         <RelativeTime dateString={post.publishedAt} />
       </div>
-      <div className="flex justify-center items-center py-4 sm:py-3">
+      <div className="flex justify-center items-center p-2.5">
         <div style={{ transform: randomTransform }}>
           <Link
             href={`/posts/${post.slug}`}
             locale={locale}
             prefetch={true}
-            className="group w-26.5 h-26.5 rounded-full outline-2 outline-red-500 dark:outline-red-400 flex items-center justify-center bg-white dark:bg-black hover:bg-red-500 dark:hover:bg-red-400 transition-colors"
+            className="group w-24 h-24 rounded-full outline-2 outline-red-500 dark:outline-red-400 flex items-center justify-center bg-white dark:bg-black hover:bg-red-500 dark:hover:bg-red-400 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

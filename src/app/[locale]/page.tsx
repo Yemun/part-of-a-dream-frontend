@@ -71,19 +71,20 @@ export default async function Home({ params }: PageProps) {
   }
 
   return (
-    <div className="flex flex-col">
+    <>
       {[...postsByYear.entries()].map(([year, yearPosts]) => (
         <div key={year}>
-          <div className="text-sm font-semibold text-stroke-effect mb-1">
+          <div className="inline-flex text-sm font-semibold px-1 -ml-px border ">
             {year}
+            {locale === "ko" ? "년" : ""}
           </div>
-          <div className="flex border-l flex-wrap items-start content-start overflow-hidden texture-filter">
+          <div className="flex-1">
             {yearPosts.map((post) => (
               <PostCard key={post.slug} post={post} locale={locale} />
             ))}
           </div>
         </div>
       ))}
-    </div>
+    </>
   );
 }

@@ -16,7 +16,7 @@ export default function CommentForm({
   postSlug,
   onCommentAdded,
 }: CommentFormProps) {
-  const t = useTranslations('comments');
+  const t = useTranslations("comments");
   const [author, setAuthor] = useState("");
   const [email, setEmail] = useState("");
   const [content, setContent] = useState("");
@@ -26,7 +26,7 @@ export default function CommentForm({
     e.preventDefault();
 
     if (!author.trim() || !email.trim() || !content.trim()) {
-      alert(t('emailRequired'));
+      alert(t("emailRequired"));
       return;
     }
 
@@ -45,14 +45,14 @@ export default function CommentForm({
         setEmail("");
         setContent("");
         onCommentAdded(comment);
-        alert(t('commentPosted'));
+        alert(t("commentPosted"));
       } else {
-        alert(t('errorPostingComment'));
+        alert(t("errorPostingComment"));
         onCommentAdded();
       }
     } catch (error) {
       console.error("댓글 작성 실패:", error);
-      alert(t('errorPostingComment'));
+      alert(t("errorPostingComment"));
       onCommentAdded();
     } finally {
       setIsSubmitting(false);
@@ -60,9 +60,9 @@ export default function CommentForm({
   };
 
   return (
-    <div className="mt-8 p-6 rounded-2xl border border-black dot-pattern texture-filter dark:border-white">
-      <h3 className="text-lg font-semibold mb-4 text-stroke-effect dark:text-white">
-        {t('writeComment')}
+    <div className="mt-8 p-6 rounded-2xl border border-black dot-pattern dark:border-white">
+      <h3 className="text-lg font-semibold mb-4 dark:text-white">
+        {t("writeComment")}
       </h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -71,7 +71,7 @@ export default function CommentForm({
             id="author"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            placeholder={t('name')}
+            placeholder={t("name")}
             disabled={isSubmitting}
           />
           <Input
@@ -79,7 +79,7 @@ export default function CommentForm({
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder={t('email')}
+            placeholder={t("email")}
             disabled={isSubmitting}
           />
         </div>
@@ -88,12 +88,12 @@ export default function CommentForm({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={4}
-          placeholder={t('message')}
+          placeholder={t("message")}
           disabled={isSubmitting}
         />
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting} size="lg">
-            {isSubmitting ? t('submit') + '...' : t('submit')}
+            {isSubmitting ? t("submit") + "..." : t("submit")}
           </Button>
         </div>
       </form>

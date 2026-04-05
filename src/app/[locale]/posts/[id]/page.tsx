@@ -131,7 +131,7 @@ export default async function PostPage({ params }: PageProps) {
       />
       <article>
         <header className="mb-10 sm:mb-14">
-          <h1 className="font-bold text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-4 sm:mb-4">
+          <h1 className="font-bold text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-3">
             {post.title}
           </h1>
           <div className="font-normal text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-5 sm:leading-6">

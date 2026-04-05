@@ -1,4 +1,10 @@
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+@font-face {
+  font-family: "JoseonGulim";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ChosunGu.woff")
+    format("woff");
+  font-weight: normal;
+  font-display: swap;
+}
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -28,7 +34,6 @@
 .prose figure img {
   @apply rounded border-[0.5px] border-black mb-2 w-full max-h-[50vh] dark:border-white;
   background-image: var(--dot-pattern);
-  filter: url(#texture-filter);
 }
 
 .prose figure img.object-contain {
@@ -94,25 +99,28 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Pretendard Variable", Pretendard, -apple-system,
-    BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
-    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  font-family:
+    "JoseonGulim",
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    Roboto,
+    "Helvetica Neue",
+    "Segoe UI",
+    "Apple SD Gothic Neo",
+    "Noto Sans KR",
+    "Malgun Gothic",
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    sans-serif;
 }
 
 .dot-pattern {
   background-image: var(--dot-pattern);
   background-repeat: repeat;
   background-size: 6px 6px;
-}
-
-.text-stroke-effect {
-  text-shadow: -1px -1px 0 var(--background), 1px -1px 0 var(--background),
-    -1px 1px 0 var(--background), 1px 1px 0 var(--background);
-}
-
-.texture-filter {
-  filter: url(#texture-filter);
 }
 
 @keyframes slide-up {

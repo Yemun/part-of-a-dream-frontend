@@ -51,30 +51,6 @@ export default async function LocaleLayout({
         </Script>
       </head>
       <body className="antialiased">
-        <svg width="0" height="0" style={{ position: "absolute" }}>
-          <filter
-            id="texture-filter"
-            x="0"
-            y="0"
-            width="1"
-            height="1"
-            filterUnits="objectBoundingBox"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.2"
-              result="turb"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="turb"
-              scale="1.4"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </svg>
-
         <NextIntlClientProvider messages={messages}>
           <div className="min-h-screen">
             <div className="flex flex-col items-center">

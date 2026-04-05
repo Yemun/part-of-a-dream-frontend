@@ -20,13 +20,11 @@ export default function LanguageSwitcher() {
       type="button"
       title={locale === "ko" ? "Switch to English" : "한국어로 변경"}
     >
-      <span className="text-3xl">
-        <span className="group-hover:hidden">
-          {locale === "ko" ? "🇰🇷" : "🇬🇧"}
-        </span>
-        <span className="hidden group-hover:inline">
-          {locale === "ko" ? "🇬🇧" : "🇰🇷"}
-        </span>
+      <span className="group-hover:hidden">
+        {locale === "ko" ? "ENG" : "한국어로"}
+      </span>
+      <span className="hidden group-hover:inline">
+        {locale === "ko" ? "영어로" : "KOR"}
       </span>
     </button>
   );

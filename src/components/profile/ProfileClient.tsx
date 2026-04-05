@@ -76,7 +76,7 @@ interface CareerGraphItem {
 // 두 날짜 사이의 모든 달을 계산하는 함수 (365일 기준)
 const getMonthsBetweenDates = (
   startDate: string,
-  endDate: string
+  endDate: string,
 ): MonthCircleData[] => {
   const circles: MonthCircleData[] = [];
   const start = new Date(startDate);
@@ -169,7 +169,7 @@ const MonthCircle = ({
   // fillPercentage를 10% 단위로 반올림하여 아이콘 선택
   const moonPhase = Math.max(
     1,
-    Math.min(10, Math.round(fillPercentage / 10) || 1)
+    Math.min(10, Math.round(fillPercentage / 10) || 1),
   );
 
   // 현재 재직중인지에 따라 색상 클래스 적용
@@ -241,12 +241,25 @@ const CareerGraph = ({ career }: { career: CareerEntry[] }) => {
             {formatDate(item.startDate, t("present"), locale)} -{" "}
             {formatDate(item.endDate, t("present"), locale)}
             {", "}
-            {item.totalMonths}
-            {t("monthsUnit")}
+            {(() => {
+              const years = Math.floor(item.totalMonths / 12);
+              const months = item.totalMonths % 12;
+              const isKo = locale === "ko";
+              const parts = [];
+              if (years > 0)
+                parts.push(
+                  `${years}${isKo ? t("yearsUnit") : t(years === 1 ? "yearsUnit" : "yearsUnitPlural")}`,
+                );
+              if (months > 0)
+                parts.push(
+                  `${months}${isKo ? t("monthsUnit") : t(months === 1 ? "monthsUnit" : "monthsUnitPlural")}`,
+                );
+              return parts.join(" ") || `0${t("monthsUnit")}`;
+            })()}
           </p>
 
           {/* 월별 원들 */}
-          <div className="inline-flex rounded border-[0.5px] flex-wrap dot-pattern texture-filter p-1">
+          <div className="inline-flex border-[0.5px] flex-wrap dot-pattern p-0.5">
             {item.monthCircles.map((circle, circleIndex) => (
               <div key={circleIndex} className="flex items-center">
                 {/* 12개월마다 연도 divider 추가 (첫 번째 제외) */}
@@ -346,10 +359,29 @@ export default function ProfileClient({
   profileData: ProfileData;
 }) {
   const t = useTranslations("profile");
+  const locale = useLocale();
+
+  const totalCareerMonths = processCareerToGraph(profileData.career).reduce(
+    (sum, item) => sum + item.totalMonths,
+    0,
+  );
+  const careerYears = Math.floor(totalCareerMonths / 12);
+  const careerMonths = totalCareerMonths % 12;
+  const isKo = locale === "ko";
+  const careerDuration = [
+    careerYears > 0
+      ? `${careerYears}${isKo ? t("yearsUnit") : t(careerYears === 1 ? "yearsUnit" : "yearsUnitPlural")}`
+      : "",
+    careerMonths > 0
+      ? `${careerMonths}${isKo ? t("monthsUnit") : t(careerMonths === 1 ? "monthsUnit" : "monthsUnitPlural")}`
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <section>
-      <h1 className="font-bold text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-4 sm:mb-4">
+      <h1 className="font-bold text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-3">
         {t("name")}
       </h1>
 
@@ -358,7 +390,9 @@ export default function ProfileClient({
       </div>
 
       <div className="mb-4 sm:mb-6">
-        <SectionTitle>{t("career")}</SectionTitle>
+        <SectionTitle>
+          {t("career")}·{careerDuration}
+        </SectionTitle>
 
         <CareerGraph career={profileData.career} />
       </div>
