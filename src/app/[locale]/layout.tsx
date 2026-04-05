@@ -8,6 +8,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing, isValidLocale } from "@/i18n/routing";
+import { PostCardAnimationProvider } from "@/components/post/PostCardAnimationProvider";
 
 export const metadata: Metadata = createMetadata();
 
@@ -56,16 +57,18 @@ export default async function LocaleLayout({
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <div className="min-h-screen">
-            <div className="flex flex-col items-center">
-              <div className="flex flex-col gap-12 sm:gap-14 items-center justify-start px-4 sm:px-8 lg:px-16 pt-8 pb-22 sm:pt-12 sm:pb-24 lg:pt-20 lg:pb-26 w-full">
-                <NavigationVisibility>
-                  <Navigation />
-                </NavigationVisibility>
-                <div className="max-w-5xl w-full">{children}</div>
+          <PostCardAnimationProvider>
+            <div className="min-h-screen">
+              <div className="flex flex-col items-center">
+                <div className="flex flex-col gap-12 sm:gap-14 items-center justify-start px-4 sm:px-8 lg:px-16 pt-8 pb-22 sm:pt-12 sm:pb-24 lg:pt-20 lg:pb-26 w-full">
+                  <NavigationVisibility>
+                    <Navigation />
+                  </NavigationVisibility>
+                  <div className="max-w-5xl w-full">{children}</div>
+                </div>
               </div>
             </div>
-          </div>
+          </PostCardAnimationProvider>
         </NextIntlClientProvider>
       </body>
     </html>
