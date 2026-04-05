@@ -12,7 +12,7 @@ interface PostCardProps {
 }
 
 let hasAnimatedPostCards = false;
-const savedTransforms = new Map<string, string>();
+const savedTransforms = new Map<string, { transform: string; x: number }>();
 
 export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
   const [randomTransform, setRandomTransform] = useState("");
@@ -27,7 +27,8 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
   useEffect(() => {
     const saved = savedTransforms.get(post.slug);
     if (saved) {
-      setRandomTransform(saved);
+      setRandomTransform(saved.transform);
+      setTranslateX(saved.x);
       return;
     }
 
@@ -41,7 +42,7 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
     const radius = circleRect.width / 2;
     const rotate = Math.round((x / (2 * Math.PI * radius)) * 360);
     const transform = `translate(${x}px, 0px) rotate(${rotate}deg)`;
-    savedTransforms.set(post.slug, transform);
+    savedTransforms.set(post.slug, { transform, x });
 
     if (isFirstLoad.current) {
       const delay = index * 100;
