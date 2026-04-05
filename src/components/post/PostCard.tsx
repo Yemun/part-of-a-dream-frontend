@@ -3,33 +3,38 @@
 import { Link } from "@/i18n/routing";
 import RelativeTime from "@/components/common/RelativeTime";
 import { BlogPost } from "@/lib/content";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface PostCardProps {
   post: BlogPost;
   locale?: string;
 }
 
-function getRandomTransform(): string {
-  const x = Math.floor(Math.random() * 12) - 6;
-  const y = Math.floor(Math.random() * 12) - 6;
-  const rotate = Math.floor(Math.random() * 90);
-  return `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
-}
-
 export default function PostCard({ post, locale }: PostCardProps) {
   const [randomTransform, setRandomTransform] = useState("");
+  const circleRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    setRandomTransform(getRandomTransform());
+    const el = circleRef.current;
+    const parent = el?.parentElement;
+    if (!el || !parent) return;
+    const parentRect = parent.getBoundingClientRect();
+    const circleRect = el.getBoundingClientRect();
+    const maxX = (parentRect.width - circleRect.width) / 2;
+    const maxY = (parentRect.height - circleRect.height) / 2;
+    const x = Math.round(Math.random() * maxX * 2 - maxX);
+
+    const rotate = Math.floor(Math.random() * 90);
+    setRandomTransform(`translate(${x}px, 0px) rotate(${rotate}deg)`);
   }, [post]);
 
   return (
-    <div className="-ml-px -mt-px border flex flex-col">
+    <div className="-ml-px -mt-px border">
       <div className="border-b-[0.5px] text-sm text-center font-medium">
         <RelativeTime dateString={post.publishedAt} />
       </div>
       <div className="flex justify-center items-center p-2.5">
-        <div style={{ transform: randomTransform }}>
+        <div ref={circleRef} style={{ transform: randomTransform }}>
           <Link
             href={`/posts/${post.slug}`}
             locale={locale}
