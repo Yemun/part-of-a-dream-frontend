@@ -70,6 +70,8 @@ export default async function Home({ params }: PageProps) {
     }
   }
 
+  let globalIndex = 0;
+
   return (
     <>
       {[...postsByYear.entries()].map(([year, yearPosts]) => (
@@ -79,9 +81,17 @@ export default async function Home({ params }: PageProps) {
             {locale === "ko" ? "년" : ""}
           </div>
           <div className="flex-1">
-            {yearPosts.map((post) => (
-              <PostCard key={post.slug} post={post} locale={locale} />
-            ))}
+            {yearPosts.map((post) => {
+              const idx = globalIndex++;
+              return (
+                <PostCard
+                  key={post.slug}
+                  post={post}
+                  locale={locale}
+                  index={idx}
+                />
+              );
+            })}
           </div>
         </div>
       ))}

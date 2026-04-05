@@ -8,33 +8,78 @@ import { useState, useEffect, useRef } from "react";
 interface PostCardProps {
   post: BlogPost;
   locale?: string;
+  index?: number;
 }
 
-export default function PostCard({ post, locale }: PostCardProps) {
+let hasAnimatedPostCards = false;
+const savedTransforms = new Map<string, string>();
+
+export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
   const [randomTransform, setRandomTransform] = useState("");
+  const [translateX, setTranslateX] = useState(0);
+  const isFirstLoad = useRef(!hasAnimatedPostCards);
   const circleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    hasAnimatedPostCards = true;
+  }, []);
+
+  useEffect(() => {
+    const saved = savedTransforms.get(post.slug);
+    if (saved) {
+      setRandomTransform(saved);
+      return;
+    }
+
     const el = circleRef.current;
     const parent = el?.parentElement;
     if (!el || !parent) return;
     const parentRect = parent.getBoundingClientRect();
     const circleRect = el.getBoundingClientRect();
     const maxX = (parentRect.width - circleRect.width) / 2;
-    const maxY = (parentRect.height - circleRect.height) / 2;
     const x = Math.round(Math.random() * maxX * 2 - maxX);
+    const radius = circleRect.width / 2;
+    const rotate = Math.round((x / (2 * Math.PI * radius)) * 360);
+    const transform = `translate(${x}px, 0px) rotate(${rotate}deg)`;
+    savedTransforms.set(post.slug, transform);
 
-    const rotate = Math.floor(Math.random() * 90);
-    setRandomTransform(`translate(${x}px, 0px) rotate(${rotate}deg)`);
+    if (isFirstLoad.current) {
+      const delay = index * 100;
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          setTranslateX(x);
+          setRandomTransform(transform);
+        });
+      }, delay);
+    } else {
+      setTranslateX(x);
+      setRandomTransform(transform);
+    }
   }, [post]);
 
   return (
     <div className="-ml-px -mt-px border">
-      <div className="border-b-[0.5px] text-sm text-center font-medium">
+      <div
+        className="text-sm text-center font-medium"
+        style={{
+          transform: `translateX(${translateX}px)`,
+          ...(isFirstLoad.current && {
+            transition: "transform 2s cubic-bezier(0.215, 0.61, 0.355, 1)",
+          }),
+        }}
+      >
         <RelativeTime dateString={post.publishedAt} />
       </div>
-      <div className="flex justify-center items-center p-2.5">
-        <div ref={circleRef} style={{ transform: randomTransform }}>
+      <div className="flex justify-center items-center p-2.5 border-t-[0.5px]">
+        <div
+          ref={circleRef}
+          style={{
+            transform: randomTransform || "translate(0px, 0px) rotate(0deg)",
+            ...(isFirstLoad.current && {
+              transition: "transform 2s cubic-bezier(0.215, 0.61, 0.355, 1)",
+            }),
+          }}
+        >
           <Link
             href={`/posts/${post.slug}`}
             locale={locale}
