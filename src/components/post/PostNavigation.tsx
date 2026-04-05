@@ -11,9 +11,9 @@ export default function PostNavigation({
   previous,
   next,
 }: PostNavigationProps) {
-  const t = useTranslations('post');
+  const t = useTranslations("post");
   const locale = useLocale();
-  
+
   if (!previous && !next) {
     return null;
   }
@@ -31,10 +31,10 @@ export default function PostNavigation({
               prefetch={true}
               className="group flex flex-col items-start"
             >
-              <span className="text-sm text-gray-500 group-hover:text-red-600 dark:group-hover:text-red-300 dark:text-gray-400 mb-1">
-                {t('navigation.previous')}
+              <span className="text-sm text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-300 dark:text-gray-400 mb-1">
+                {t("navigation.previous")}
               </span>
-              <span className="text-gray-900 dark:text-white font-medium group-hover:text-red-600 dark:group-hover:text-red-300 ">
+              <span className="text-gray-900 dark:text-white font-medium group-hover:text-blue-600 dark:group-hover:text-blue-300 ">
                 {previous.title}
               </span>
             </Link>
@@ -49,10 +49,10 @@ export default function PostNavigation({
               prefetch={true}
               className="group flex flex-col items-end text-right"
             >
-              <span className="text-sm text-gray-500 group-hover:text-red-600 dark:group-hover:text-red-300 dark:text-gray-400 mb-1">
-                {t('navigation.next')}
+              <span className="text-sm text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-300 dark:text-gray-400 mb-1">
+                {t("navigation.next")}
               </span>
-              <span className="text-gray-900 dark:text-white font-medium group-hover:text-red-600 dark:group-hover:text-red-300 ">
+              <span className="text-gray-900 dark:text-white font-medium group-hover:text-blue-600 dark:group-hover:text-blue-300 ">
                 {next.title}
               </span>
             </Link>

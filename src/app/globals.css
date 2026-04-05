@@ -1,10 +1,11 @@
 @font-face {
-  font-family: "JoseonGulim";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ChosunGu.woff")
+  font-family: "ChosunIlboMyungjo";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff")
     format("woff");
   font-weight: normal;
   font-display: swap;
 }
+
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -32,7 +33,7 @@
 }
 
 .prose figure img {
-  @apply rounded border-[0.5px] border-black mb-2 w-full max-h-[50vh] dark:border-white;
+  @apply border-[0.5px] border-black w-full max-h-[50vh] dark:border-white;
   background-image: var(--dot-pattern);
 }
 
@@ -99,22 +100,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family:
-    "JoseonGulim",
-    Pretendard,
-    -apple-system,
-    BlinkMacSystemFont,
-    system-ui,
-    Roboto,
-    "Helvetica Neue",
-    "Segoe UI",
-    "Apple SD Gothic Neo",
-    "Noto Sans KR",
-    "Malgun Gothic",
-    "Apple Color Emoji",
-    "Segoe UI Emoji",
-    "Segoe UI Symbol",
-    sans-serif;
+  font-family: "ChosunIlboMyungjo", serif;
 }
 
 .dot-pattern {

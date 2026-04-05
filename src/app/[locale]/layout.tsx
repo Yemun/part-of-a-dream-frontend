@@ -50,7 +50,7 @@ export default async function LocaleLayout({
           `}
         </Script>
       </head>
-      <body className="antialiased">
+      <body>
         <NextIntlClientProvider messages={messages}>
           <div className="min-h-screen">
             <div className="flex flex-col items-center">
