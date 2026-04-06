@@ -75,8 +75,8 @@ export default async function Home({ params }: PageProps) {
   return (
     <>
       {[...postsByYear.entries()].map(([year, yearPosts]) => (
-        <div key={year}>
-          <div className="inline-flex text-sm font-medium px-1 -ml-px border-t border-x ">
+        <div key={year} className="flex">
+          <div className="inline-flex text-sm font-medium px-1 -ml-px -mt-px border [writing-mode:vertical-rl] [text-orientation:upright]">
             {year}
             {locale === "ko" ? "년" : ""}
           </div>
