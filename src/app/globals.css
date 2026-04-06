@@ -56,13 +56,7 @@
 }
 
 .prose p {
-  @apply mb-2 leading-8 text-base whitespace-pre-wrap;
-}
-
-@media (min-width: 640px) {
-  .prose p {
-    @apply leading-9 mb-3 text-lg;
-  }
+  @apply mb-2 leading-9 text-lg whitespace-pre-wrap;
 }
 
 .prose ul {
@@ -101,6 +95,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: "ChosunIlboMyungjo", serif;
+  -webkit-text-stroke: 0.2px;
+  letter-spacing: -0.5px;
 }
 
 .dot-pattern {
