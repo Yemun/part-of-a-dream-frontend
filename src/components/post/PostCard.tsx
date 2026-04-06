@@ -17,13 +17,16 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
   const [randomTransform, setRandomTransform] = useState("");
   const [translateX, setTranslateX] = useState(0);
   const firstLoad = useRef(isFirstLoad);
+  const [shouldTransition] = useState(isFirstLoad);
   const circleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const saved = getTransform(post.slug);
     if (saved) {
-      setRandomTransform(saved.transform);
-      setTranslateX(saved.x);
+      requestAnimationFrame(() => {
+        setRandomTransform(saved.transform);
+        setTranslateX(saved.x);
+      });
       return;
     }
 
@@ -49,8 +52,10 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
       }, delay);
       return () => clearTimeout(timeoutId);
     } else {
-      setTranslateX(x);
-      setRandomTransform(transform);
+      requestAnimationFrame(() => {
+        setTranslateX(x);
+        setRandomTransform(transform);
+      });
     }
   }, [post]);
 
@@ -60,7 +65,7 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
         className="text-sm text-center font-medium"
         style={{
           transform: `translateX(${translateX}px)`,
-          ...(firstLoad.current && {
+          ...(shouldTransition && {
             transition: "transform 2s cubic-bezier(0.215, 0.61, 0.355, 1)",
           }),
         }}
@@ -72,7 +77,7 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
           ref={circleRef}
           style={{
             transform: randomTransform || "translate(0px, 0px) rotate(0deg)",
-            ...(firstLoad.current && {
+            ...(shouldTransition && {
               transition: "transform 2s cubic-bezier(0.215, 0.61, 0.355, 1)",
             }),
           }}

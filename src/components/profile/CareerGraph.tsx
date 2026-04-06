@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import type { CareerEntry, MonthCircleData } from "@/lib/careerUtils";
 import {
@@ -105,11 +105,7 @@ export default function CareerGraph({ career }: { career: CareerEntry[] }) {
   const locale = useLocale();
   const graphItems = processCareerToGraph(career);
 
-  const hasAnimated = useRef(false);
-  const shouldAnimate = !hasAnimated.current;
-  useEffect(() => {
-    hasAnimated.current = true;
-  }, []);
+  const [shouldAnimate] = useState(true);
 
   const globalOffsets: number[] = [];
   let runningTotal = 0;

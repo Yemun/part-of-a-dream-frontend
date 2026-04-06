@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useRef, type ReactNode } from "react";
+import { createContext, useContext, useRef, useState, type ReactNode } from "react";
 
 interface TransformData {
   transform: string;
@@ -21,13 +21,8 @@ export function PostCardAnimationProvider({
 }: {
   children: ReactNode;
 }) {
-  const hasAnimated = useRef(false);
+  const [isFirstLoad] = useState(true);
   const savedTransforms = useRef(new Map<string, TransformData>());
-  const isFirstLoad = !hasAnimated.current;
-
-  if (!hasAnimated.current) {
-    hasAnimated.current = true;
-  }
 
   return (
     <PostCardAnimationContext.Provider

@@ -37,18 +37,17 @@ export function getDistance(
 
 export function useGpsTracking(): UseGpsTrackingReturn {
   const [position, setPosition] = useState<GpsPosition | null>(null);
-  const [status, setStatus] = useState<GpsStatus>("requesting");
+  const [status, setStatus] = useState<GpsStatus>(() =>
+    typeof navigator !== "undefined" && navigator.geolocation
+      ? "requesting"
+      : "unavailable"
+  );
   const [isPaused, setIsPaused] = useState(false);
   const watchIdRef = useRef<number | null>(null);
   const lastUpdateRef = useRef<number>(0);
 
   const startWatching = useCallback(() => {
-    if (!navigator.geolocation) {
-      setStatus("unavailable");
-      return;
-    }
-
-    setStatus("requesting");
+    if (!navigator.geolocation) return;
 
     watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {
@@ -93,6 +92,7 @@ export function useGpsTracking(): UseGpsTrackingReturn {
 
   const resume = useCallback(() => {
     setIsPaused(false);
+    setStatus("requesting");
     startWatching();
   }, [startWatching]);
 

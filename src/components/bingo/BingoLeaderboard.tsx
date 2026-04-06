@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { getLeaderboard, LeaderboardEntry } from "@/lib/bingo";
 
@@ -16,15 +16,16 @@ export default function BingoLeaderboard({
   const t = useTranslations("bingo");
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
 
-  const fetchLeaderboard = useCallback(async () => {
-    const data = await getLeaderboard();
-    setEntries(data);
-  }, []);
-
   // Refresh on mount and whenever refreshKey changes (realtime event)
   useEffect(() => {
-    fetchLeaderboard();
-  }, [fetchLeaderboard, refreshKey]);
+    let cancelled = false;
+    getLeaderboard().then((data) => {
+      if (!cancelled) setEntries(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshKey]);
 
   if (entries.length === 0) return null;
 
