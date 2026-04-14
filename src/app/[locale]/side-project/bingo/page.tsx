@@ -41,5 +41,9 @@ export default async function SideProject({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <BingoEntry />;
+  return (
+    <div className="font-bingo">
+      <BingoEntry />
+    </div>
+  );
 }

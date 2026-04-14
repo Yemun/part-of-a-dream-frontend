@@ -132,3 +132,12 @@ body {
 .animate-shadow-breath {
   animation: shadow-breath 1.8s ease-in-out infinite;
 }
+
+.font-bingo,
+.font-bingo * {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    "Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif;
+  -webkit-text-stroke: 0;
+  letter-spacing: normal;
+}

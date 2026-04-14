@@ -65,6 +65,18 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
     }
   }
 
+  // Dev-only: ?testNearby=<cell_index> forces that cell into nearby state (GPS 없이 접근 상태 테스트)
+  if (typeof window !== "undefined") {
+    const param = new URLSearchParams(window.location.search).get("testNearby");
+    if (param !== null) {
+      const targetIndex = Number(param);
+      const targetLoc = locations.find((l) => l.cell_index === targetIndex);
+      if (targetLoc && !checkedLocationIds.has(targetLoc.id)) {
+        nearbyLocationIds.add(targetLoc.id);
+      }
+    }
+  }
+
   const addToast = useCallback((text: string) => {
     const id = crypto.randomUUID();
     setToasts((prev) => [...prev, { id, text }]);

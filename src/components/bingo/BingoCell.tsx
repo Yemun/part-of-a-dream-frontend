@@ -28,13 +28,17 @@ export default function BingoCell({
 
   if (isChecked) {
     return (
-      <div className="aspect-square flex items-center justify-center">
-        <div className="w-[80%] h-[80%] rounded-full border-[4px] border-blue-600 dark:border-blue-400 flex items-center justify-center p-2">
+      <button
+        type="button"
+        onClick={() => onOpenDetails(location)}
+        className="aspect-square flex items-center justify-center cursor-pointer"
+      >
+        <span className="w-[80%] h-[80%] rounded-full border-[4px] border-blue-600 dark:border-blue-400 flex items-center justify-center p-2">
           <span className="text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-300 text-center leading-tight line-clamp-2">
             {displayName}
           </span>
-        </div>
-      </div>
+        </span>
+      </button>
     );
   }
 
