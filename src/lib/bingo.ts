@@ -5,6 +5,8 @@ export const BINGO_EVENT = {
   name: "을지로 탐험 빙고",
   description: "을지로 일대 9곳을 방문하세요!",
   proximityRadiusMeters: 50,
+  startAt: "2026-04-28T14:00:00+09:00",
+  endAt: "2026-04-28T17:00:00+09:00",
 };
 
 // Types

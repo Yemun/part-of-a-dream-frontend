@@ -43,14 +43,6 @@ export default function BingoEntry() {
     load();
   }, []);
 
-  const handleLogout = useCallback(() => {
-    sessionStorage.removeItem("bingo_player_id");
-    sessionStorage.removeItem("bingo_player_name");
-    setPlayer(null);
-    setName("");
-    setError("");
-  }, []);
-
   const handleJoin = useCallback(async () => {
     if (!name.trim()) return;
     setJoining(true);
@@ -83,7 +75,7 @@ export default function BingoEntry() {
   }
 
   if (player) {
-    return <BingoBoard locations={locations} player={player} onChangeName={handleLogout} />;
+    return <BingoBoard locations={locations} player={player} />;
   }
 
   return (

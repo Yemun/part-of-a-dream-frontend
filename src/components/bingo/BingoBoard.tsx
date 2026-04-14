@@ -21,14 +21,16 @@ import BingoCell from "./BingoCell";
 import BingoStatus from "./BingoStatus";
 import BingoLeaderboard from "./BingoLeaderboard";
 import BingoToast, { ToastMessage } from "./BingoToast";
+import BingoEventHeader from "./BingoEventHeader";
+import LocationModal from "./LocationModal";
+import Button from "@/components/ui/Button";
 
 interface BingoBoardProps {
   locations: BingoLocation[];
   player: BingoPlayer;
-  onChangeName: () => void;
 }
 
-export default function BingoBoard({ locations, player, onChangeName }: BingoBoardProps) {
+export default function BingoBoard({ locations, player }: BingoBoardProps) {
   const t = useTranslations("bingo");
   const locale = useLocale();
   const [checks, setChecks] = useState<BingoCheck[]>([]);
@@ -36,14 +38,14 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
   const [distances, setDistances] = useState<Map<string, number>>(new Map());
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
+  const [selectedLocation, setSelectedLocation] =
+    useState<BingoLocation | null>(null);
   const checkingRef = useRef<Set<string>>(new Set());
 
   const { position, status, pause, resume, isPaused } = useGpsTracking();
 
-  // Location lookup by ID
   const locationById = new Map(locations.map((loc) => [loc.id, loc]));
 
-  // Build board: player.board_layout[i] = cell_index of location at board position i
   const locationByCellIndex = new Map(
     locations.map((loc) => [loc.cell_index, loc])
   );
@@ -51,17 +53,8 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
     (cellIndex) => locationByCellIndex.get(cellIndex)
   );
 
-  // Set of checked location IDs
   const checkedLocationIds = new Set(checks.map((c) => c.location_id));
 
-  // Set of board positions that are checked
-  const checkedBoardPositions = new Set(
-    board
-      .map((loc, i) => (loc && checkedLocationIds.has(loc.id) ? i : -1))
-      .filter((i) => i >= 0)
-  );
-
-  // Nearby (within radius) location IDs
   const nearbyLocationIds = new Set<string>();
   for (const [locId, dist] of distances) {
     if (
@@ -69,17 +62,6 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
       !checkedLocationIds.has(locId)
     ) {
       nearbyLocationIds.add(locId);
-    }
-  }
-
-  // Completed line types
-  const completedLineTypes = new Set(lines.map((l) => l.line_type));
-
-  // Board positions that belong to a completed line
-  const linePositions = new Set<number>();
-  for (const line of BINGO_LINES) {
-    if (completedLineTypes.has(line.type)) {
-      line.cells.forEach((c) => linePositions.add(c));
     }
   }
 
@@ -92,7 +74,6 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // Load existing checks and lines
   useEffect(() => {
     async function load() {
       const [existingChecks, existingLines] = await Promise.all([
@@ -105,7 +86,6 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
     load();
   }, [player.id]);
 
-  // Supabase Realtime subscription
   useEffect(() => {
     const supabase = getSupabaseClient();
 
@@ -116,7 +96,6 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
         { event: "INSERT", schema: "public", table: "bingo_checks" },
         async (payload) => {
           const row = payload.new as { player_id: string; location_id: string };
-          // Skip own actions (already handled optimistically)
           if (row.player_id === player.id) return;
 
           const playerName = await getPlayerNameById(row.player_id);
@@ -154,7 +133,6 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player.id]);
 
-  // Detect new bingo lines after checks change
   const detectLines = useCallback(
     async (currentChecks: BingoCheck[], currentLines: BingoLine[]) => {
       const currentCheckedLocationIds = new Set(
@@ -187,7 +165,6 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
     [board, player.id, player.name, addToast, t]
   );
 
-  // GPS position update → calculate distances only
   useEffect(() => {
     if (!position || status !== "active") return;
 
@@ -207,7 +184,6 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [position, status]);
 
-  // Manual check handler — called when user taps a nearby cell
   const handleCheck = useCallback(
     async (locationId: string) => {
       if (!position) return;
@@ -255,28 +231,45 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
     ]
   );
 
+  const handleEnableGps = useCallback(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      () => resume(),
+      () => resume(),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, [resume]);
+
+  const gpsActive = status === "active" && !isPaused;
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <span className="text-sm font-medium">{player.name}</span>
-        <button
-          type="button"
-          onClick={onChangeName}
-          className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-        >
-          {t("changeName")}
-        </button>
       </div>
+
+      <BingoEventHeader />
+
+      {gpsActive ? (
+        <span className="inline-flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
+          <span className="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+          {t("gpsTracking")}
+        </span>
+      ) : (
+        <Button variant="primary" size="md" onClick={handleEnableGps}>
+          {t("enableGps")}
+        </Button>
+      )}
+
       <BingoStatus
         gpsStatus={status}
-        checkedCount={checkedBoardPositions.size}
         lineCount={lines.length}
         isPaused={isPaused}
         onPause={pause}
         onResume={resume}
       />
 
-      <div className="grid grid-cols-3 gap-1 max-w-sm mx-auto w-full">
+      <div className="grid grid-cols-3 gap-2 max-w-sm mx-auto w-full">
         {board.map((loc, index) =>
           loc ? (
             <BingoCell
@@ -284,9 +277,9 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
               location={loc}
               isChecked={checkedLocationIds.has(loc.id)}
               isNearby={nearbyLocationIds.has(loc.id)}
-              isInLine={linePositions.has(index)}
               distance={distances.get(loc.id) ?? null}
               onCheck={() => handleCheck(loc.id)}
+              onOpenDetails={setSelectedLocation}
             />
           ) : (
             <div
@@ -302,6 +295,10 @@ export default function BingoBoard({ locations, player, onChangeName }: BingoBoa
         refreshKey={leaderboardKey}
       />
       <BingoToast toasts={toasts} onDismiss={dismissToast} />
+      <LocationModal
+        location={selectedLocation}
+        onClose={() => setSelectedLocation(null)}
+      />
     </div>
   );
 }

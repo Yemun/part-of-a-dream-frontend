@@ -7,18 +7,18 @@ interface BingoCellProps {
   location: BingoLocation;
   isChecked: boolean;
   isNearby: boolean;
-  isInLine: boolean;
   distance: number | null;
   onCheck: () => void;
+  onOpenDetails: (location: BingoLocation) => void;
 }
 
 export default function BingoCell({
   location,
   isChecked,
   isNearby,
-  isInLine,
   distance,
   onCheck,
+  onOpenDetails,
 }: BingoCellProps) {
   const t = useTranslations("bingo");
   const locale = useLocale();
@@ -26,53 +26,52 @@ export default function BingoCell({
   const displayName =
     locale === "en" && location.name_en ? location.name_en : location.name;
 
+  if (isChecked) {
+    return (
+      <div className="aspect-square flex items-center justify-center">
+        <div className="w-[80%] h-[80%] rounded-full border-[4px] border-blue-600 dark:border-blue-400 flex items-center justify-center p-2">
+          <span className="text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-300 text-center leading-tight line-clamp-2">
+            {displayName}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   const distanceText =
     distance !== null
       ? t("metersAway", { meters: Math.round(distance) })
       : null;
 
-  const statusText = isChecked
-    ? t("checked")
-    : isNearby
-      ? t("tapToCheck")
-      : distanceText || t("unchecked");
+  const statusText = isNearby
+    ? t("tapToCheck")
+    : distanceText || t("unchecked");
+
+  const handleClick = isNearby
+    ? onCheck
+    : () => onOpenDetails(location);
 
   return (
     <button
       type="button"
-      disabled={!isNearby || isChecked}
-      onClick={isNearby && !isChecked ? onCheck : undefined}
+      onClick={handleClick}
       className={`
-        relative aspect-square flex flex-col items-center justify-center
-        border-[0.5px] p-2 text-center transition-all duration-300
+        relative aspect-square flex flex-col items-center justify-center rounded-md
+        border-[0.5px] p-2 text-center transition-all duration-300 cursor-pointer
         ${
-          isChecked
-            ? isInLine
-              ? "bg-green-100 border-green-500 dark:bg-green-900/40 dark:border-green-400"
-              : "bg-green-50 border-green-400 dark:bg-green-950/30 dark:border-green-600"
-            : isNearby
-              ? "bg-yellow-50 border-yellow-400 dark:bg-yellow-900/30 dark:border-yellow-500 animate-pulse cursor-pointer"
-              : "border-gray-300 dark:border-gray-600 cursor-default"
+          isNearby
+            ? "bg-blue-50 border-blue-400 dark:bg-blue-900/30 dark:border-blue-500 animate-shadow-breath"
+            : "border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
         }
       `}
     >
-      {isChecked && (
-        <span className="absolute top-1 right-1 text-green-600 dark:text-green-400 text-xs">
-          ✓
-        </span>
-      )}
-      {isNearby && !isChecked && (
-        <span className="absolute top-1 right-1 text-yellow-600 dark:text-yellow-400 text-xs">
-          ●
-        </span>
-      )}
       <span className="text-xs sm:text-sm font-medium leading-tight line-clamp-2">
         {displayName}
       </span>
       <span
         className={`text-[10px] sm:text-xs mt-1 ${
-          isNearby && !isChecked
-            ? "text-yellow-600 dark:text-yellow-400 font-medium"
+          isNearby
+            ? "text-blue-600 dark:text-blue-400 font-medium"
             : "text-gray-400 dark:text-gray-500"
         }`}
       >
