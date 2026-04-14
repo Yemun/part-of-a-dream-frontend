@@ -6,6 +6,7 @@ import {
   BINGO_EVENT,
   getLocations,
   getPlayerByName,
+  getOrCreatePlayer,
   BingoLocation,
   BingoPlayer,
 } from "@/lib/bingo";
@@ -49,18 +50,20 @@ export default function BingoEntry() {
     setError("");
 
     try {
-      const p = await getPlayerByName(name.trim());
-      if (!p) {
-        setError(t("notRegistered"));
+      const result = await getOrCreatePlayer(name.trim());
+      if (!result.ok) {
+        setError(
+          result.reason === "limit" ? t("playerLimitReached") : t("joinFailed"),
+        );
         setJoining(false);
         return;
       }
-      setPlayer(p);
-      sessionStorage.setItem("bingo_player_id", p.id);
-      sessionStorage.setItem("bingo_player_name", p.name);
+      setPlayer(result.player);
+      sessionStorage.setItem("bingo_player_id", result.player.id);
+      sessionStorage.setItem("bingo_player_name", result.player.name);
     } catch (err) {
       console.error("Error joining:", err);
-      setError(t("notRegistered"));
+      setError(t("joinFailed"));
     } finally {
       setJoining(false);
     }

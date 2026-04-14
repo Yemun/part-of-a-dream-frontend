@@ -9,6 +9,12 @@ export const BINGO_EVENT = {
   endAt: "2026-04-28T17:00:00+09:00",
 };
 
+export const MAX_BINGO_PLAYERS = 100;
+
+export type GetOrCreatePlayerResult =
+  | { ok: true; player: BingoPlayer; created: boolean }
+  | { ok: false; reason: "limit" | "failed" };
+
 // Types
 export type BingoLocation =
   Database["public"]["Tables"]["bingo_locations"]["Row"];
@@ -22,6 +28,12 @@ export interface LeaderboardEntry {
   line_count: number;
   check_count: number;
   latest_line_at: string | null;
+  first_line_at: string | null;
+}
+
+export interface Leaderboards {
+  mostLines: LeaderboardEntry[];
+  speed: LeaderboardEntry[];
 }
 
 // All possible bingo lines (indices refer to board position 0-8)
@@ -96,6 +108,65 @@ export async function getPlayerByName(
   } catch (error) {
     console.error("Error fetching player:", error);
     return null;
+  }
+}
+
+function generateBoardLayout(): number[] {
+  const cells = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  for (let i = cells.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cells[i], cells[j]] = [cells[j], cells[i]];
+  }
+  return cells;
+}
+
+export async function getOrCreatePlayer(
+  name: string,
+): Promise<GetOrCreatePlayerResult> {
+  const trimmed = name.trim();
+  if (!trimmed) return { ok: false, reason: "failed" };
+
+  try {
+    const existing = await getPlayerByName(trimmed);
+    if (existing) return { ok: true, player: existing, created: false };
+
+    const supabase = getSupabaseClient();
+
+    const { count, error: countError } = await supabase
+      .from("bingo_players")
+      .select("id", { count: "exact", head: true });
+
+    if (countError) {
+      console.error("Error counting players:", countError);
+      return { ok: false, reason: "failed" };
+    }
+    if ((count ?? 0) >= MAX_BINGO_PLAYERS) {
+      return { ok: false, reason: "limit" };
+    }
+
+    const { data, error } = await supabase
+      .from("bingo_players")
+      .insert({ name: trimmed, board_layout: generateBoardLayout() })
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === "23505") {
+        const raced = await getPlayerByName(trimmed);
+        if (raced) return { ok: true, player: raced, created: false };
+      }
+      console.error("Error creating player:", error);
+      return { ok: false, reason: "failed" };
+    }
+
+    return {
+      ok: true,
+      player: data as unknown as BingoPlayer,
+      created: true,
+    };
+  } catch (error) {
+    console.error("Error in getOrCreatePlayer:", error);
+    return { ok: false, reason: "failed" };
   }
 }
 
@@ -195,7 +266,7 @@ export async function insertLine(
   }
 }
 
-export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
+export async function getLeaderboard(): Promise<Leaderboards> {
   try {
     const supabase = getSupabaseClient();
 
@@ -203,7 +274,7 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
       .from("bingo_players")
       .select("id, name");
 
-    if (playersError || !players) return [];
+    if (playersError || !players) return { mostLines: [], speed: [] };
 
     const entries: LeaderboardEntry[] = [];
 
@@ -217,7 +288,7 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
           .from("bingo_lines")
           .select("*")
           .eq("player_id", player.id)
-          .order("completed_at", { ascending: false }),
+          .order("completed_at", { ascending: true }),
       ]);
 
       const lines = (linesRes.data as unknown as BingoLine[]) || [];
@@ -226,26 +297,39 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
         player_name: player.name,
         line_count: lines.length,
         check_count: checksRes.count || 0,
-        latest_line_at: lines.length > 0 ? lines[0].completed_at : null,
+        first_line_at: lines.length > 0 ? lines[0].completed_at : null,
+        latest_line_at:
+          lines.length > 0 ? lines[lines.length - 1].completed_at : null,
       });
     }
 
-    entries.sort((a, b) => {
-      if (b.line_count !== a.line_count) return b.line_count - a.line_count;
-      if (a.latest_line_at && b.latest_line_at) {
-        return (
-          new Date(a.latest_line_at).getTime() -
-          new Date(b.latest_line_at).getTime()
-        );
-      }
-      if (a.latest_line_at) return -1;
-      if (b.latest_line_at) return 1;
-      return 0;
-    });
+    const mostLines = [...entries]
+      .sort((a, b) => {
+        if (b.line_count !== a.line_count) return b.line_count - a.line_count;
+        if (a.latest_line_at && b.latest_line_at) {
+          return (
+            new Date(a.latest_line_at).getTime() -
+            new Date(b.latest_line_at).getTime()
+          );
+        }
+        if (a.latest_line_at) return -1;
+        if (b.latest_line_at) return 1;
+        return 0;
+      })
+      .slice(0, 5);
 
-    return entries;
+    const speed = entries
+      .filter((e) => e.first_line_at !== null)
+      .sort(
+        (a, b) =>
+          new Date(a.first_line_at as string).getTime() -
+          new Date(b.first_line_at as string).getTime(),
+      )
+      .slice(0, 5);
+
+    return { mostLines, speed };
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
-    return [];
+    return { mostLines: [], speed: [] };
   }
 }
