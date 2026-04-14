@@ -281,7 +281,7 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
         onResume={resume}
       />
 
-      <div className="grid grid-cols-3 gap-2 max-w-sm mx-auto w-full">
+      <div className="grid grid-cols-3 gap-2 mx-auto w-full max-w-[500px]">
         {board.map((loc, index) =>
           loc ? (
             <BingoCell

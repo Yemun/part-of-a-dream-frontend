@@ -34,7 +34,7 @@ export default function BingoCell({
         className="aspect-square flex items-center justify-center cursor-pointer"
       >
         <span className="w-[80%] h-[80%] rounded-full border-[4px] border-blue-600 dark:border-blue-400 flex items-center justify-center p-2">
-          <span className="text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-300 text-center leading-tight line-clamp-2">
+          <span className="text-sm sm:text-base font-semibold text-blue-700 dark:text-blue-300 text-center leading-tight line-clamp-2">
             {displayName}
           </span>
         </span>
@@ -69,11 +69,11 @@ export default function BingoCell({
         }
       `}
     >
-      <span className="text-xs sm:text-sm font-medium leading-tight line-clamp-2">
+      <span className="text-sm sm:text-base font-medium leading-tight line-clamp-2">
         {displayName}
       </span>
       <span
-        className={`text-[10px] sm:text-xs mt-1 ${
+        className={`text-xs sm:text-sm mt-1 ${
           isNearby
             ? "text-blue-600 dark:text-blue-400 font-medium"
             : "text-gray-400 dark:text-gray-500"
