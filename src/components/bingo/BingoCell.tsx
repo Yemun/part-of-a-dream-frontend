@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { BingoLocation } from "@/lib/bingo";
 
 interface BingoCellProps {
@@ -21,10 +21,8 @@ export default function BingoCell({
   onOpenDetails,
 }: BingoCellProps) {
   const t = useTranslations("bingo");
-  const locale = useLocale();
 
-  const displayName =
-    locale === "en" && location.name_en ? location.name_en : location.name;
+  const displayName = location.name;
 
   if (isChecked) {
     return (

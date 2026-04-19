@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import {
   BINGO_EVENT,
   BINGO_ADMIN_NAME,
@@ -33,7 +33,6 @@ interface BingoBoardProps {
 
 export default function BingoBoard({ locations, player }: BingoBoardProps) {
   const t = useTranslations("bingo");
-  const locale = useLocale();
   const [checks, setChecks] = useState<BingoCheck[]>([]);
   const [lines, setLines] = useState<BingoLine[]>([]);
   const [distances, setDistances] = useState<Map<string, number>>(new Map());
@@ -122,8 +121,7 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
 
           const playerName = await getPlayerNameById(row.player_id);
           const loc = locationById.get(row.location_id);
-          const locName =
-            locale === "en" && loc?.name_en ? loc.name_en : loc?.name;
+          const locName = loc?.name;
 
           if (playerName && locName) {
             addToast(
@@ -228,8 +226,7 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
         setLeaderboardKey((k) => k + 1);
 
         const loc = locationById.get(locationId);
-        const locName =
-          locale === "en" && loc?.name_en ? loc.name_en : loc?.name;
+        const locName = loc?.name;
         if (locName) {
           addToast(t("toastCheckIn", { player: player.name, location: locName }));
         }
@@ -246,7 +243,6 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
       player.id,
       player.name,
       locationById,
-      locale,
       addToast,
       t,
       detectLines,

@@ -39,7 +39,6 @@ export interface Database {
         Row: {
           id: string
           name: string
-          name_en: string | null
           latitude: number
           longitude: number
           cell_index: number
@@ -47,14 +46,12 @@ export interface Database {
         }
         Insert: {
           name: string
-          name_en?: string | null
           latitude: number
           longitude: number
           cell_index: number
         }
         Update: {
           name?: string
-          name_en?: string | null
           latitude?: number
           longitude?: number
           cell_index?: number

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { BingoLocation, updateLocationCoords } from "@/lib/bingo";
 import Button from "@/components/ui/Button";
 
@@ -62,7 +62,6 @@ export default function LocationModal({
   onNotify,
 }: LocationModalProps) {
   const t = useTranslations("bingo");
-  const locale = useLocale();
 
   const [isEditing, setIsEditing] = useState(false);
   const [latInput, setLatInput] = useState("");
@@ -89,8 +88,7 @@ export default function LocationModal({
 
   if (!location) return null;
 
-  const displayName =
-    locale === "en" && location.name_en ? location.name_en : location.name;
+  const displayName = location.name;
 
   const fillWithCurrentGps = () => {
     if (!navigator.geolocation) return;
