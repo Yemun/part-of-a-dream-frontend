@@ -4,12 +4,14 @@ import { getSupabaseClient, Database } from "./supabase";
 export const BINGO_EVENT = {
   name: "을지로 탐험 빙고",
   description: "을지로 일대 9곳을 방문하세요!",
-  proximityRadiusMeters: 50,
+  proximityRadiusMeters: 75,
   startAt: "2026-04-29T14:00:00+09:00",
   endAt: "2026-04-29T17:00:00+09:00",
 };
 
 export const MAX_BINGO_PLAYERS = 100;
+
+export const BINGO_ADMIN_NAME = "이소정";
 
 export type GetOrCreatePlayerResult =
   | { ok: true; player: BingoPlayer; created: boolean }
@@ -235,6 +237,31 @@ export async function insertCheck(
     return data as unknown as BingoCheck;
   } catch (error) {
     console.error("Error inserting check:", error);
+    return null;
+  }
+}
+
+export async function updateLocationCoords(
+  locationId: string,
+  latitude: number,
+  longitude: number,
+): Promise<BingoLocation | null> {
+  try {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from("bingo_locations")
+      .update({ latitude, longitude })
+      .eq("id", locationId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error updating location coords:", error);
+      return null;
+    }
+    return data as unknown as BingoLocation;
+  } catch (error) {
+    console.error("Error updating location coords:", error);
     return null;
   }
 }

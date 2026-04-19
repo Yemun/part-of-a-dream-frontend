@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import {
   BINGO_EVENT,
+  BINGO_ADMIN_NAME,
   BingoLocation,
   BingoPlayer,
   BingoCheck,
@@ -40,14 +41,23 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
   const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [selectedLocation, setSelectedLocation] =
     useState<BingoLocation | null>(null);
+  const [locationOverrides, setLocationOverrides] = useState<
+    Map<string, BingoLocation>
+  >(new Map());
   const checkingRef = useRef<Set<string>>(new Set());
 
   const { position, status, pause, resume, isPaused } = useGpsTracking();
 
-  const locationById = new Map(locations.map((loc) => [loc.id, loc]));
+  const isAdmin = player.name === BINGO_ADMIN_NAME;
+
+  const effectiveLocations = locations.map(
+    (loc) => locationOverrides.get(loc.id) ?? loc
+  );
+
+  const locationById = new Map(effectiveLocations.map((loc) => [loc.id, loc]));
 
   const locationByCellIndex = new Map(
-    locations.map((loc) => [loc.cell_index, loc])
+    effectiveLocations.map((loc) => [loc.cell_index, loc])
   );
   const board: (BingoLocation | undefined)[] = player.board_layout.map(
     (cellIndex) => locationByCellIndex.get(cellIndex)
@@ -181,7 +191,7 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
     if (!position || status !== "active") return;
 
     const newDistances = new Map<string, number>();
-    for (const loc of locations) {
+    for (const loc of effectiveLocations) {
       if (!checkedLocationIds.has(loc.id)) {
         const dist = getDistance(
           position.latitude,
@@ -194,7 +204,7 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
     }
     setDistances(newDistances);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [position, status]);
+  }, [position, status, locationOverrides]);
 
   const handleCheck = useCallback(
     async (locationId: string) => {
@@ -310,6 +320,15 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
       <LocationModal
         location={selectedLocation}
         onClose={() => setSelectedLocation(null)}
+        isAdmin={isAdmin}
+        onLocationUpdated={(updated) => {
+          setLocationOverrides((prev) => {
+            const next = new Map(prev);
+            next.set(updated.id, updated);
+            return next;
+          });
+        }}
+        onNotify={addToast}
       />
     </div>
   );

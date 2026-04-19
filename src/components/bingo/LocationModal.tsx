@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { BingoLocation } from "@/lib/bingo";
+import { BingoLocation, updateLocationCoords } from "@/lib/bingo";
 import Button from "@/components/ui/Button";
 
 interface LocationModalProps {
   location: BingoLocation | null;
   onClose: () => void;
+  isAdmin?: boolean;
+  onLocationUpdated?: (updated: BingoLocation) => void;
+  onNotify?: (text: string) => void;
 }
 
 const IOS_STORE_URL = "https://apps.apple.com/kr/app/id304608425";
@@ -54,9 +57,26 @@ function openKakaoWalkingRoute(location: BingoLocation) {
 export default function LocationModal({
   location,
   onClose,
+  isAdmin = false,
+  onLocationUpdated,
+  onNotify,
 }: LocationModalProps) {
   const t = useTranslations("bingo");
   const locale = useLocale();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [latInput, setLatInput] = useState("");
+  const [lngInput, setLngInput] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [prevLocationId, setPrevLocationId] = useState<string | null>(null);
+
+  if (location && location.id !== prevLocationId) {
+    setPrevLocationId(location.id);
+    setLatInput(String(location.latitude));
+    setLngInput(String(location.longitude));
+    setIsEditing(false);
+  }
 
   useEffect(() => {
     if (!location) return;
@@ -71,6 +91,40 @@ export default function LocationModal({
 
   const displayName =
     locale === "en" && location.name_en ? location.name_en : location.name;
+
+  const fillWithCurrentGps = () => {
+    if (!navigator.geolocation) return;
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLatInput(String(pos.coords.latitude));
+        setLngInput(String(pos.coords.longitude));
+        setGpsLoading(false);
+      },
+      () => {
+        setGpsLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
+  const handleSave = async () => {
+    const lat = Number(latInput);
+    const lng = Number(lngInput);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    setSaving(true);
+    const updated = await updateLocationCoords(location.id, lat, lng);
+    setSaving(false);
+
+    if (updated) {
+      onLocationUpdated?.(updated);
+      onNotify?.(t("coordsUpdated"));
+      onClose();
+    } else {
+      onNotify?.(t("coordsUpdateFailed"));
+    }
+  };
 
   return (
     <div
@@ -96,6 +150,71 @@ export default function LocationModal({
           >
             {t("openInMaps")}
           </Button>
+
+          {isAdmin && !isEditing && (
+            <Button
+              variant="secondary"
+              size="md"
+              className="w-full"
+              onClick={() => setIsEditing(true)}
+            >
+              {t("editCoords")}
+            </Button>
+          )}
+
+          {isAdmin && isEditing && (
+            <div className="flex flex-col gap-2 border-t border-gray-200 dark:border-gray-700 pt-3">
+              <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
+                {t("latitude")}
+                <input
+                  type="number"
+                  step="any"
+                  value={latInput}
+                  onChange={(e) => setLatInput(e.target.value)}
+                  className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-sm"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
+                {t("longitude")}
+                <input
+                  type="number"
+                  step="any"
+                  value={lngInput}
+                  onChange={(e) => setLngInput(e.target.value)}
+                  className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-sm"
+                />
+              </label>
+              <Button
+                variant="secondary"
+                size="md"
+                className="w-full"
+                onClick={fillWithCurrentGps}
+                disabled={gpsLoading}
+              >
+                {gpsLoading ? t("gettingGps") : t("fillWithCurrentGps")}
+              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="secondary"
+                  size="md"
+                  className="flex-1"
+                  onClick={() => setIsEditing(false)}
+                  disabled={saving}
+                >
+                  {t("cancel")}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="md"
+                  className="flex-1"
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  {t("save")}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

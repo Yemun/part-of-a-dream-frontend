@@ -116,6 +116,15 @@
     "openInMaps": "카카오맵에서 열기",
     "locationPlaceholder": "사진 준비 중",
     "toastCheckIn": "{player}님이 {location}을 방문했습니다",
-    "toastBingoLine": "{player}님이 빙고를 완성했습니다!"
+    "toastBingoLine": "{player}님이 빙고를 완성했습니다!",
+    "editCoords": "좌표 수정",
+    "latitude": "위도",
+    "longitude": "경도",
+    "fillWithCurrentGps": "현재 GPS 위치로 채우기",
+    "save": "저장",
+    "cancel": "취소",
+    "coordsUpdated": "좌표가 업데이트되었습니다",
+    "coordsUpdateFailed": "좌표 업데이트에 실패했습니다",
+    "gettingGps": "위치 가져오는 중..."
   }
 }
