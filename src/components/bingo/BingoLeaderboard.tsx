@@ -141,10 +141,16 @@ function LeaderboardTable({
             <tr className="border-b-[0.5px] border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900">
               <th className="px-3 py-2 text-left font-medium">{t("rank")}</th>
               <th className="px-3 py-2 text-left font-medium">{t("player")}</th>
-              <th className="px-3 py-2 text-center font-medium">
-                {valueLabel}
-              </th>
-              <th className="px-3 py-2 text-right font-medium hidden sm:table-cell">
+              {mode === "mostLines" && (
+                <th className="px-3 py-2 text-center font-medium">
+                  {valueLabel}
+                </th>
+              )}
+              <th
+                className={`px-3 py-2 text-right font-medium ${
+                  mode === "mostLines" ? "hidden sm:table-cell" : ""
+                }`}
+              >
                 {timeLabel}
               </th>
             </tr>
@@ -153,7 +159,7 @@ function LeaderboardTable({
             {entries.length === 0 ? (
               <tr>
                 <td
-                  colSpan={4}
+                  colSpan={mode === "mostLines" ? 4 : 3}
                   className="px-3 py-4 text-center text-gray-500"
                 >
                   {emptyLabel}
@@ -177,10 +183,16 @@ function LeaderboardTable({
                   >
                     <td className="px-3 py-2">{index + 1}</td>
                     <td className="px-3 py-2">{entry.player_name}</td>
-                    <td className="px-3 py-2 text-center">
-                      {entry.line_count > 0 ? entry.line_count : "-"}
-                    </td>
-                    <td className="px-3 py-2 text-right text-gray-500 hidden sm:table-cell">
+                    {mode === "mostLines" && (
+                      <td className="px-3 py-2 text-center">
+                        {entry.line_count > 0 ? entry.line_count : "-"}
+                      </td>
+                    )}
+                    <td
+                      className={`px-3 py-2 text-right text-gray-500 ${
+                        mode === "mostLines" ? "hidden sm:table-cell" : ""
+                      }`}
+                    >
                       {timeValue
                         ? new Date(timeValue).toLocaleTimeString()
                         : "-"}
