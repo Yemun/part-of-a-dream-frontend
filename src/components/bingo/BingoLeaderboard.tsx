@@ -26,20 +26,8 @@ export default function BingoLeaderboard({
     };
   }, [refreshKey]);
 
-  if (data.mostLines.length === 0 && data.speed.length === 0) return null;
-
   return (
     <>
-      <LeaderboardSection
-        title={t("leaderboardMostLines")}
-        rule={t("ruleMostLines")}
-        ruleLabel={t("ruleLabel")}
-        entries={data.mostLines}
-        currentPlayerId={currentPlayerId}
-        emptyLabel={t("noEntries")}
-        mode="mostLines"
-        unitLabel={t("lines")}
-      />
       <LeaderboardSection
         title={t("leaderboardSpeed")}
         rule={t("ruleSpeed")}
@@ -48,6 +36,16 @@ export default function BingoLeaderboard({
         currentPlayerId={currentPlayerId}
         emptyLabel={t("noEntries")}
         mode="speed"
+        unitLabel={t("lines")}
+      />
+      <LeaderboardSection
+        title={t("leaderboardMostLines")}
+        rule={t("ruleMostLines")}
+        ruleLabel={t("ruleLabel")}
+        entries={data.mostLines}
+        currentPlayerId={currentPlayerId}
+        emptyLabel={t("noEntries")}
+        mode="mostLines"
         unitLabel={t("lines")}
       />
     </>

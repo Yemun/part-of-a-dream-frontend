@@ -330,7 +330,8 @@ export async function getLeaderboard(): Promise<Leaderboards> {
       });
     }
 
-    const mostLines = [...entries]
+    const mostLines = entries
+      .filter((e) => e.line_count >= 1)
       .sort((a, b) => {
         if (b.line_count !== a.line_count) return b.line_count - a.line_count;
         if (a.latest_line_at && b.latest_line_at) {

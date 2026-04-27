@@ -298,17 +298,6 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
     ]
   );
 
-  const handleEnableGps = useCallback(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      () => resume(),
-      () => resume(),
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  }, [resume]);
-
-  const gpsActive = status === "active" && !isPaused;
-
   return (
     <>
       <BingoEventHeader />
@@ -346,37 +335,19 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
         <Confetti show={showConfetti} />
       </div>
 
-      {gpsActive ? (
-        <div className="bingo-gps-bar">
-          <div className="bingo-gps-info">
-            <span className="ping" />
-            <span>{t("gpsTracking")}</span>
-          </div>
-          <button className="bingo-toggle-btn" onClick={pause} type="button">
-            {t("pauseTracking")}
-          </button>
+      <div className="bingo-gps-bar">
+        <div className="bingo-gps-info">
+          {!isPaused && <span className="ping" />}
+          <span>{isPaused ? t("pauseTracking") : t("gpsTracking")}</span>
         </div>
-      ) : status === "active" && isPaused ? (
-        <div className="bingo-gps-bar">
-          <div className="bingo-gps-info">
-            <span className="ping" style={{ background: "var(--bingo-muted-2)" }} />
-            <span>{t("pauseTracking")}</span>
-          </div>
-          <button className="bingo-toggle-btn" onClick={resume} type="button">
-            {t("resumeTracking")}
-          </button>
-        </div>
-      ) : (
-        <div className="bingo-gps-cta-wrap">
-          <button
-            className="bingo-cta primary"
-            onClick={handleEnableGps}
-            type="button"
-          >
-            📡 {t("enableGps")}
-          </button>
-        </div>
-      )}
+        <button
+          className={`bingo-toggle-btn ${isPaused ? "accent" : ""}`}
+          onClick={isPaused ? resume : pause}
+          type="button"
+        >
+          {isPaused ? t("enableGps") : t("pauseTracking")}
+        </button>
+      </div>
 
       <BingoLeaderboard
         currentPlayerId={player.id}
@@ -453,12 +424,13 @@ function Confetti({ show }: { show: boolean }) {
   // Deterministic jitter (index-seeded) keeps render pure.
   const jitter = (i: number, salt: number) =>
     (Math.sin((i + 1) * 12.9898 + salt * 78.233) + 1) / 2;
+  // Constant radius → pieces land on a perfect circle.
+  const RADIUS = 160;
   const pieces = Array.from({ length: 24 }, (_, i) => {
-    const angle = (Math.PI * 2 * i) / 24 + jitter(i, 1) * 0.3;
-    const dist = 120 + jitter(i, 2) * 80;
+    const angle = (Math.PI * 2 * i) / 24;
     return {
-      tx: `${Math.cos(angle) * dist}px`,
-      ty: `${Math.sin(angle) * dist}px`,
+      tx: `${Math.cos(angle) * RADIUS}px`,
+      ty: `${Math.sin(angle) * RADIUS}px`,
       tr: `${(jitter(i, 3) - 0.5) * 720}deg`,
       bg: colors[i % colors.length],
       delay: `${jitter(i, 4) * 80}ms`,

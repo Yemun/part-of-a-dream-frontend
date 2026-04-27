@@ -92,7 +92,8 @@ export function useGpsTracking(): UseGpsTrackingReturn {
 
   const resume = useCallback(() => {
     setIsPaused(false);
-    setStatus("requesting");
+    // Don't flip status to "requesting" — UI keys on isPaused, and the watch
+    // callback will set status="active" again once the next fix arrives.
     startWatching();
   }, [startWatching]);
 
