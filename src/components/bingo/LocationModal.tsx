@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { BingoLocation, updateLocationCoords } from "@/lib/bingo";
-import Button from "@/components/ui/Button";
 
 interface LocationModalProps {
   location: BingoLocation | null;
@@ -69,12 +69,14 @@ export default function LocationModal({
   const [saving, setSaving] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [prevLocationId, setPrevLocationId] = useState<string | null>(null);
+  const [imageFailed, setImageFailed] = useState(false);
 
   if (location && location.id !== prevLocationId) {
     setPrevLocationId(location.id);
     setLatInput(String(location.latitude));
     setLngInput(String(location.longitude));
     setIsEditing(false);
+    setImageFailed(false);
   }
 
   useEffect(() => {
@@ -88,8 +90,6 @@ export default function LocationModal({
 
   if (!location) return null;
 
-  const displayName = location.name;
-
   const fillWithCurrentGps = () => {
     if (!navigator.geolocation) return;
     setGpsLoading(true);
@@ -99,9 +99,7 @@ export default function LocationModal({
         setLngInput(String(pos.coords.longitude));
         setGpsLoading(false);
       },
-      () => {
-        setGpsLoading(false);
-      },
+      () => setGpsLoading(false),
       { enableHighAccuracy: true, timeout: 10000 },
     );
   };
@@ -125,91 +123,100 @@ export default function LocationModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-sm overflow-hidden border-[0.5px] border-gray-300 dark:border-gray-600"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-          <span className="text-xs text-gray-400 dark:text-gray-500">
-            {t("locationPlaceholder")}
-          </span>
-        </div>
-        <div className="flex flex-col gap-3 p-4">
-          <h3 className="text-base font-semibold">{displayName}</h3>
-          <Button
-            variant="primary"
-            size="md"
-            className="w-full"
-            onClick={() => openKakaoWalkingRoute(location)}
-          >
-            {t("openInMaps")}
-          </Button>
-
-          {isAdmin && !isEditing && (
-            <Button
-              variant="secondary"
-              size="md"
-              className="w-full"
-              onClick={() => setIsEditing(true)}
-            >
-              {t("editCoords")}
-            </Button>
+    <div className="bingo-modal-backdrop" onClick={onClose}>
+      <div className="bingo-modal" onClick={(e) => e.stopPropagation()}>
+        <div className={`bingo-modal-cover ${imageFailed ? "" : "has-image"}`}>
+          {imageFailed ? (
+            <span className="pin">📍</span>
+          ) : (
+            <Image
+              src={`/bingo/locations/${location.id}.jpg`}
+              alt={location.name.replace("\n", " ")}
+              fill
+              sizes="340px"
+              style={{ objectFit: "cover" }}
+              priority
+              onError={() => setImageFailed(true)}
+            />
           )}
+        </div>
+        <div className="bingo-modal-body">
+          <h3 className="bingo-modal-title">
+            {location.name.replace("\n", " ")}
+          </h3>
+          <div className="bingo-modal-actions">
+            <button
+              type="button"
+              className="bingo-cta primary"
+              onClick={() => openKakaoWalkingRoute(location)}
+            >
+              🗺 {t("openInMaps")}
+            </button>
+
+            {isAdmin && !isEditing && (
+              <button
+                type="button"
+                className="bingo-cta secondary"
+                onClick={() => setIsEditing(true)}
+              >
+                {t("editCoords")}
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="bingo-cta secondary"
+              onClick={onClose}
+            >
+              {t("cancel")}
+            </button>
+          </div>
 
           {isAdmin && isEditing && (
-            <div className="flex flex-col gap-2 border-t border-gray-200 dark:border-gray-700 pt-3">
-              <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
+            <div className="bingo-modal-edit">
+              <label>
                 {t("latitude")}
                 <input
                   type="number"
                   step="any"
                   value={latInput}
                   onChange={(e) => setLatInput(e.target.value)}
-                  className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-sm"
                 />
               </label>
-              <label className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
+              <label>
                 {t("longitude")}
                 <input
                   type="number"
                   step="any"
                   value={lngInput}
                   onChange={(e) => setLngInput(e.target.value)}
-                  className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-sm"
                 />
               </label>
-              <Button
-                variant="secondary"
-                size="md"
-                className="w-full"
+              <button
+                type="button"
+                className="bingo-cta secondary"
                 onClick={fillWithCurrentGps}
                 disabled={gpsLoading}
               >
                 {gpsLoading ? t("gettingGps") : t("fillWithCurrentGps")}
-              </Button>
-              <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="md"
-                  className="flex-1"
+              </button>
+              <div className="bingo-modal-edit-row">
+                <button
+                  type="button"
+                  className="bingo-cta secondary"
                   onClick={() => setIsEditing(false)}
                   disabled={saving}
                 >
                   {t("cancel")}
-                </Button>
-                <Button
-                  variant="primary"
-                  size="md"
-                  className="flex-1"
+                </button>
+                <button
+                  type="button"
+                  className="bingo-cta primary"
                   onClick={handleSave}
                   disabled={saving}
                 >
                   {t("save")}
-                </Button>
+                </button>
               </div>
             </div>
           )}

@@ -14,10 +14,7 @@ export default function BingoLeaderboard({
   refreshKey,
 }: BingoLeaderboardProps) {
   const t = useTranslations("bingo");
-  const [data, setData] = useState<Leaderboards>({
-    mostLines: [],
-    speed: [],
-  });
+  const [data, setData] = useState<Leaderboards>({ mostLines: [], speed: [] });
 
   useEffect(() => {
     let cancelled = false;
@@ -32,31 +29,152 @@ export default function BingoLeaderboard({
   if (data.mostLines.length === 0 && data.speed.length === 0) return null;
 
   return (
-    <div className="mt-6 space-y-6">
-      <LeaderboardTable
+    <>
+      <LeaderboardSection
         title={t("leaderboardMostLines")}
         rule={t("ruleMostLines")}
         ruleLabel={t("ruleLabel")}
         entries={data.mostLines}
         currentPlayerId={currentPlayerId}
-        valueLabel={t("lines")}
-        timeLabel={t("time")}
         emptyLabel={t("noEntries")}
         mode="mostLines"
-        t={t}
+        unitLabel={t("lines")}
       />
-      <LeaderboardTable
+      <LeaderboardSection
         title={t("leaderboardSpeed")}
         rule={t("ruleSpeed")}
         ruleLabel={t("ruleLabel")}
         entries={data.speed}
         currentPlayerId={currentPlayerId}
-        valueLabel={t("lines")}
-        timeLabel={t("firstLineTime")}
         emptyLabel={t("noEntries")}
         mode="speed"
-        t={t}
+        unitLabel={t("lines")}
       />
+    </>
+  );
+}
+
+function LeaderboardSection({
+  title,
+  rule,
+  ruleLabel,
+  entries,
+  currentPlayerId,
+  emptyLabel,
+  mode,
+  unitLabel,
+}: {
+  title: string;
+  rule: string;
+  ruleLabel: string;
+  entries: LeaderboardEntry[];
+  currentPlayerId: string;
+  emptyLabel: string;
+  mode: "mostLines" | "speed";
+  unitLabel: string;
+}) {
+  return (
+    <div className="bingo-section">
+      <h2 className="bingo-section-title">
+        {title}
+        <RuleTooltip rule={rule} label={ruleLabel} />
+      </h2>
+      {entries.length === 0 ? (
+        <div className="bingo-lb-empty">{emptyLabel}</div>
+      ) : (
+        <div className="bingo-lb-list">
+          {entries.map((entry, index) => {
+            const rank = index + 1;
+            const isMe = entry.player_id === currentPlayerId;
+            const timeValue =
+              mode === "speed" ? entry.first_line_at : entry.latest_line_at;
+            return (
+              <div
+                key={entry.player_id}
+                className={`bingo-lb-row rank-${rank} ${isMe ? "me" : ""}`}
+              >
+                <Medal rank={rank} />
+                <div className="bingo-lb-player">
+                  {entry.player_name}
+                  {isMe && <span className="you-tag">YOU</span>}
+                </div>
+                {mode === "mostLines" ? (
+                  <div className="bingo-lb-value">
+                    {entry.line_count > 0 ? (
+                      <>
+                        {entry.line_count}
+                        <span className="unit">{unitLabel}</span>
+                      </>
+                    ) : (
+                      <span className="empty">—</span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="bingo-lb-time">
+                    {timeValue ? new Date(timeValue).toLocaleTimeString() : "—"}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Medal({ rank }: { rank: number }) {
+  if (rank > 3) {
+    return (
+      <div className="bingo-lb-medal">
+        <div className="bingo-lb-medal-chip">{rank}</div>
+      </div>
+    );
+  }
+  const palettes: Record<number, { body: string; ring: string; star: string }> =
+    {
+      1: { body: "#FFE04A", ring: "#F9A012", star: "#F55142" },
+      2: { body: "#E0E6F1", ring: "#8694B1", star: "#4262FF" },
+      3: { body: "#FFC0A8", ring: "#E0653F", star: "#1BA46E" },
+    };
+  const p = palettes[rank];
+  return (
+    <div className="bingo-lb-medal">
+      <svg
+        className="bingo-lb-medal-svg"
+        viewBox="0 0 52 52"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle
+          cx="26"
+          cy="26"
+          r="22"
+          fill={p.ring}
+          stroke="#020616"
+          strokeWidth="2.5"
+        />
+        <circle
+          cx="26"
+          cy="26"
+          r="17"
+          fill={p.body}
+          stroke="#020616"
+          strokeWidth="2"
+        />
+        <text
+          x="26"
+          y="32"
+          textAnchor="middle"
+          fontFamily="Pretendard, system-ui, sans-serif"
+          fontWeight="900"
+          fontSize="20"
+          fill="#020616"
+          letterSpacing="-0.5"
+        >
+          {rank}
+        </text>
+      </svg>
     </div>
   );
 }
@@ -84,126 +202,21 @@ function RuleTooltip({ rule, label }: { rule: string; label: string }) {
   }, [open]);
 
   return (
-    <div ref={ref} className="relative inline-block">
+    <div ref={ref} style={{ position: "relative", display: "inline-block" }}>
       <button
         type="button"
+        className="bingo-help"
         aria-label={label}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center justify-center w-5 h-5 rounded-full border-[0.5px] border-gray-400 dark:border-gray-500 text-xs leading-none text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-100 hover:border-gray-600 dark:hover:border-gray-300 transition-colors"
       >
         ?
       </button>
       {open && (
-        <div
-          role="tooltip"
-          className="absolute left-0 top-full mt-1.5 z-10 w-64 px-3 py-2 text-sm leading-relaxed text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border-[0.5px] border-gray-300 dark:border-gray-600 rounded-md shadow-sm whitespace-pre-line"
-        >
+        <div role="tooltip" className="bingo-tooltip">
           {rule}
         </div>
       )}
-    </div>
-  );
-}
-
-function LeaderboardTable({
-  title,
-  rule,
-  ruleLabel,
-  entries,
-  currentPlayerId,
-  valueLabel,
-  timeLabel,
-  emptyLabel,
-  mode,
-  t,
-}: {
-  title: string;
-  rule: string;
-  ruleLabel: string;
-  entries: LeaderboardEntry[];
-  currentPlayerId: string;
-  valueLabel: string;
-  timeLabel: string;
-  emptyLabel: string;
-  mode: "mostLines" | "speed";
-  t: ReturnType<typeof useTranslations>;
-}) {
-  return (
-    <div>
-      <h2 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
-        {title}
-        <RuleTooltip rule={rule} label={ruleLabel} />
-      </h2>
-      <div className="border-[0.5px] border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
-        <table className="w-full text-sm sm:text-base">
-          <thead>
-            <tr className="border-b-[0.5px] border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900">
-              <th className="px-3 py-2 text-left font-medium">{t("rank")}</th>
-              <th className="px-3 py-2 text-left font-medium">{t("player")}</th>
-              {mode === "mostLines" && (
-                <th className="px-3 py-2 text-center font-medium">
-                  {valueLabel}
-                </th>
-              )}
-              <th
-                className={`px-3 py-2 text-right font-medium ${
-                  mode === "mostLines" ? "hidden sm:table-cell" : ""
-                }`}
-              >
-                {timeLabel}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {entries.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={mode === "mostLines" ? 4 : 3}
-                  className="px-3 py-4 text-center text-gray-500"
-                >
-                  {emptyLabel}
-                </td>
-              </tr>
-            ) : (
-              entries.map((entry, index) => {
-                const timeValue =
-                  mode === "speed" ? entry.first_line_at : entry.latest_line_at;
-                return (
-                  <tr
-                    key={entry.player_id}
-                    className={`
-                      border-b-[0.5px] border-gray-200 dark:border-gray-700 last:border-b-0
-                      ${
-                        entry.player_id === currentPlayerId
-                          ? "bg-blue-50 dark:bg-blue-950/30 font-medium"
-                          : ""
-                      }
-                    `}
-                  >
-                    <td className="px-3 py-2">{index + 1}</td>
-                    <td className="px-3 py-2">{entry.player_name}</td>
-                    {mode === "mostLines" && (
-                      <td className="px-3 py-2 text-center">
-                        {entry.line_count > 0 ? entry.line_count : "-"}
-                      </td>
-                    )}
-                    <td
-                      className={`px-3 py-2 text-right text-gray-500 ${
-                        mode === "mostLines" ? "hidden sm:table-cell" : ""
-                      }`}
-                    >
-                      {timeValue
-                        ? new Date(timeValue).toLocaleTimeString()
-                        : "-"}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }

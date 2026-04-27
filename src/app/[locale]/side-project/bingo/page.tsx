@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { getLocalePrefix, type Locale } from "@/i18n/routing";
 import BingoEntry from "@/components/bingo/BingoEntry";
+import "@/components/bingo/bingo.css";
 
 interface PageProps {
   params: Promise<{
@@ -43,7 +44,9 @@ export default async function SideProject({ params }: PageProps) {
 
   return (
     <div className="font-bingo">
-      <BingoEntry />
+      <div className="bingo-app">
+        <BingoEntry />
+      </div>
     </div>
   );
 }

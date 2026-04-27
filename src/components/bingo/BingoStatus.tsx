@@ -1,40 +1,25 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { GpsStatus } from "@/lib/bingo-gps";
-import Button from "@/components/ui/Button";
 
 interface BingoStatusProps {
-  gpsStatus: GpsStatus;
   lineCount: number;
-  isPaused: boolean;
-  onPause: () => void;
-  onResume: () => void;
+  checkedCount: number;
 }
 
 export default function BingoStatus({
-  gpsStatus,
   lineCount,
-  isPaused,
-  onPause,
-  onResume,
+  checkedCount,
 }: BingoStatusProps) {
   const t = useTranslations("bingo");
 
   return (
-    <div className="flex items-center justify-between text-sm">
-      <span className="font-semibold text-blue-600 dark:text-blue-400">
-        {t("bingoLine")} ×{lineCount}
+    <div className="bingo-status-row">
+      <span className="bingo-count-pill">
+        <span className="x">{t("bingoLine")} ×</span>
+        {lineCount}
       </span>
-      {gpsStatus === "active" && (
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={isPaused ? onResume : onPause}
-        >
-          {isPaused ? t("resumeTracking") : t("pauseTracking")}
-        </Button>
-      )}
+      <span className="bingo-progress-text">{checkedCount}/9 방문</span>
     </div>
   );
 }

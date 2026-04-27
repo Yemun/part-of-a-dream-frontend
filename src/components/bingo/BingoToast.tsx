@@ -5,6 +5,7 @@ import { useEffect } from "react";
 export interface ToastMessage {
   id: string;
   text: string;
+  kind?: "bingo";
 }
 
 interface BingoToastProps {
@@ -14,7 +15,7 @@ interface BingoToastProps {
 
 export default function BingoToast({ toasts, onDismiss }: BingoToastProps) {
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-[calc(100%-2rem)] max-w-sm">
+    <div className="bingo-toast-stack">
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onDismiss={onDismiss} />
       ))}
@@ -35,8 +36,14 @@ function ToastItem({
   }, [toast.id, onDismiss]);
 
   return (
-    <div className="bg-black dark:bg-white text-white dark:text-black text-sm px-4 py-3 rounded-md shadow-lg animate-slide-up">
-      {toast.text}
+    <div className={`bingo-toast ${toast.kind === "bingo" ? "bingo" : ""}`}>
+      {toast.kind === "bingo" ? (
+        <>
+          <strong>BINGO!</strong> {toast.text}
+        </>
+      ) : (
+        toast.text
+      )}
     </div>
   );
 }

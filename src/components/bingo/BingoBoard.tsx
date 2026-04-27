@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useTranslations } from "next-intl";
 import {
   BINGO_EVENT,
@@ -24,7 +24,6 @@ import BingoLeaderboard from "./BingoLeaderboard";
 import BingoToast, { ToastMessage } from "./BingoToast";
 import BingoEventHeader from "./BingoEventHeader";
 import LocationModal from "./LocationModal";
-import Button from "@/components/ui/Button";
 
 interface BingoBoardProps {
   locations: BingoLocation[];
@@ -43,6 +42,11 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
   const [locationOverrides, setLocationOverrides] = useState<
     Map<string, BingoLocation>
   >(new Map());
+  const [justChecked, setJustChecked] = useState<string | null>(null);
+  const [lineFlashCells, setLineFlashCells] = useState<Set<number>>(new Set());
+  const [showCelebrate, setShowCelebrate] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showGrandSlam, setShowGrandSlam] = useState(false);
   const checkingRef = useRef<Set<string>>(new Set());
 
   const { position, status, pause, resume, isPaused } = useGpsTracking();
@@ -53,10 +57,14 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
     (loc) => locationOverrides.get(loc.id) ?? loc
   );
 
-  const locationById = new Map(effectiveLocations.map((loc) => [loc.id, loc]));
+  const locationById = useMemo(
+    () => new Map(effectiveLocations.map((loc) => [loc.id, loc])),
+    [effectiveLocations]
+  );
 
-  const locationByCellIndex = new Map(
-    effectiveLocations.map((loc) => [loc.cell_index, loc])
+  const locationByCellIndex = useMemo(
+    () => new Map(effectiveLocations.map((loc) => [loc.cell_index, loc])),
+    [effectiveLocations]
   );
   const board: (BingoLocation | undefined)[] = player.board_layout.map(
     (cellIndex) => locationByCellIndex.get(cellIndex)
@@ -86,10 +94,24 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
     }
   }
 
-  const addToast = useCallback((text: string) => {
-    const id = crypto.randomUUID();
-    setToasts((prev) => [...prev, { id, text }]);
-  }, []);
+  const completedLineIndexCells = useMemo(() => {
+    const checkedPositions = new Set(
+      board
+        .map((loc, i) => (loc && checkedLocationIds.has(loc.id) ? i : -1))
+        .filter((i) => i >= 0)
+    );
+    return BINGO_LINES.filter((line) =>
+      line.cells.every((c) => checkedPositions.has(c))
+    );
+  }, [board, checkedLocationIds]);
+
+  const addToast = useCallback(
+    (text: string, kind?: "bingo") => {
+      const id = crypto.randomUUID();
+      setToasts((prev) => [...prev, { id, text, kind }]);
+    },
+    []
+  );
 
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -167,6 +189,9 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
       );
       const currentLineTypes = new Set(currentLines.map((l) => l.line_type));
 
+      const newlyCompletedCells = new Set<number>();
+      let newLineCount = 0;
+
       for (const line of BINGO_LINES) {
         if (currentLineTypes.has(line.type)) continue;
         const allChecked = line.cells.every((c) =>
@@ -177,8 +202,30 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
           if (newLine) {
             setLines((prev) => [...prev, newLine]);
             currentLineTypes.add(line.type);
-            addToast(t("toastBingoLine", { player: player.name }));
+            line.cells.forEach((c) => newlyCompletedCells.add(c));
+            newLineCount += 1;
           }
+        }
+      }
+
+      if (newLineCount > 0) {
+        const totalLines = currentLineTypes.size;
+        const isGrandSlam = totalLines === BINGO_LINES.length;
+        addToast(t("toastBingoLine", { player: player.name }), "bingo");
+
+        if (newlyCompletedCells.size > 0) {
+          setLineFlashCells(newlyCompletedCells);
+          setTimeout(() => setLineFlashCells(new Set()), 1000);
+        }
+
+        if (isGrandSlam) {
+          setShowGrandSlam(true);
+          setTimeout(() => setShowGrandSlam(false), 3200);
+        } else {
+          setShowCelebrate(true);
+          setShowConfetti(true);
+          setTimeout(() => setShowCelebrate(false), 1400);
+          setTimeout(() => setShowConfetti(false), 1300);
         }
       }
     },
@@ -224,6 +271,8 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
         const newChecks = [...checks, check];
         setChecks(newChecks);
         setLeaderboardKey((k) => k + 1);
+        setJustChecked(locationId);
+        setTimeout(() => setJustChecked(null), 700);
 
         const loc = locationById.get(locationId);
         const locName = loc?.name;
@@ -261,57 +310,81 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
   const gpsActive = status === "active" && !isPaused;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-medium">{player.name}</span>
-      </div>
-
+    <>
       <BingoEventHeader />
 
-      {gpsActive ? (
-        <span className="inline-flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
-          <span className="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-          {t("gpsTracking")}
-        </span>
-      ) : (
-        <Button variant="primary" size="md" onClick={handleEnableGps}>
-          {t("enableGps")}
-        </Button>
-      )}
-
-      <BingoStatus
-        gpsStatus={status}
-        lineCount={lines.length}
-        isPaused={isPaused}
-        onPause={pause}
-        onResume={resume}
-      />
-
-      <div className="grid grid-cols-3 gap-2 mx-auto w-full max-w-[500px]">
-        {board.map((loc, index) =>
-          loc ? (
-            <BingoCell
-              key={loc.id}
-              location={loc}
-              isChecked={checkedLocationIds.has(loc.id)}
-              isNearby={nearbyLocationIds.has(loc.id)}
-              distance={distances.get(loc.id) ?? null}
-              onCheck={() => handleCheck(loc.id)}
-              onOpenDetails={setSelectedLocation}
-            />
-          ) : (
-            <div
-              key={index}
-              className="aspect-square border-[0.5px] border-gray-200 dark:border-gray-700"
-            />
-          )
+      <div className="bingo-board-wrap">
+        <BingoStatus lineCount={lines.length} checkedCount={checks.length} />
+        <div className="bingo-board" role="grid" aria-label={t("board")}>
+          {board.map((loc, index) =>
+            loc ? (
+              <BingoCell
+                key={loc.id}
+                location={loc}
+                isChecked={checkedLocationIds.has(loc.id)}
+                isNearby={nearbyLocationIds.has(loc.id)}
+                justChecked={justChecked === loc.id}
+                inCompletedLine={lineFlashCells.has(index)}
+                distance={distances.get(loc.id) ?? null}
+                onCheck={() => handleCheck(loc.id)}
+                onOpenDetails={setSelectedLocation}
+              />
+            ) : (
+              <div key={index} className="bingo-cell empty" />
+            )
+          )}
+          <BingoLineOverlay lines={completedLineIndexCells} />
+        </div>
+        {showCelebrate && (
+          <div className="bingo-celebrate">
+            <div className="bingo-celebrate-card">
+              <div className="big">BINGO!</div>
+              <div className="small">한 줄 완성 🎉</div>
+            </div>
+          </div>
         )}
+        <Confetti show={showConfetti} />
       </div>
+
+      {gpsActive ? (
+        <div className="bingo-gps-bar">
+          <div className="bingo-gps-info">
+            <span className="ping" />
+            <span>{t("gpsTracking")}</span>
+          </div>
+          <button className="bingo-toggle-btn" onClick={pause} type="button">
+            {t("pauseTracking")}
+          </button>
+        </div>
+      ) : status === "active" && isPaused ? (
+        <div className="bingo-gps-bar">
+          <div className="bingo-gps-info">
+            <span className="ping" style={{ background: "var(--bingo-muted-2)" }} />
+            <span>{t("pauseTracking")}</span>
+          </div>
+          <button className="bingo-toggle-btn" onClick={resume} type="button">
+            {t("resumeTracking")}
+          </button>
+        </div>
+      ) : (
+        <div className="bingo-gps-cta-wrap">
+          <button
+            className="bingo-cta primary"
+            onClick={handleEnableGps}
+            type="button"
+          >
+            📡 {t("enableGps")}
+          </button>
+        </div>
+      )}
 
       <BingoLeaderboard
         currentPlayerId={player.id}
         refreshKey={leaderboardKey}
       />
+
+      <div className="bingo-spacer-bottom" />
+
       <BingoToast toasts={toasts} onDismiss={dismissToast} />
       <LocationModal
         location={selectedLocation}
@@ -324,8 +397,106 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
             return next;
           });
         }}
-        onNotify={addToast}
+        onNotify={(text) => addToast(text)}
       />
+
+      {showGrandSlam && <GrandSlamOverlay />}
+    </>
+  );
+}
+
+function BingoLineOverlay({
+  lines,
+}: {
+  lines: { type: string; cells: number[] }[];
+}) {
+  if (lines.length === 0) return null;
+  const center = (idx: number): [number, number] => {
+    const r = Math.floor(idx / 3);
+    const c = idx % 3;
+    return [(c + 0.5) / 3, (r + 0.5) / 3];
+  };
+  return (
+    <svg
+      className="bingo-line-flash"
+      viewBox="0 0 1 1"
+      preserveAspectRatio="none"
+    >
+      {lines.map((ln, i) => {
+        const [s, e] = [center(ln.cells[0]), center(ln.cells[2])];
+        return (
+          <line
+            key={ln.type}
+            x1={s[0]}
+            y1={s[1]}
+            x2={e[0]}
+            y2={e[1]}
+            stroke="#F55142"
+            strokeWidth="0.04"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            style={{
+              strokeDasharray: 2,
+              strokeDashoffset: 2,
+              animation: `bingoDrawLine 500ms ${i * 120}ms ease forwards`,
+            }}
+          />
+        );
+      })}
+    </svg>
+  );
+}
+
+function Confetti({ show }: { show: boolean }) {
+  if (!show) return null;
+  const colors = ["#FFE04A", "#F55142", "#4262FF", "#1BA46E", "#FFB8D1"];
+  // Deterministic jitter (index-seeded) keeps render pure.
+  const jitter = (i: number, salt: number) =>
+    (Math.sin((i + 1) * 12.9898 + salt * 78.233) + 1) / 2;
+  const pieces = Array.from({ length: 24 }, (_, i) => {
+    const angle = (Math.PI * 2 * i) / 24 + jitter(i, 1) * 0.3;
+    const dist = 120 + jitter(i, 2) * 80;
+    return {
+      tx: `${Math.cos(angle) * dist}px`,
+      ty: `${Math.sin(angle) * dist}px`,
+      tr: `${(jitter(i, 3) - 0.5) * 720}deg`,
+      bg: colors[i % colors.length],
+      delay: `${jitter(i, 4) * 80}ms`,
+    };
+  });
+  return (
+    <div className="bingo-confetti">
+      {pieces.map((p, i) => (
+        <span
+          key={i}
+          style={
+            {
+              background: p.bg,
+              "--tx": p.tx,
+              "--ty": p.ty,
+              "--tr": p.tr,
+              animationDelay: p.delay,
+            } as React.CSSProperties
+          }
+        />
+      ))}
+    </div>
+  );
+}
+
+function GrandSlamOverlay() {
+  return (
+    <div className="bingo-grand-slam">
+      <div className="bingo-grand-slam-rays" />
+      <div className="bingo-grand-slam-card">
+        <span className="crown">👑</span>
+        <div className="gs-label">PERFECT</div>
+        <div className="gs-big">
+          <span>GRAND</span>
+          <span>SLAM</span>
+        </div>
+        <div className="gs-sub">9개 위치 전부 방문 · 모든 빙고 완성</div>
+      </div>
     </div>
   );
 }

@@ -11,8 +11,6 @@ import {
   BingoPlayer,
 } from "@/lib/bingo";
 import BingoBoard from "./BingoBoard";
-import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
 
 export default function BingoEntry() {
   const t = useTranslations("bingo");
@@ -29,7 +27,6 @@ export default function BingoEntry() {
         const locs = await getLocations();
         setLocations(locs);
 
-        // Restore session
         const savedName = sessionStorage.getItem("bingo_player_name");
         if (savedName) {
           const p = await getPlayerByName(savedName);
@@ -71,8 +68,8 @@ export default function BingoEntry() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[40vh]">
-        <p className="text-sm text-gray-500">{t("loading")}</p>
+      <div className="bingo-entry">
+        <p>{t("loading")}</p>
       </div>
     );
   }
@@ -82,25 +79,30 @@ export default function BingoEntry() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[40vh] gap-6">
-      <h1 className="text-lg font-semibold">{BINGO_EVENT.name}</h1>
-      <p className="text-sm text-gray-500">{BINGO_EVENT.description}</p>
+    <div className="bingo-entry">
+      <h1>{BINGO_EVENT.name}</h1>
+      <p>{BINGO_EVENT.description}</p>
       <form
+        className="bingo-entry-form"
         onSubmit={(e) => {
           e.preventDefault();
           handleJoin();
         }}
-        className="flex flex-col gap-3 w-full max-w-xs"
       >
-        <Input
+        <input
+          type="text"
           placeholder={t("enterName")}
           value={name}
           onChange={(e) => setName(e.target.value)}
-          error={error || undefined}
         />
-        <Button type="submit" disabled={joining || !name.trim()}>
+        {error && <span className="bingo-entry-error">{error}</span>}
+        <button
+          type="submit"
+          className="bingo-cta primary"
+          disabled={joining || !name.trim()}
+        >
           {joining ? t("loading") : t("join")}
-        </Button>
+        </button>
       </form>
     </div>
   );
