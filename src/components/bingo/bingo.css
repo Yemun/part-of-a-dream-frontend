@@ -93,6 +93,25 @@
   opacity: 0.9;
   position: relative;
 }
+.bingo-hero-player {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+  background: var(--bingo-paper);
+  color: var(--bingo-ink);
+  border: 2px solid var(--bingo-ink);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  box-shadow: var(--bingo-shadow-sm);
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .bingo-hero-title {
   font-size: 26px;
   font-weight: 900;

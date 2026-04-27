@@ -138,6 +138,15 @@
     "openInMaps": "카카오맵에서 열기",
     "locationPlaceholder": "사진 준비 중",
     "toastCheckIn": "{player} visited {location}",
-    "toastBingoLine": "{player} completed a bingo line!"
+    "toastBingoLine": "{player} completed a bingo line!",
+    "editCoords": "Edit coordinates",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "fillWithCurrentGps": "Use current GPS location",
+    "gettingGps": "Getting location...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "coordsUpdated": "Coordinates updated",
+    "coordsUpdateFailed": "Failed to update coordinates"
   }
 }

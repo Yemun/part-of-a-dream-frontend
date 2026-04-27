@@ -49,6 +49,13 @@ export function useGpsTracking(): UseGpsTrackingReturn {
   const startWatching = useCallback(() => {
     if (!navigator.geolocation) return;
 
+    // Clear any existing watch defensively so resume doesn't leak watchers
+    // if it's somehow called twice in a row.
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+
     watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {
         const now = Date.now();
@@ -92,6 +99,9 @@ export function useGpsTracking(): UseGpsTrackingReturn {
 
   const resume = useCallback(() => {
     setIsPaused(false);
+    // Reset throttle so the first fix after resume isn't swallowed by the
+    // 3s window left over from before pause.
+    lastUpdateRef.current = 0;
     // Don't flip status to "requesting" — UI keys on isPaused, and the watch
     // callback will set status="active" again once the next fix arrives.
     startWatching();

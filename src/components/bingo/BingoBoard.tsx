@@ -253,18 +253,21 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
 
   const handleCheck = useCallback(
     async (locationId: string) => {
-      if (!position) return;
       if (checkedLocationIds.has(locationId)) return;
       if (!nearbyLocationIds.has(locationId)) return;
       if (checkingRef.current.has(locationId)) return;
 
+      const targetLoc = locationById.get(locationId);
+      if (!targetLoc) return;
+
+      // Real GPS fix when we have one; otherwise fall back to the location's
+      // own coordinates so the testNearby flow (and non-HTTPS dev hosts that
+      // can't get a fix) can still record a check-in.
+      const lat = position?.latitude ?? targetLoc.latitude;
+      const lng = position?.longitude ?? targetLoc.longitude;
+
       checkingRef.current.add(locationId);
-      const check = await insertCheck(
-        player.id,
-        locationId,
-        position.latitude,
-        position.longitude
-      );
+      const check = await insertCheck(player.id, locationId, lat, lng);
       checkingRef.current.delete(locationId);
 
       if (check) {
@@ -300,7 +303,7 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
 
   return (
     <>
-      <BingoEventHeader />
+      <BingoEventHeader playerName={player.name} />
 
       <div className="bingo-board-wrap">
         <BingoStatus lineCount={lines.length} checkedCount={checks.length} />
