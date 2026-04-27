@@ -233,6 +233,12 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
   );
 
   useEffect(() => {
+    // While paused, drop distance data so cells don't show stale values.
+    // Resume's first GPS fix re-runs this effect and repopulates distances.
+    if (isPaused) {
+      setDistances(new Map());
+      return;
+    }
     if (!position || status !== "active") return;
 
     const newDistances = new Map<string, number>();
@@ -249,7 +255,7 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
     }
     setDistances(newDistances);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [position, status, locationOverrides]);
+  }, [position, status, isPaused, locationOverrides]);
 
   const handleCheck = useCallback(
     async (locationId: string) => {
