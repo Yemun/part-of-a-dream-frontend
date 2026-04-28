@@ -13,6 +13,15 @@ export const MAX_BINGO_PLAYERS = 100;
 
 export const BINGO_ADMIN_NAME = "이소정";
 
+export const BINGO_TEAMS = [
+  "AX팀",
+  "BX팀",
+  "앱전략팀",
+  "코어디자인팀",
+  "프로덕트디자인팀",
+] as const;
+export type BingoTeam = (typeof BINGO_TEAMS)[number];
+
 export type GetOrCreatePlayerResult =
   | { ok: true; player: BingoPlayer; created: boolean }
   | { ok: false; reason: "limit" | "failed" };
@@ -27,6 +36,7 @@ export type BingoLine = Database["public"]["Tables"]["bingo_lines"]["Row"];
 export interface LeaderboardEntry {
   player_id: string;
   player_name: string;
+  player_team: BingoTeam;
   line_count: number;
   check_count: number;
   latest_line_at: string | null;
@@ -124,9 +134,11 @@ function generateBoardLayout(): number[] {
 
 export async function getOrCreatePlayer(
   name: string,
+  team: BingoTeam,
 ): Promise<GetOrCreatePlayerResult> {
   const trimmed = name.trim();
   if (!trimmed) return { ok: false, reason: "failed" };
+  if (!BINGO_TEAMS.includes(team)) return { ok: false, reason: "failed" };
 
   try {
     const existing = await getPlayerByName(trimmed);
@@ -148,7 +160,7 @@ export async function getOrCreatePlayer(
 
     const { data, error } = await supabase
       .from("bingo_players")
-      .insert({ name: trimmed, board_layout: generateBoardLayout() })
+      .insert({ name: trimmed, team, board_layout: generateBoardLayout() })
       .select()
       .single();
 
@@ -299,13 +311,17 @@ export async function getLeaderboard(): Promise<Leaderboards> {
 
     const { data: players, error: playersError } = await supabase
       .from("bingo_players")
-      .select("id, name");
+      .select("id, name, team");
 
     if (playersError || !players) return { mostLines: [], speed: [] };
 
     const entries: LeaderboardEntry[] = [];
 
-    for (const player of players as unknown as { id: string; name: string }[]) {
+    for (const player of players as unknown as {
+      id: string;
+      name: string;
+      team: BingoTeam;
+    }[]) {
       const [checksRes, linesRes] = await Promise.all([
         supabase
           .from("bingo_checks")
@@ -322,6 +338,7 @@ export async function getLeaderboard(): Promise<Leaderboards> {
       entries.push({
         player_id: player.id,
         player_name: player.name,
+        player_team: player.team,
         line_count: lines.length,
         check_count: checksRes.count || 0,
         first_line_at: lines.length > 0 ? lines[0].completed_at : null,

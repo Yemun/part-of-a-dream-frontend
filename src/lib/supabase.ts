@@ -61,15 +61,18 @@ export interface Database {
         Row: {
           id: string
           name: string
+          team: string
           board_layout: number[]
           created_at: string
         }
         Insert: {
           name: string
+          team: string
           board_layout: number[]
         }
         Update: {
           name?: string
+          team?: string
           board_layout?: number[]
         }
       }

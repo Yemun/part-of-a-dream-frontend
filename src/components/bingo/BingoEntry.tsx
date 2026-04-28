@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import {
   BINGO_EVENT,
+  BINGO_TEAMS,
+  BingoTeam,
   getLocations,
   getPlayerByName,
   getOrCreatePlayer,
@@ -17,6 +19,7 @@ export default function BingoEntry() {
   const [locations, setLocations] = useState<BingoLocation[]>([]);
   const [player, setPlayer] = useState<BingoPlayer | null>(null);
   const [name, setName] = useState("");
+  const [team, setTeam] = useState<BingoTeam | "">("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
@@ -42,12 +45,12 @@ export default function BingoEntry() {
   }, []);
 
   const handleJoin = useCallback(async () => {
-    if (!name.trim()) return;
+    if (!name.trim() || !team) return;
     setJoining(true);
     setError("");
 
     try {
-      const result = await getOrCreatePlayer(name.trim());
+      const result = await getOrCreatePlayer(name.trim(), team);
       if (!result.ok) {
         setError(
           result.reason === "limit" ? t("playerLimitReached") : t("joinFailed"),
@@ -64,7 +67,7 @@ export default function BingoEntry() {
     } finally {
       setJoining(false);
     }
-  }, [name, t]);
+  }, [name, team, t]);
 
   if (loading) {
     return (
@@ -89,6 +92,21 @@ export default function BingoEntry() {
           handleJoin();
         }}
       >
+        <fieldset className="bingo-entry-teams">
+          <legend>{t("selectTeam")}</legend>
+          {BINGO_TEAMS.map((option) => (
+            <label key={option} className="bingo-entry-team-option">
+              <input
+                type="radio"
+                name="bingo-team"
+                value={option}
+                checked={team === option}
+                onChange={() => setTeam(option)}
+              />
+              <span>{option}</span>
+            </label>
+          ))}
+        </fieldset>
         <input
           type="text"
           placeholder={t("enterName")}
@@ -99,7 +117,7 @@ export default function BingoEntry() {
         <button
           type="submit"
           className="bingo-cta primary"
-          disabled={joining || !name.trim()}
+          disabled={joining || !name.trim() || !team}
         >
           {joining ? t("loading") : t("join")}
         </button>

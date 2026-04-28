@@ -93,7 +93,12 @@ function LeaderboardSection({
               >
                 <Medal rank={rank} />
                 <div className="bingo-lb-player">
-                  {entry.player_name}
+                  <span className="bingo-lb-player-name">
+                    {entry.player_name}
+                  </span>
+                  <span className="bingo-lb-player-team">
+                    {entry.player_team}
+                  </span>
                   {isMe && <span className="you-tag">YOU</span>}
                 </div>
                 {mode === "mostLines" ? (

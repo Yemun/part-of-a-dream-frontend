@@ -309,7 +309,7 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
 
   return (
     <>
-      <BingoEventHeader playerName={player.name} />
+      <BingoEventHeader playerName={player.name} playerTeam={player.team} />
 
       <div className="bingo-board-wrap">
         <BingoStatus lineCount={lines.length} checkedCount={checks.length} />

@@ -63,7 +63,15 @@
     "weeksAgo": "{weeks}주 전",
     "monthsAgo": "{months}개월 전",
     "yearsAgo": "{years}년 전",
-    "weekdays": ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"],
+    "weekdays": [
+      "일요일",
+      "월요일",
+      "화요일",
+      "수요일",
+      "목요일",
+      "금요일",
+      "토요일"
+    ],
     "absoluteFormat": "{month}월 {day}일 {weekday}",
     "shortFormat": "{month}월 {day}일"
   },
@@ -76,6 +84,7 @@
   "bingo": {
     "title": "GPS 빙고",
     "enterName": "이름을 입력하세요",
+    "selectTeam": "소속 팀을 선택하세요",
     "join": "참여하기",
     "notRegistered": "등록되지 않은 이름입니다.",
     "playerLimitReached": "참가 인원이 가득 찼습니다. (최대 100명)",
@@ -96,7 +105,7 @@
     "noEntries": "아직 기록이 없습니다",
     "checked": "방문 완료",
     "unchecked": "미방문",
-    "nearby": "근처에 있어요!",
+    "nearby": "탭하여 완료하기!",
     "tapToCheck": "탭하여 방문 체크",
     "metersAway": "{meters}m 거리",
     "gpsActive": "GPS 활성",
