@@ -60,7 +60,10 @@
   background: var(--bingo-paper);
   color: var(--bingo-ink);
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 /* ---- HERO header ---- */
