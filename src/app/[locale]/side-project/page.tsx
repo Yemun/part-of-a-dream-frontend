@@ -48,7 +48,9 @@ export default async function SideProjectPage({
   const activeTab = parseTab(tab);
 
   return (
-    <MobileContainer>
+    <>
+      <style>{`html, body { overflow-y: hidden; }`}</style>
+      <MobileContainer>
       {activeTab === "bingo" ? (
         <div className="font-bingo bingo-app h-full">
           <BingoEntry />
@@ -56,6 +58,7 @@ export default async function SideProjectPage({
       ) : (
         <JangbogiFrame />
       )}
-    </MobileContainer>
+      </MobileContainer>
+    </>
   );
 }

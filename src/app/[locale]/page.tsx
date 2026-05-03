@@ -74,6 +74,7 @@ export default async function Home({ params }: PageProps) {
 
   return (
     <>
+      <style>{`html, body { overflow-x: hidden; }`}</style>
       {[...postsByYear.entries()].map(([year, yearPosts]) => (
         <div key={year} className="flex">
           <div className="inline-flex text-sm font-medium px-1 -ml-px -mt-px border [writing-mode:vertical-rl] [text-orientation:upright]">

@@ -72,7 +72,12 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
       >
         <RelativeTime dateString={post.publishedAt} />
       </div>
-      <div className="flex justify-center items-center p-2.5 border-t-[0.5px]">
+      <Link
+        href={`/posts/${post.slug}`}
+        locale={locale}
+        prefetch={true}
+        className="group flex justify-center items-center p-2.5 border-t-[0.5px]"
+      >
         <div
           ref={circleRef}
           style={{
@@ -82,11 +87,8 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
             }),
           }}
         >
-          <Link
-            href={`/posts/${post.slug}`}
-            locale={locale}
-            prefetch={true}
-            className="group w-24 h-24 rounded-full outline-2 outline-red-500 dark:outline-red-400 flex items-center justify-center bg-white dark:bg-black hover:bg-red-500 dark:hover:bg-red-400 transition-colors"
+          <div
+            className="w-24 h-24 rounded-full outline-2 outline-red-500 dark:outline-red-400 flex items-center justify-center bg-white dark:bg-black group-hover:bg-red-500 dark:group-hover:bg-red-400 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -131,9 +133,9 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
                 );
               })()}
             </svg>
-          </Link>
+          </div>
         </div>
-      </div>
+      </Link>
     </div>
   );
 }
