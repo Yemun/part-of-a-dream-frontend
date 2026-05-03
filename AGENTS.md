@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 Multilingual blog "꿈의 일환" (Part of a Dream) - Next.js with next-intl, Contentlayer & Supabase
 

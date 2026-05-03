@@ -81,6 +81,12 @@
       "next": "다음 글"
     }
   },
+  "sideProject": {
+    "title": "사이드 프로젝트",
+    "description": "직접 만든 작은 도구들",
+    "tabBingo": "GPS 빙고",
+    "tabJangbogi": "장보기"
+  },
   "bingo": {
     "title": "GPS 빙고",
     "enterName": "이름을 입력하세요",

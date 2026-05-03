@@ -26,12 +26,18 @@ export type GetOrCreatePlayerResult =
   | { ok: true; player: BingoPlayer; created: boolean }
   | { ok: false; reason: "limit" | "failed" };
 
-// Types
 export type BingoLocation =
   Database["public"]["Tables"]["bingo_locations"]["Row"];
 export type BingoPlayer = Database["public"]["Tables"]["bingo_players"]["Row"];
 export type BingoCheck = Database["public"]["Tables"]["bingo_checks"]["Row"];
 export type BingoLine = Database["public"]["Tables"]["bingo_lines"]["Row"];
+
+export interface BingoSnapshot {
+  locations: BingoLocation[];
+  players: BingoPlayer[];
+  checks: BingoCheck[];
+  lines: BingoLine[];
+}
 
 export interface LeaderboardEntry {
   player_id: string;
@@ -48,6 +54,9 @@ export interface Leaderboards {
   speed: LeaderboardEntry[];
 }
 
+const BINGO_CACHE_KEY = "bingo_frozen_snapshot";
+const BINGO_PLAYER_KEYS = ["bingo_player_id", "bingo_player_name"];
+
 // All possible bingo lines (indices refer to board position 0-8)
 export const BINGO_LINES: { type: string; cells: number[] }[] = [
   { type: "row-0", cells: [0, 1, 2] },
@@ -60,67 +69,119 @@ export const BINGO_LINES: { type: string; cells: number[] }[] = [
   { type: "diag-anti", cells: [2, 4, 6] },
 ];
 
-// Player name lookup (for realtime toast messages)
-export async function getPlayerNameById(
-  playerId: string,
-): Promise<string | null> {
-  try {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-      .from("bingo_players")
-      .select("name")
-      .eq("id", playerId)
-      .single();
+function emptySnapshot(): BingoSnapshot {
+  return { locations: [], players: [], checks: [], lines: [] };
+}
 
-    if (error) return null;
-    return (data as unknown as { name: string }).name;
-  } catch {
-    return null;
+function canUseSessionStorage() {
+  return typeof window !== "undefined" && Boolean(window.sessionStorage);
+}
+
+function getCachedSnapshot(): BingoSnapshot {
+  if (!canUseSessionStorage()) return emptySnapshot();
+
+  const raw = window.sessionStorage.getItem(BINGO_CACHE_KEY);
+  if (!raw) return emptySnapshot();
+
+  try {
+    const snapshot = JSON.parse(raw) as Partial<BingoSnapshot>;
+    return {
+      locations: snapshot.locations ?? [],
+      players: snapshot.players ?? [],
+      checks: snapshot.checks ?? [],
+      lines: snapshot.lines ?? [],
+    };
+  } catch (error) {
+    console.error("Error parsing bingo session cache:", error);
+    return emptySnapshot();
   }
 }
 
-// Data access functions
+function saveCachedSnapshot(snapshot: BingoSnapshot) {
+  if (!canUseSessionStorage()) return;
+  window.sessionStorage.setItem(BINGO_CACHE_KEY, JSON.stringify(snapshot));
+}
 
-export async function getLocations(): Promise<BingoLocation[]> {
+export function clearBingoSessionCache() {
+  if (!canUseSessionStorage()) return;
+  window.sessionStorage.removeItem(BINGO_CACHE_KEY);
+  for (const key of BINGO_PLAYER_KEYS) {
+    window.sessionStorage.removeItem(key);
+  }
+}
+
+export async function loadFrozenBingoSnapshot(): Promise<BingoSnapshot> {
+  clearBingoSessionCache();
+
   try {
     const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-      .from("bingo_locations")
-      .select("*")
-      .order("cell_index", { ascending: true });
+    const [locationsRes, playersRes, checksRes, linesRes] = await Promise.all([
+      supabase
+        .from("bingo_locations")
+        .select("*")
+        .order("cell_index", { ascending: true }),
+      supabase
+        .from("bingo_players")
+        .select("*")
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("bingo_checks")
+        .select("*")
+        .order("checked_at", { ascending: true }),
+      supabase
+        .from("bingo_lines")
+        .select("*")
+        .order("completed_at", { ascending: true }),
+    ]);
 
-    if (error) {
-      console.error("Error fetching locations:", error);
-      return [];
+    if (locationsRes.error) {
+      console.error("Error fetching locations:", locationsRes.error);
     }
-    return (data as unknown as BingoLocation[]) || [];
+    if (playersRes.error) {
+      console.error("Error fetching players:", playersRes.error);
+    }
+    if (checksRes.error) {
+      console.error("Error fetching checks:", checksRes.error);
+    }
+    if (linesRes.error) {
+      console.error("Error fetching lines:", linesRes.error);
+    }
+
+    const snapshot: BingoSnapshot = {
+      locations: (locationsRes.data as unknown as BingoLocation[]) ?? [],
+      players: (playersRes.data as unknown as BingoPlayer[]) ?? [],
+      checks: (checksRes.data as unknown as BingoCheck[]) ?? [],
+      lines: (linesRes.data as unknown as BingoLine[]) ?? [],
+    };
+    saveCachedSnapshot(snapshot);
+    return snapshot;
   } catch (error) {
-    console.error("Error fetching locations:", error);
-    return [];
+    console.error("Error fetching bingo snapshot:", error);
+    const snapshot = emptySnapshot();
+    saveCachedSnapshot(snapshot);
+    return snapshot;
   }
+}
+
+export async function getLocations(): Promise<BingoLocation[]> {
+  return getCachedSnapshot().locations;
+}
+
+export async function getPlayerNameById(
+  playerId: string,
+): Promise<string | null> {
+  return getCachedSnapshot().players.find((player) => player.id === playerId)
+    ?.name ?? null;
 }
 
 export async function getPlayerByName(
   name: string,
 ): Promise<BingoPlayer | null> {
-  try {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-      .from("bingo_players")
-      .select("*")
-      .eq("name", name)
-      .single();
-
-    if (error) {
-      if (error.code === "PGRST116") return null;
-      console.error("Error fetching player:", error);
-      return null;
-    }
-    return data as unknown as BingoPlayer;
-  } catch (error) {
-    console.error("Error fetching player:", error);
-    return null;
-  }
+  const trimmed = name.trim();
+  return (
+    getCachedSnapshot().players.find((player) => player.name === trimmed) ??
+    null
+  );
 }
 
 function generateBoardLayout(): number[] {
@@ -140,86 +201,35 @@ export async function getOrCreatePlayer(
   if (!trimmed) return { ok: false, reason: "failed" };
   if (!BINGO_TEAMS.includes(team)) return { ok: false, reason: "failed" };
 
-  try {
-    const existing = await getPlayerByName(trimmed);
-    if (existing) return { ok: true, player: existing, created: false };
+  const snapshot = getCachedSnapshot();
+  const existing = snapshot.players.find((player) => player.name === trimmed);
+  if (existing) return { ok: true, player: existing, created: false };
 
-    const supabase = getSupabaseClient();
-
-    const { count, error: countError } = await supabase
-      .from("bingo_players")
-      .select("id", { count: "exact", head: true });
-
-    if (countError) {
-      console.error("Error counting players:", countError);
-      return { ok: false, reason: "failed" };
-    }
-    if ((count ?? 0) >= MAX_BINGO_PLAYERS) {
-      return { ok: false, reason: "limit" };
-    }
-
-    const { data, error } = await supabase
-      .from("bingo_players")
-      .insert({ name: trimmed, team, board_layout: generateBoardLayout() })
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === "23505") {
-        const raced = await getPlayerByName(trimmed);
-        if (raced) return { ok: true, player: raced, created: false };
-      }
-      console.error("Error creating player:", error);
-      return { ok: false, reason: "failed" };
-    }
-
-    return {
-      ok: true,
-      player: data as unknown as BingoPlayer,
-      created: true,
-    };
-  } catch (error) {
-    console.error("Error in getOrCreatePlayer:", error);
-    return { ok: false, reason: "failed" };
+  if (snapshot.players.length >= MAX_BINGO_PLAYERS) {
+    return { ok: false, reason: "limit" };
   }
+
+  const now = new Date().toISOString();
+  const player: BingoPlayer = {
+    id: crypto.randomUUID(),
+    name: trimmed,
+    team,
+    board_layout: generateBoardLayout(),
+    created_at: now,
+  };
+
+  snapshot.players = [...snapshot.players, player];
+  saveCachedSnapshot(snapshot);
+
+  return { ok: true, player, created: true };
 }
 
 export async function getPlayerChecks(playerId: string): Promise<BingoCheck[]> {
-  try {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-      .from("bingo_checks")
-      .select("*")
-      .eq("player_id", playerId);
-
-    if (error) {
-      console.error("Error fetching checks:", error);
-      return [];
-    }
-    return (data as unknown as BingoCheck[]) || [];
-  } catch (error) {
-    console.error("Error fetching checks:", error);
-    return [];
-  }
+  return getCachedSnapshot().checks.filter((check) => check.player_id === playerId);
 }
 
 export async function getPlayerLines(playerId: string): Promise<BingoLine[]> {
-  try {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-      .from("bingo_lines")
-      .select("*")
-      .eq("player_id", playerId);
-
-    if (error) {
-      console.error("Error fetching lines:", error);
-      return [];
-    }
-    return (data as unknown as BingoLine[]) || [];
-  } catch (error) {
-    console.error("Error fetching lines:", error);
-    return [];
-  }
+  return getCachedSnapshot().lines.filter((line) => line.player_id === playerId);
 }
 
 export async function insertCheck(
@@ -228,29 +238,25 @@ export async function insertCheck(
   lat: number,
   lng: number,
 ): Promise<BingoCheck | null> {
-  try {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-      .from("bingo_checks")
-      .insert({
-        player_id: playerId,
-        location_id: locationId,
-        latitude: lat,
-        longitude: lng,
-      })
-      .select()
-      .single();
+  const snapshot = getCachedSnapshot();
+  const exists = snapshot.checks.some(
+    (check) =>
+      check.player_id === playerId && check.location_id === locationId,
+  );
+  if (exists) return null;
 
-    if (error) {
-      if (error.code === "23505") return null;
-      console.error("Error inserting check:", error);
-      return null;
-    }
-    return data as unknown as BingoCheck;
-  } catch (error) {
-    console.error("Error inserting check:", error);
-    return null;
-  }
+  const check: BingoCheck = {
+    id: crypto.randomUUID(),
+    player_id: playerId,
+    location_id: locationId,
+    checked_at: new Date().toISOString(),
+    latitude: lat,
+    longitude: lng,
+  };
+
+  snapshot.checks = [...snapshot.checks, check];
+  saveCachedSnapshot(snapshot);
+  return check;
 }
 
 export async function updateLocationCoords(
@@ -258,123 +264,96 @@ export async function updateLocationCoords(
   latitude: number,
   longitude: number,
 ): Promise<BingoLocation | null> {
-  try {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-      .from("bingo_locations")
-      .update({ latitude, longitude })
-      .eq("id", locationId)
-      .select()
-      .single();
+  const snapshot = getCachedSnapshot();
+  const location = snapshot.locations.find((loc) => loc.id === locationId);
+  if (!location) return null;
 
-    if (error) {
-      console.error("Error updating location coords:", error);
-      return null;
-    }
-    return data as unknown as BingoLocation;
-  } catch (error) {
-    console.error("Error updating location coords:", error);
-    return null;
-  }
+  const updated: BingoLocation = { ...location, latitude, longitude };
+  snapshot.locations = snapshot.locations.map((loc) =>
+    loc.id === locationId ? updated : loc,
+  );
+  saveCachedSnapshot(snapshot);
+  return updated;
 }
 
 export async function insertLine(
   playerId: string,
   lineType: string,
 ): Promise<BingoLine | null> {
-  try {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-      .from("bingo_lines")
-      .insert({
-        player_id: playerId,
-        line_type: lineType,
-      })
-      .select()
-      .single();
+  const snapshot = getCachedSnapshot();
+  const exists = snapshot.lines.some(
+    (line) => line.player_id === playerId && line.line_type === lineType,
+  );
+  if (exists) return null;
 
-    if (error) {
-      if (error.code === "23505") return null;
-      console.error("Error inserting line:", error);
-      return null;
-    }
-    return data as unknown as BingoLine;
-  } catch (error) {
-    console.error("Error inserting line:", error);
-    return null;
-  }
+  const line: BingoLine = {
+    id: crypto.randomUUID(),
+    player_id: playerId,
+    line_type: lineType,
+    completed_at: new Date().toISOString(),
+  };
+
+  snapshot.lines = [...snapshot.lines, line];
+  saveCachedSnapshot(snapshot);
+  return line;
+}
+
+function coerceTeam(team: string): BingoTeam {
+  return BINGO_TEAMS.includes(team as BingoTeam)
+    ? (team as BingoTeam)
+    : BINGO_TEAMS[0];
 }
 
 export async function getLeaderboard(): Promise<Leaderboards> {
-  try {
-    const supabase = getSupabaseClient();
-
-    const { data: players, error: playersError } = await supabase
-      .from("bingo_players")
-      .select("id, name, team");
-
-    if (playersError || !players) return { mostLines: [], speed: [] };
-
-    const entries: LeaderboardEntry[] = [];
-
-    for (const player of players as unknown as {
-      id: string;
-      name: string;
-      team: BingoTeam;
-    }[]) {
-      const [checksRes, linesRes] = await Promise.all([
-        supabase
-          .from("bingo_checks")
-          .select("id", { count: "exact" })
-          .eq("player_id", player.id),
-        supabase
-          .from("bingo_lines")
-          .select("*")
-          .eq("player_id", player.id)
-          .order("completed_at", { ascending: true }),
-      ]);
-
-      const lines = (linesRes.data as unknown as BingoLine[]) || [];
-      entries.push({
-        player_id: player.id,
-        player_name: player.name,
-        player_team: player.team,
-        line_count: lines.length,
-        check_count: checksRes.count || 0,
-        first_line_at: lines.length > 0 ? lines[0].completed_at : null,
-        latest_line_at:
-          lines.length > 0 ? lines[lines.length - 1].completed_at : null,
-      });
-    }
-
-    const mostLines = entries
-      .filter((e) => e.line_count >= 1)
-      .sort((a, b) => {
-        if (b.line_count !== a.line_count) return b.line_count - a.line_count;
-        if (a.latest_line_at && b.latest_line_at) {
-          return (
-            new Date(a.latest_line_at).getTime() -
-            new Date(b.latest_line_at).getTime()
-          );
-        }
-        if (a.latest_line_at) return -1;
-        if (b.latest_line_at) return 1;
-        return 0;
-      })
-      .slice(0, 5);
-
-    const speed = entries
-      .filter((e) => e.first_line_at !== null)
+  const snapshot = getCachedSnapshot();
+  const entries: LeaderboardEntry[] = snapshot.players.map((player) => {
+    const checks = snapshot.checks.filter(
+      (check) => check.player_id === player.id,
+    );
+    const lines = snapshot.lines
+      .filter((line) => line.player_id === player.id)
       .sort(
         (a, b) =>
-          new Date(a.first_line_at as string).getTime() -
-          new Date(b.first_line_at as string).getTime(),
-      )
-      .slice(0, 5);
+          new Date(a.completed_at).getTime() -
+          new Date(b.completed_at).getTime(),
+      );
 
-    return { mostLines, speed };
-  } catch (error) {
-    console.error("Error fetching leaderboard:", error);
-    return { mostLines: [], speed: [] };
-  }
+    return {
+      player_id: player.id,
+      player_name: player.name,
+      player_team: coerceTeam(player.team),
+      line_count: lines.length,
+      check_count: checks.length,
+      first_line_at: lines.length > 0 ? lines[0].completed_at : null,
+      latest_line_at:
+        lines.length > 0 ? lines[lines.length - 1].completed_at : null,
+    };
+  });
+
+  const mostLines = entries
+    .filter((entry) => entry.line_count >= 1)
+    .sort((a, b) => {
+      if (b.line_count !== a.line_count) return b.line_count - a.line_count;
+      if (a.latest_line_at && b.latest_line_at) {
+        return (
+          new Date(a.latest_line_at).getTime() -
+          new Date(b.latest_line_at).getTime()
+        );
+      }
+      if (a.latest_line_at) return -1;
+      if (b.latest_line_at) return 1;
+      return 0;
+    })
+    .slice(0, 5);
+
+  const speed = entries
+    .filter((entry) => entry.first_line_at !== null)
+    .sort(
+      (a, b) =>
+        new Date(a.first_line_at as string).getTime() -
+        new Date(b.first_line_at as string).getTime(),
+    )
+    .slice(0, 5);
+
+  return { mostLines, speed };
 }

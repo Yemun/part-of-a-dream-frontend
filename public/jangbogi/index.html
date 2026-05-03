@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <title>장보기</title>
+    <link rel="apple-touch-icon" href="favicon.png" />
+    <link rel="icon" href="favicon.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <nav id="tabs">
+        <div class="tab-row">
+          <button class="tab active" data-tab="inventory">재고</button>
+          <button class="tab" data-tab="shopping">장보기 목록</button>
+        </div>
+        <div class="search-bar">
+          <div class="search-wrap">
+            <input
+              type="text"
+              id="search-inventory"
+              placeholder="항목 검색..."
+            />
+            <button id="btn-clear-search" class="btn-clear-search hidden">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+              >
+                <circle cx="8" cy="8" r="7" fill="#6f6f6f" />
+                <path
+                  d="M5.5 5.5l5 5M10.5 5.5l-5 5"
+                  stroke="white"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- 재고 탭: 카탈로그에서 장보기 목록에 추가 -->
+      <main id="tab-inventory" class="tab-content active">
+        <div id="inventory-list"></div>
+        <div class="form-row" style="margin-top: 24px">
+          <input
+            type="text"
+            id="new-cat-name"
+            placeholder="새 카테고리를 추가하려면 여기 입력하세요..."
+          />
+          <button id="btn-add-cat" disabled>추가</button>
+        </div>
+      </main>
+
+      <!-- 장보기 목록 탭: 활성 쇼핑 리스트 -->
+      <main id="tab-shopping" class="tab-content">
+        <div id="shopping-list"></div>
+        <div id="shopping-actions" class="floating-bar hidden">
+          <span id="completed-count"></span>
+          <button id="btn-clear-completed" class="btn-primary">
+            완료 항목 정리
+          </button>
+        </div>
+      </main>
+
+      <div id="add-bar" class="floating-bar hidden">
+        <span id="selected-count">0개 선택</span>
+        <div class="bar-actions">
+          <button id="btn-set-storage" class="btn-secondary">온도</button>
+          <button id="btn-delete-selected" class="btn-danger">삭제</button>
+          <button id="btn-add-to-shopping" class="btn-primary">
+            장보기 추가
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- /app -->
+
+    <div id="toast" class="toast hidden"></div>
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

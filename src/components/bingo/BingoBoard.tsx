@@ -12,11 +12,9 @@ import {
   BINGO_LINES,
   getPlayerChecks,
   getPlayerLines,
-  getPlayerNameById,
   insertCheck,
   insertLine,
 } from "@/lib/bingo";
-import { getSupabaseClient } from "@/lib/supabase";
 import { useGpsTracking, getDistance } from "@/lib/bingo-gps";
 import BingoCell from "./BingoCell";
 import BingoStatus from "./BingoStatus";
@@ -127,52 +125,6 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
       setLines(existingLines);
     }
     load();
-  }, [player.id]);
-
-  useEffect(() => {
-    const supabase = getSupabaseClient();
-
-    const channel = supabase
-      .channel("bingo-realtime")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "bingo_checks" },
-        async (payload) => {
-          const row = payload.new as { player_id: string; location_id: string };
-          if (row.player_id === player.id) return;
-
-          const playerName = await getPlayerNameById(row.player_id);
-          const loc = locationById.get(row.location_id);
-          const locName = loc?.name;
-
-          if (playerName && locName) {
-            addToast(
-              t("toastCheckIn", { player: playerName, location: locName })
-            );
-          }
-          setLeaderboardKey((k) => k + 1);
-        }
-      )
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "bingo_lines" },
-        async (payload) => {
-          const row = payload.new as { player_id: string };
-          if (row.player_id === player.id) return;
-
-          const playerName = await getPlayerNameById(row.player_id);
-          if (playerName) {
-            addToast(t("toastBingoLine", { player: playerName }));
-          }
-          setLeaderboardKey((k) => k + 1);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player.id]);
 
   const detectLines = useCallback(

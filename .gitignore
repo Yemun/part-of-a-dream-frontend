@@ -48,3 +48,8 @@ SuperClaude/
 
 # local scripts
 /scripts/
+
+# etc
+/supabase/*
+!/supabase/migrations/
+!/supabase/migrations/*.sql

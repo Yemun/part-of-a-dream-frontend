@@ -6,9 +6,8 @@ import {
   BINGO_EVENT,
   BINGO_TEAMS,
   BingoTeam,
-  getLocations,
-  getPlayerByName,
   getOrCreatePlayer,
+  loadFrozenBingoSnapshot,
   BingoLocation,
   BingoPlayer,
 } from "@/lib/bingo";
@@ -27,14 +26,8 @@ export default function BingoEntry() {
   useEffect(() => {
     async function load() {
       try {
-        const locs = await getLocations();
-        setLocations(locs);
-
-        const savedName = sessionStorage.getItem("bingo_player_name");
-        if (savedName) {
-          const p = await getPlayerByName(savedName);
-          if (p) setPlayer(p);
-        }
+        const snapshot = await loadFrozenBingoSnapshot();
+        setLocations(snapshot.locations);
       } catch (err) {
         console.error("Error loading:", err);
       } finally {

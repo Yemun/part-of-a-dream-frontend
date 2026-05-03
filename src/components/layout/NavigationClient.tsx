@@ -42,11 +42,11 @@ export default function NavigationClient({
         <p className="whitespace-pre">{profileText}</p>
       </Link>
       <Link
-        href="/side-project/bingo"
+        href="/side-project"
         locale={locale}
         prefetch={true}
         className={`hover:text-blue-600 dark:hover:text-blue-300 transition-colors ${
-          pathname.startsWith("/side-project/bingo")
+          pathname.startsWith("/side-project")
             ? "font-semibold underline"
             : "font-normal"
         } `}
