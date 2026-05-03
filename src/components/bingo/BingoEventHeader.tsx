@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 interface BingoEventHeaderProps {
   playerName?: string;
   playerTeam?: string;
@@ -9,6 +11,8 @@ export default function BingoEventHeader({
   playerName,
   playerTeam,
 }: BingoEventHeaderProps) {
+  const t = useTranslations("bingo");
+
   return (
     <header className="bingo-hero">
       {playerName && (
@@ -21,7 +25,7 @@ export default function BingoEventHeader({
       )}
       <div className="bingo-hero-eyebrow">AI CX KEMIDAY</div>
       <h1 className="bingo-hero-title">
-        <em>을지로</em> 탐험 빙고
+        <em>{t("heroTitleEm")}</em> {t("heroTitleRest")}
       </h1>
     </header>
   );

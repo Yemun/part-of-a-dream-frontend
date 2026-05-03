@@ -1,6 +1,6 @@
--- Freeze public writes for side-project tables.
--- The app still reads a snapshot from Supabase on load, but all user actions
--- after that run against device session cache only.
+-- Freeze public permissions for side-project tables.
+-- Public clients keep SELECT only; side-project mutations now run in device
+-- session cache.
 
 alter table public.bingo_locations enable row level security;
 alter table public.bingo_players enable row level security;
@@ -10,13 +10,13 @@ alter table public.jangbogi_categories enable row level security;
 alter table public.jangbogi_items enable row level security;
 alter table public.jangbogi_shopping enable row level security;
 
-revoke insert, update, delete on table public.bingo_locations from anon, authenticated;
-revoke insert, update, delete on table public.bingo_players from anon, authenticated;
-revoke insert, update, delete on table public.bingo_checks from anon, authenticated;
-revoke insert, update, delete on table public.bingo_lines from anon, authenticated;
-revoke insert, update, delete on table public.jangbogi_categories from anon, authenticated;
-revoke insert, update, delete on table public.jangbogi_items from anon, authenticated;
-revoke insert, update, delete on table public.jangbogi_shopping from anon, authenticated;
+revoke all privileges on table public.bingo_locations from anon, authenticated, public;
+revoke all privileges on table public.bingo_players from anon, authenticated, public;
+revoke all privileges on table public.bingo_checks from anon, authenticated, public;
+revoke all privileges on table public.bingo_lines from anon, authenticated, public;
+revoke all privileges on table public.jangbogi_categories from anon, authenticated, public;
+revoke all privileges on table public.jangbogi_items from anon, authenticated, public;
+revoke all privileges on table public.jangbogi_shopping from anon, authenticated, public;
 
 grant select on table public.bingo_locations to anon, authenticated;
 grant select on table public.bingo_players to anon, authenticated;
@@ -26,7 +26,17 @@ grant select on table public.jangbogi_categories to anon, authenticated;
 grant select on table public.jangbogi_items to anon, authenticated;
 grant select on table public.jangbogi_shopping to anon, authenticated;
 
+drop policy if exists "Allow public insert" on public.bingo_checks;
+drop policy if exists "Allow public insert" on public.bingo_lines;
+drop policy if exists "Allow public insert" on public.bingo_players;
+drop policy if exists "Allow public read" on public.bingo_checks;
+drop policy if exists "Allow public read" on public.bingo_lines;
+drop policy if exists "Allow public read" on public.bingo_locations;
+drop policy if exists "Allow public read" on public.bingo_players;
 drop policy if exists "bingo_locations_update_anon" on public.bingo_locations;
+drop policy if exists "anon_all_categories" on public.jangbogi_categories;
+drop policy if exists "anon_all_items" on public.jangbogi_items;
+drop policy if exists "anon_all_shopping" on public.jangbogi_shopping;
 
 drop policy if exists "side_project_bingo_locations_read" on public.bingo_locations;
 create policy "side_project_bingo_locations_read"

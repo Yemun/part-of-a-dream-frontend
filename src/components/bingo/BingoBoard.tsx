@@ -289,7 +289,7 @@ export default function BingoBoard({ locations, player }: BingoBoardProps) {
           <div className="bingo-celebrate">
             <div className="bingo-celebrate-card">
               <div className="big">BINGO!</div>
-              <div className="small">한 줄 완성 🎉</div>
+              <div className="small">{t("lineComplete")}</div>
             </div>
           </div>
         )}
@@ -418,6 +418,8 @@ function Confetti({ show }: { show: boolean }) {
 }
 
 function GrandSlamOverlay() {
+  const t = useTranslations("bingo");
+
   return (
     <div className="bingo-grand-slam">
       <div className="bingo-grand-slam-rays" />
@@ -428,7 +430,7 @@ function GrandSlamOverlay() {
           <span>GRAND</span>
           <span>SLAM</span>
         </div>
-        <div className="gs-sub">9개 위치 전부 방문 · 모든 빙고 완성</div>
+        <div className="gs-sub">{t("grandSlamSub")}</div>
       </div>
     </div>
   );

@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import {
-  BINGO_EVENT,
   BINGO_TEAMS,
   BingoTeam,
   getOrCreatePlayer,
@@ -76,8 +75,8 @@ export default function BingoEntry() {
 
   return (
     <div className="bingo-entry">
-      <h1>{BINGO_EVENT.name}</h1>
-      <p>{BINGO_EVENT.description}</p>
+      <h1>{t("eventName")}</h1>
+      <p>{t("eventDescription")}</p>
       <form
         className="bingo-entry-form"
         onSubmit={(e) => {

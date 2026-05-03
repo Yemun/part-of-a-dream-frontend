@@ -83,6 +83,7 @@
   @apply rounded-2xl bg-gray-950 border-[0.5px] border-white;
 }
 
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: oklch(7% 0 0);

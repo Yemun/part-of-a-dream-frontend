@@ -19,7 +19,9 @@ export default function BingoStatus({
         <span className="x">{t("bingoLine")} ×</span>
         {lineCount}
       </span>
-      <span className="bingo-progress-text">{checkedCount}/9 방문</span>
+      <span className="bingo-progress-text">
+        {t("visitProgress", { checkedCount })}
+      </span>
     </div>
   );
 }
