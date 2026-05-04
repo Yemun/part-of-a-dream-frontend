@@ -1,10 +1,4 @@
-@font-face {
-  font-family: "ChosunIlboMyungjo";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff")
-    format("woff");
-  font-weight: normal;
-  font-display: swap;
-}
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
@@ -83,7 +77,6 @@
   @apply rounded-2xl bg-gray-950 border-[0.5px] border-white;
 }
 
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: oklch(7% 0 0);
@@ -95,9 +88,25 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "ChosunIlboMyungjo", serif;
-  -webkit-text-stroke: 0.2px;
-  letter-spacing: -0.5px;
+  font-family:
+    "Pretendard Variable",
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    Roboto,
+    "Helvetica Neue",
+    "Segoe UI",
+    "Apple SD Gothic Neo",
+    "Noto Sans KR",
+    "Malgun Gothic",
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    sans-serif;
+  /* -webkit-text-stroke: 0.2px; */
+  /* letter-spacing: -0.5px; */
+  /* font-weight: 325; */
 }
 
 .dot-pattern {
@@ -122,7 +131,8 @@ body {
 }
 
 @keyframes shadow-breath {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.45);
   }
   50% {

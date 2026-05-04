@@ -57,7 +57,7 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <PostCardAnimationProvider>
-            <div className="min-h-screen">
+            <div className="min-h-screen antialiased">
               <PageShell>{children}</PageShell>
             </div>
           </PostCardAnimationProvider>

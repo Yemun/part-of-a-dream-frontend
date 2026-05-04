@@ -23,7 +23,7 @@ export default function ProfileClient({
 
   return (
     <section>
-      <h1 className="font-bold text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-3">
+      <h1 className="font-semibold text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-3">
         {t("name")}
       </h1>
 
@@ -33,7 +33,7 @@ export default function ProfileClient({
 
       <div className="mb-4 sm:mb-6">
         <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-3">
-          {t("career")}·{careerDuration}
+          {t("career")} · {careerDuration}
         </h2>
 
         <CareerGraph career={profileData.career} />

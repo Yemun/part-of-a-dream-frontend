@@ -60,7 +60,7 @@ export default function CommentForm({
   };
 
   return (
-    <div className="mt-8 p-6 rounded-2xl border border-black dot-pattern dark:border-white">
+    <div className="mt-8 py-6 border-t border-gray-200 dark:border-gray-400">
       <h3 className="text-lg font-semibold mb-4 dark:text-white">
         {t("writeComment")}
       </h3>

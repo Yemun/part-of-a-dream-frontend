@@ -87,9 +87,7 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
             }),
           }}
         >
-          <div
-            className="w-24 h-24 rounded-full outline-2 outline-red-500 dark:outline-red-400 flex items-center justify-center bg-white dark:bg-black group-hover:bg-red-500 dark:group-hover:bg-red-400 transition-colors"
-          >
+          <div className="w-24 h-24 rounded-full outline-2 outline-red-500 dark:outline-red-400 flex items-center justify-center bg-white dark:bg-black group-hover:bg-red-500 dark:group-hover:bg-red-400 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="104"
@@ -117,14 +115,14 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
                 return (
                   <>
                     <text
-                      className="text-base font-semibold uppercase stroke-white dark:stroke-black stroke-6 group-hover:stroke-4 transition-all"
+                      className="text-base font-semibold tracking-tight uppercase stroke-white dark:stroke-black stroke-6 group-hover:stroke-4 transition-all"
                       strokeLinejoin="round"
                     >
                       <textPath href={`#circle-${post.slug}`}>
                         {displayTitle}
                       </textPath>
                     </text>
-                    <text className="text-base font-semibold uppercase fill-red-500 dark:fill-red-400">
+                    <text className="text-base font-semibold tracking-tight uppercase fill-red-500 dark:fill-red-400">
                       <textPath href={`#circle-${post.slug}`}>
                         {displayTitle}
                       </textPath>
