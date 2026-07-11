@@ -1,7 +1,6 @@
 "use client";
 
 import { Link, usePathname } from "@/i18n/routing";
-import { useLocale } from "next-intl";
 
 interface NavigationClientProps {
   blogText: string;
@@ -15,13 +14,11 @@ export default function NavigationClient({
   sideProjectText,
 }: NavigationClientProps) {
   const pathname = usePathname();
-  const locale = useLocale();
 
   return (
     <div className="flex items-center gap-4">
       <Link
         href="/"
-        locale={locale}
         prefetch={true}
         className={`hover:text-blue-600 dark:hover:text-blue-300 transition-colors ${
           pathname === "/" || pathname.startsWith("/posts/")
@@ -33,7 +30,6 @@ export default function NavigationClient({
       </Link>
       <Link
         href="/profile"
-        locale={locale}
         prefetch={true}
         className={`hover:text-blue-600 dark:hover:text-blue-300 transition-colors ${
           pathname === "/profile" ? "font-semibold underline" : "font-normal"
@@ -43,7 +39,6 @@ export default function NavigationClient({
       </Link>
       <Link
         href="/side-project"
-        locale={locale}
         prefetch={true}
         className={`hover:text-blue-600 dark:hover:text-blue-300 transition-colors ${
           pathname.startsWith("/side-project")
