@@ -129,7 +129,7 @@ export default async function PostPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
-      <article>
+      <article className="max-w-2xl mx-auto w-full">
         <header className="mb-10 sm:mb-14">
           <h1 className="font-semibold text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl leading-7 sm:leading-9 lg:leading-10 mb-3">
             {post.title}

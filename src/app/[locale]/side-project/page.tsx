@@ -35,7 +35,7 @@ export async function generateMetadata({
 }
 
 function parseTab(value: string | undefined): SideProjectTab {
-  return value === "jangbogi" ? "jangbogi" : "bingo";
+  return value === "bingo" ? "bingo" : "jangbogi";
 }
 
 export default async function SideProjectPage({

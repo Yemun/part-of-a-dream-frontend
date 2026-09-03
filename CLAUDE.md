@@ -31,8 +31,7 @@ npm run deploy  # Build, commit, and deploy
 - Homepage: `/` (Korean), `/en` (English)
 - Posts: `/posts/[id]` (Korean), `/en/posts/[id]` (English)
 - Profile: `/profile` (Korean), `/en/profile` (English)
-- Side Project: `/side-project?tab=bingo|jangbogi` (tab toggle, default `bingo`)
-- Legacy `/side-project/bingo` redirects to `/side-project?tab=bingo`
+- Side Project: `/side-project?tab=jangbogi|bingo` (tab toggle, default `jangbogi`)
 
 ### Language Switching
 - Automatic locale detection via middleware
