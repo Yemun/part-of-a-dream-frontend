@@ -152,3 +152,9 @@ body {
   -webkit-text-stroke: 0;
   letter-spacing: normal;
 }
+
+/* rehype-pretty-code(shiki) 토큰 색. 듀얼 테마라 색이 CSS 변수로만 오는데,
+   .prose pre 배경이 라이트/다크 모두 어두우므로(bg-gray-950) dark 테마 색을 고정 적용한다. */
+.prose pre code[data-theme] span {
+  color: var(--shiki-dark);
+}

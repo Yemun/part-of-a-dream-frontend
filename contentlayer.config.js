@@ -3,6 +3,7 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeUnwrapImages from "rehype-unwrap-images";
+import remarkObsidian from "./src/lib/mdx/remark-obsidian.mjs";
 
 export const BlogPost = defineDocumentType(() => ({
   name: "BlogPost",
@@ -55,11 +56,43 @@ export const BlogPost = defineDocumentType(() => ({
   },
 }));
 
+export const Work = defineDocumentType(() => ({
+  name: "Work",
+  filePathPattern: `work/**/*.mdx`,
+  contentType: "mdx",
+  fields: {
+    title: { type: "string", required: true },
+    description: { type: "string", required: false },
+    category: { type: "string", required: false },
+    company: { type: "string", required: false },
+    role: { type: "string", required: false },
+    startDate: { type: "date", required: true },
+    endDate: { type: "date", required: false },
+    problem: { type: "list", of: { type: "string" }, required: false },
+    impact: { type: "list", of: { type: "string" }, required: false },
+    tags: { type: "list", of: { type: "string" }, required: false },
+    product: { type: "string", required: false },
+    productDescription: { type: "string", required: false },
+  },
+  computedFields: {
+    slug: {
+      type: "string",
+      resolve: (doc) =>
+        doc._raw.flattenedPath.replace("work/", "").replace(/-(?:ko|en)$/, ""),
+    },
+    locale: {
+      type: "string",
+      resolve: (doc) =>
+        doc._raw.flattenedPath.endsWith("-en") ? "en" : "ko",
+    },
+  },
+}));
 
 export default makeSource({
   contentDirPath: "./content",
-  documentTypes: [BlogPost],
+  documentTypes: [BlogPost, Work],
   mdx: {
+    remarkPlugins: [remarkObsidian],
     rehypePlugins: [
       rehypeUnwrapImages, // 이미지를 p 태그에서 분리
       rehypeSlug,

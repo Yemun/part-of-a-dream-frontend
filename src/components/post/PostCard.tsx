@@ -3,16 +3,25 @@
 import { Link } from "@/i18n/routing";
 import RelativeTime from "@/components/common/RelativeTime";
 import { BlogPost } from "@/lib/content";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import { usePostCardAnimation } from "./PostCardAnimationProvider";
 
 interface PostCardProps {
-  post: BlogPost;
-  locale?: string;
+  post: Pick<BlogPost, "slug" | "title" | "publishedAt">;
+  /** 링크 대상. 기본값은 블로그 글(`/posts/[slug]`) */
+  href?: string;
+  /** 원 위에 표시할 라벨. 기본값은 발행일(RelativeTime) */
+  dateLabel?: ReactNode;
   index?: number;
 }
 
-export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
+export default function PostCard({
+  post,
+  href,
+  dateLabel,
+  index = 0,
+}: PostCardProps) {
+  const linkHref = href ?? `/posts/${post.slug}`;
   const { isFirstLoad, getTransform, setTransform } = usePostCardAnimation();
   const [randomTransform, setRandomTransform] = useState("");
   const [translateX, setTranslateX] = useState(0);
@@ -21,7 +30,7 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
   const circleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const saved = getTransform(post.slug);
+    const saved = getTransform(linkHref);
     if (saved) {
       requestAnimationFrame(() => {
         setRandomTransform(saved.transform);
@@ -40,7 +49,7 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
     const radius = circleRect.width / 2;
     const rotate = Math.round((x / (2 * Math.PI * radius)) * 360);
     const transform = `translate(${x}px, 0px) rotate(${rotate}deg)`;
-    setTransform(post.slug, { transform, x });
+    setTransform(linkHref, { transform, x });
 
     if (firstLoad.current) {
       const delay = index * 100;
@@ -57,7 +66,7 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
         setRandomTransform(transform);
       });
     }
-  }, [post]);
+  }, [post, linkHref]);
 
   return (
     <div className="-ml-px -mt-px border">
@@ -70,11 +79,10 @@ export default function PostCard({ post, locale, index = 0 }: PostCardProps) {
           }),
         }}
       >
-        <RelativeTime dateString={post.publishedAt} />
+        {dateLabel ?? <RelativeTime dateString={post.publishedAt} />}
       </div>
       <Link
-        href={`/posts/${post.slug}`}
-        locale={locale}
+        href={linkHref}
         prefetch={true}
         className="group flex justify-center items-center p-2.5 border-t-[0.5px]"
       >

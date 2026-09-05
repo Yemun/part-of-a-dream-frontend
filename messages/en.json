@@ -1,5 +1,6 @@
 {
   "navigation": {
+    "work": "Work",
     "blog": "Blog",
     "profile": "Profile",
     "sideProject": "Side Project"
@@ -14,7 +15,23 @@
     "title": "Part of a Dream",
     "description": "A journal exploring the relationship between users and products.",
     "noPostsFound": "No posts found.",
-    "relatedPosts": "You might also like"
+    "relatedPosts": "You might also like",
+    "postList": "Posts"
+  },
+  "work": {
+    "noWorksFound": "No work entries yet.",
+    "company": "Company",
+    "role": "Role",
+    "period": "Period",
+    "product": "Product",
+    "problem": "Problem",
+    "impact": "Impact",
+    "tags": "Tags",
+    "present": "Present",
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next"
+    }
   },
   "profile": {
     "title": "About Me",

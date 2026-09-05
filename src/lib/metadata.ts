@@ -154,6 +154,8 @@ export function createArticleSchema(options: {
   publishedTime: string;
   slug: string;
   locale?: "ko" | "en";
+  /** 문서 경로 접두사. 블로그 글은 posts, 포트폴리오는 work */
+  pathPrefix?: "posts" | "work";
 }) {
   const {
     title,
@@ -162,9 +164,11 @@ export function createArticleSchema(options: {
     publishedTime,
     slug,
     locale = "ko",
+    pathPrefix = "posts",
   } = options;
   const config = baseConfig[locale] ?? baseConfig.ko;
   const localePrefix = getLocalePrefix(locale);
+  const pageUrl = `${baseConfig.baseUrl}${localePrefix}/${pathPrefix}/${slug}`;
 
   return {
     "@context": "https://schema.org",
@@ -184,9 +188,9 @@ export function createArticleSchema(options: {
     datePublished: publishedTime,
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${baseConfig.baseUrl}${localePrefix}/posts/${slug}`,
+      "@id": pageUrl,
     },
-    url: `${baseConfig.baseUrl}${localePrefix}/posts/${slug}`,
+    url: pageUrl,
     inLanguage: locale === "ko" ? "ko-KR" : "en-US",
   };
 }

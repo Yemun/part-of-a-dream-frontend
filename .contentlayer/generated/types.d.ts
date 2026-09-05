@@ -26,6 +26,29 @@ export type BlogPost = {
   slug: string
   originalSlug: string
   locale: string
+}
+
+export type Work = {
+  /** File path relative to `contentDirPath` */
+  _id: string
+  _raw: Local.RawDocumentData
+  type: 'Work'
+  title: string
+  description?: string | undefined
+  category?: string | undefined
+  company?: string | undefined
+  role?: string | undefined
+  startDate: IsoDateTimeString
+  endDate?: IsoDateTimeString | undefined
+  problem?: string[] | undefined
+  impact?: string[] | undefined
+  tags?: string[] | undefined
+  product?: string | undefined
+  productDescription?: string | undefined
+  /** MDX file body */
+  body: MDX
+  slug: string
+  locale: string
 }  
 
 /** Nested types */
@@ -36,8 +59,8 @@ export type BlogPost = {
 export type AllTypes = DocumentTypes | NestedTypes
 export type AllTypeNames = DocumentTypeNames | NestedTypeNames
 
-export type DocumentTypes = BlogPost
-export type DocumentTypeNames = 'BlogPost'
+export type DocumentTypes = BlogPost | Work
+export type DocumentTypeNames = 'BlogPost' | 'Work'
 
 export type NestedTypes = never
 export type NestedTypeNames = never
@@ -45,6 +68,7 @@ export type NestedTypeNames = never
 export type DataExports = {
   allDocuments: DocumentTypes[]
   allBlogPosts: BlogPost[]
+  allWorks: Work[]
 }
 
 
@@ -65,6 +89,7 @@ declare global {
 
 export type DocumentTypeMap = {
   BlogPost: BlogPost
+  Work: Work
 }
 
 export type NestedTypeMap = {

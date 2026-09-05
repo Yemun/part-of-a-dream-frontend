@@ -12,6 +12,7 @@ export default function Navigation() {
     <nav className="w-full max-w-5xl">
       <div className="flex flex-row items-center justify-between w-full">
         <NavigationClient
+          workText={t("work")}
           blogText={t("blog")}
           profileText={t("profile")}
           sideProjectText={t("sideProject")}

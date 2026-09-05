@@ -1,6 +1,8 @@
 import {
   allBlogPosts,
+  allWorks,
   BlogPost as ContentlayerBlogPost,
+  Work as ContentlayerWork,
 } from "contentlayer/generated";
 import {
   getSupabaseClient,
@@ -70,6 +72,98 @@ export const getBlogPosts = async (locale?: string): Promise<BlogPost[]> => {
   } catch (error) {
     console.error("Error fetching blog posts:", error);
     return [];
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Work (포트폴리오)
+// ---------------------------------------------------------------------------
+
+export interface WorkItem {
+  slug: string;
+  title: string;
+  description?: string;
+  category?: string;
+  company?: string;
+  role?: string;
+  startDate: string;
+  endDate: string | null;
+  problem?: string[];
+  impact?: string[];
+  tags?: string[];
+  product?: string;
+  productDescription?: string;
+  locale: string;
+  content: string;
+  body: {
+    raw: string;
+    code: string;
+  };
+}
+
+// Obsidian에서 붙어오는 꼬리 공백(NBSP 포함) 제거
+const trimList = (list?: string[]): string[] | undefined =>
+  list?.map((item) => item.trim()).filter(Boolean);
+
+const convertContentlayerWork = (work: ContentlayerWork): WorkItem => ({
+  slug: work.slug,
+  title: work.title,
+  description: work.description,
+  category: work.category,
+  company: work.company,
+  role: work.role,
+  startDate: work.startDate,
+  endDate: work.endDate ?? null,
+  problem: trimList(work.problem),
+  impact: trimList(work.impact),
+  tags: trimList(work.tags),
+  product: work.product,
+  productDescription: work.productDescription,
+  locale: work.locale || "ko",
+  content: work.body.raw,
+  body: work.body,
+});
+
+// 종료일 기준. 진행 중(endDate 없음)은 오늘로 간주해 맨 앞에 온다.
+export const getWorkEndDate = (work: Pick<WorkItem, "endDate">): string =>
+  work.endDate ?? new Date().toISOString();
+
+const sortWorksByEnd = (works: WorkItem[]) =>
+  works.sort((a, b) => {
+    const byEnd =
+      new Date(getWorkEndDate(b)).getTime() -
+      new Date(getWorkEndDate(a)).getTime();
+    if (byEnd !== 0) return byEnd;
+    return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+  });
+
+export const getWorks = async (locale?: string): Promise<WorkItem[]> => {
+  try {
+    const works = sortWorksByEnd(allWorks.map(convertContentlayerWork));
+    if (!locale) return works;
+
+    const localized = works.filter((work) => work.locale === locale);
+    // 해당 locale 문서가 없으면 전체로 폴백 (영문 문서 미작성 시 /en 홈이 비지 않도록)
+    return localized.length > 0 ? localized : works;
+  } catch (error) {
+    console.error("Error fetching works:", error);
+    return [];
+  }
+};
+
+export const getWorkBySlug = async (
+  slug: string,
+  locale?: string,
+): Promise<WorkItem | null> => {
+  try {
+    const works = allWorks.map(convertContentlayerWork);
+    const localized = locale
+      ? works.find((work) => work.slug === slug && work.locale === locale)
+      : undefined;
+    return localized ?? works.find((work) => work.slug === slug) ?? null;
+  } catch (error) {
+    console.error("Error fetching work:", error);
+    return null;
   }
 };
 

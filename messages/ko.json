@@ -1,5 +1,6 @@
 {
   "navigation": {
+    "work": "업무",
     "blog": "블로그",
     "profile": "프로필",
     "sideProject": "사이드 프로젝트"
@@ -14,7 +15,23 @@
     "title": "꿈의 일환",
     "description": "사용자와 제품의 관계를 탐구하는 일지입니다.",
     "noPostsFound": "작성된 포스트가 없습니다.",
-    "relatedPosts": "관련 포스트"
+    "relatedPosts": "관련 포스트",
+    "postList": "글 목록"
+  },
+  "work": {
+    "noWorksFound": "등록된 작업이 없습니다.",
+    "company": "회사",
+    "role": "역할",
+    "period": "기간",
+    "product": "제품",
+    "problem": "문제",
+    "impact": "성과",
+    "tags": "태그",
+    "present": "현재",
+    "navigation": {
+      "previous": "이전 업무",
+      "next": "다음 업무"
+    }
   },
   "profile": {
     "title": "프로필",

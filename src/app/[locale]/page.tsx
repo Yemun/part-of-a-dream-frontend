@@ -1,8 +1,10 @@
-import { getBlogPosts, BlogPost } from "@/lib/content";
+import { getWorks, getWorkEndDate, WorkItem } from "@/lib/content";
+import { groupByYear } from "@/lib/groupByYear";
+import { formatDate } from "@/lib/careerUtils";
 import PostCard from "@/components/post/PostCard";
 import { createMetadata } from "@/lib/metadata";
 import { Metadata } from "next";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getLocalePrefix, type Locale } from "@/i18n/routing";
 
 interface PageProps {
@@ -11,7 +13,7 @@ interface PageProps {
   }>;
 }
 
-// Generate metadata for homepage
+// Generate metadata for homepage (Work 목록)
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
@@ -23,13 +25,13 @@ export async function generateMetadata({
   const localePrefix = getLocalePrefix(locale);
   const homeKeywords =
     locale === "ko"
-      ? ["사용자 경험", "제품 디자인", "서울", "개발 블로그", "디자인 시스템"]
+      ? ["포트폴리오", "디자인 시스템", "제품 디자인", "사용자 경험", "서울"]
       : [
-          "user experience",
-          "product design",
-          "Seoul",
-          "development blog",
+          "portfolio",
           "design system",
+          "product design",
+          "user experience",
+          "Seoul",
         ];
 
   return createMetadata({
@@ -46,49 +48,51 @@ export default async function Home({ params }: PageProps) {
   // Enable static rendering
   setRequestLocale(locale);
 
-  let posts: BlogPost[] = [];
+  const t = await getTranslations("work");
+
+  let works: WorkItem[] = [];
 
   try {
-    posts = await getBlogPosts(locale);
+    works = await getWorks(locale);
   } catch (error) {
-    console.error("Failed to load posts:", error);
+    console.error("Failed to load works:", error);
   }
 
-  const sorted = posts.sort(
-    (a, b) =>
-      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
-  );
-
-  const postsByYear = new Map<number, BlogPost[]>();
-  for (const post of sorted) {
-    const year = new Date(post.publishedAt).getFullYear();
-    const group = postsByYear.get(year);
-    if (group) {
-      group.push(post);
-    } else {
-      postsByYear.set(year, [post]);
-    }
+  if (works.length === 0) {
+    return (
+      <p className="text-gray-500 dark:text-gray-400">{t("noWorksFound")}</p>
+    );
   }
+
+  const present = t("present");
+  // 연도 레일은 종료일 기준. 진행 중인 업무는 올해로 묶인다.
+  const worksByYear = groupByYear(works, getWorkEndDate);
 
   let globalIndex = 0;
 
   return (
     <>
       <style>{`html, body { overflow-x: hidden; }`}</style>
-      {[...postsByYear.entries()].map(([year, yearPosts]) => (
+      {worksByYear.map(([year, yearWorks]) => (
         <div key={year} className="flex">
           <div className="inline-flex text-xs font-medium px-1 -ml-px -mt-px border [writing-mode:vertical-rl] [text-orientation:upright] tracking-tighter">
             {year}
             {locale === "ko" ? "년" : ""}
           </div>
           <div className="flex-1">
-            {yearPosts.map((post) => {
+            {yearWorks.map((work) => {
               const idx = globalIndex++;
+              const period = `${formatDate(work.startDate, present, locale)} – ${formatDate(work.endDate, present, locale)}`;
               return (
                 <PostCard
-                  key={post.slug}
-                  post={post}
-                  locale={locale}
+                  key={work.slug}
+                  post={{
+                    slug: work.slug,
+                    title: work.title,
+                    publishedAt: work.startDate,
+                  }}
+                  href={`/work/${work.slug}`}
+                  dateLabel={period}
                   index={idx}
                 />
               );

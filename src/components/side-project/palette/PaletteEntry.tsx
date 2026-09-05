@@ -100,7 +100,7 @@ export default function PaletteEntry() {
   }
 
   return (
-    <div className="w-full md:flex md:items-start md:gap-6 lg:gap-8">
+    <div className="w-full sm:flex sm:items-start sm:gap-6 lg:gap-8">
       <div className="grid min-w-0 flex-1 grid-cols-[52px_repeat(6,1fr)] gap-1 sm:grid-cols-[64px_repeat(6,1fr)] sm:gap-1.5">
         <div />
         {STEPS.map((step, i) => (
@@ -161,7 +161,7 @@ export default function PaletteEntry() {
         ))}
       </div>
 
-      <div className="mt-8 md:mt-0 md:w-52 md:shrink-0 lg:w-56">
+      <div className="mt-8 sm:mt-0 sm:w-52 sm:shrink-0 lg:w-56">
         <div className="flex items-center gap-2.5">
           <span
             className="h-6 w-6 shrink-0 rounded-sm"
@@ -170,6 +170,18 @@ export default function PaletteEntry() {
           <span className="text-sm font-semibold">
             {anchor.label}-{STEPS[stepIndex].label}
           </span>
+          <button
+            type="button"
+            onClick={reset}
+            disabled={
+              !touched &&
+              hueSpread === DEFAULT_HUE_SPREAD &&
+              stepSpread === DEFAULT_STEP_SPREAD
+            }
+            className="ml-auto border border-zinc-300 px-3 py-1 text-xs text-zinc-600 transition-colors hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+          >
+            Reset
+          </button>
         </div>
         <div className="mt-2 space-y-0.5 font-mono text-[11px] tabular-nums">
           {/* 값이 그대로면 자리만 남기고 감춘다 — 슬라이더가 밀리지 않도록 */}
@@ -183,7 +195,7 @@ export default function PaletteEntry() {
           <div>{anchorCss}</div>
         </div>
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 sm:gap-x-8 md:grid-cols-1 md:gap-3">
+        <div className="mt-5 grid gap-4 sm:gap-3">
           <Slider
             label="L"
             value={anchorColor.l}
@@ -230,19 +242,6 @@ export default function PaletteEntry() {
             onChange={setStepSpread}
           />
         </div>
-
-        <button
-          type="button"
-          onClick={reset}
-          disabled={
-            !touched &&
-            hueSpread === DEFAULT_HUE_SPREAD &&
-            stepSpread === DEFAULT_STEP_SPREAD
-          }
-          className="mt-6 border border-zinc-300 px-5 py-2 text-xs text-zinc-600 transition-colors hover:bg-zinc-50 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
-        >
-          Reset
-        </button>
       </div>
     </div>
   );
