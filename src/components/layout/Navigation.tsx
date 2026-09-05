@@ -22,6 +22,7 @@ export default function Navigation() {
         <SideProjectSubNav
           bingoLabel={tSideProject("tabBingo")}
           jangbogiLabel={tSideProject("tabJangbogi")}
+          paletteLabel={tSideProject("tabPalette")}
         />
       </Suspense>
     </nav>

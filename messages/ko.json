@@ -85,7 +85,8 @@
     "title": "사이드 프로젝트",
     "description": "직접 만든 작은 도구들",
     "tabBingo": "GPS 빙고",
-    "tabJangbogi": "장보기"
+    "tabJangbogi": "장보기",
+    "tabPalette": "컬러 관여도"
   },
   "bingo": {
     "title": "GPS 빙고",

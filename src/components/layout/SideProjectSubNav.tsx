@@ -7,11 +7,13 @@ import { useLocale } from "next-intl";
 interface SideProjectSubNavProps {
   bingoLabel: string;
   jangbogiLabel: string;
+  paletteLabel: string;
 }
 
 export default function SideProjectSubNav({
   jangbogiLabel,
   bingoLabel,
+  paletteLabel,
 }: SideProjectSubNavProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -19,11 +21,14 @@ export default function SideProjectSubNav({
 
   if (!pathname.startsWith("/side-project")) return null;
 
-  const activeTab = searchParams.get("tab") === "bingo" ? "bingo" : "jangbogi";
+  const tabParam = searchParams.get("tab");
+  const activeTab =
+    tabParam === "bingo" || tabParam === "palette" ? tabParam : "jangbogi";
 
   const tabs = [
     { tab: "jangbogi", label: jangbogiLabel },
     { tab: "bingo", label: bingoLabel },
+    { tab: "palette", label: paletteLabel },
   ];
 
   return (

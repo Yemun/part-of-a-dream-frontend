@@ -4,10 +4,11 @@ import { getLocalePrefix, type Locale } from "@/i18n/routing";
 import { createMetadata } from "@/lib/metadata";
 import MobileContainer from "@/components/side-project/MobileContainer";
 import JangbogiFrame from "@/components/side-project/JangbogiFrame";
-import BingoEntry from "@/components/bingo/BingoEntry";
-import "@/components/bingo/bingo.css";
+import BingoEntry from "@/components/side-project/bingo/BingoEntry";
+import PaletteEntry from "@/components/side-project/palette/PaletteEntry";
+import "@/components/side-project/bingo/bingo.css";
 
-type SideProjectTab = "bingo" | "jangbogi";
+type SideProjectTab = "bingo" | "jangbogi" | "palette";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -35,7 +36,8 @@ export async function generateMetadata({
 }
 
 function parseTab(value: string | undefined): SideProjectTab {
-  return value === "bingo" ? "bingo" : "jangbogi";
+  if (value === "bingo" || value === "palette") return value;
+  return "jangbogi";
 }
 
 export default async function SideProjectPage({
@@ -47,17 +49,25 @@ export default async function SideProjectPage({
 
   const activeTab = parseTab(tab);
 
+  if (activeTab === "palette") {
+    return (
+      <div className="mx-auto w-full max-w-2xl">
+        <PaletteEntry />
+      </div>
+    );
+  }
+
   return (
     <>
       <style>{`html, body { overflow-y: hidden; }`}</style>
       <MobileContainer>
-      {activeTab === "bingo" ? (
-        <div className="font-bingo bingo-app h-full">
-          <BingoEntry />
-        </div>
-      ) : (
-        <JangbogiFrame />
-      )}
+        {activeTab === "bingo" ? (
+          <div className="font-bingo bingo-app h-full">
+            <BingoEntry />
+          </div>
+        ) : (
+          <JangbogiFrame />
+        )}
       </MobileContainer>
     </>
   );

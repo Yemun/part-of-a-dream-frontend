@@ -99,7 +99,8 @@
     "title": "Side Project",
     "description": "Small tools I built myself",
     "tabBingo": "GPS Bingo",
-    "tabJangbogi": "Shopping List"
+    "tabJangbogi": "Shopping List",
+    "tabPalette": "Color Involvement"
   },
   "bingo": {
     "title": "GPS Bingo",
