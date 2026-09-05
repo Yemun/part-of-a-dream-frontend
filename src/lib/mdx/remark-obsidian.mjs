@@ -12,7 +12,7 @@ import { visit } from "unist-util-visit";
  *   MDX는 소문자 JSX 태그를 `components` 매핑 없이 그대로 렌더하므로
  *   문자열 style 속성을 React가 받아들이게 하려면 컴포넌트를 거쳐야 한다.
  */
-const EMBEDDABLE = new Set(["PaletteEntry"]);
+const EMBEDDABLE = new Set(["PaletteEntry", "JangbogiFrame"]);
 const PROMOTED_TAGS = { iframe: "Iframe" };
 
 const WIKI_EMBED = /!\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]/g;

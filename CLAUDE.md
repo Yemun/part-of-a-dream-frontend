@@ -57,7 +57,7 @@ Top nav order: **작업(Work) → 블로그 → 프로필 → 사이드 프로�
 - **PostCard**: Circular SVG design with random positioning. Generic: `href` (default `/posts/[slug]`) and `dateLabel` props let the Work list reuse it
 - **BlogSideNav** (`src/components/post/`): year-grouped post list for the blog layout. Sticky left sidebar on `lg` and up only; hidden on mobile/tablet
 - **WorkSummaryCards** (`src/components/work/`): frontmatter summary grid above a Work article. Row 1: product (falls back to company) / role / period+duration; row 2: problem | impact side by side; tags row only when present. Empty fields drop out
-- **MDXRenderer**: Pre-compiled MDX with syntax highlighting (shiki dual theme; `globals.css` pins the dark palette because `.prose pre` is always dark). `components` map overrides `img`, `Iframe`, and `PaletteEntry`
+- **MDXRenderer**: Pre-compiled MDX with syntax highlighting (shiki dual theme; `globals.css` pins the dark palette because `.prose pre` is always dark). `components` map overrides `img`, `Iframe`, `PaletteEntry`, and `JangbogiFrame`
 - **CommentSection**: Supabase-powered with optimistic updates
 - **LanguageSwitcher**: Language toggle in navigation
 - **MobileContainer** (`src/components/side-project/`): 390×844 phone-shaped frame used by `/side-project`
@@ -70,7 +70,7 @@ Top nav order: **작업(Work) → 블로그 → 프로필 → 사이드 프로�
 - **Source**: Obsidian vault `2 정리/포트폴리오/*.md`. `npm run sync` copies **every** doc in that folder to `content/work/` (same rule as blog posts), so anything saved there is published.
 - **Frontmatter**: `title`, `description`, `category` (`work` / `side`, currently informational only — every doc is listed), `company`, `role`, `startDate`, `endDate` (empty = ongoing), `problem[]`, `impact[]`, `tags[]`, `product`, `productDescription`. Only `title` and `startDate` are required.
 - **Locale fallback**: `getWorks(locale)` / `getWorkBySlug()` fall back to every document when the locale has none, so `/en` still shows the Korean entries.
-- **Obsidian syntax** handled by `remark-obsidian`: `![[image.png]]` / `![[image.png|caption]]` → `/images/image.png` with the caption as alt; a bare filename in standard syntax (`![caption](image.png)`) is also prefixed with `/images/`; a paragraph that is exactly `[PaletteEntry.tsx]` → inline `<PaletteEntry />` wrapped in a 0.5px outlined box (allow-list in the plugin); raw `<iframe>` → `<Iframe>` component (string `style` is parsed, `allowfullscreen` mapped); code-fence languages are lower-cased.
+- **Obsidian syntax** handled by `remark-obsidian`: `![[image.png]]` / `![[image.png|caption]]` → `/images/image.png` with the caption as alt; a bare filename in standard syntax (`![caption](image.png)`) is also prefixed with `/images/`; a paragraph that is exactly `[PaletteEntry.tsx]` or `[JangbogiFrame.tsx]` → the matching side-project component inline (Palette in a 0.5px outlined box, Jangbogi in its own `MobileContainer` phone frame; allow-list in the plugin); raw `<iframe>` → `<Iframe>` component (string `style` is parsed, `allowfullscreen` mapped); code-fence languages are lower-cased.
 - Work pages have prev/next links (`PostNavigation` with `basePath="/work"`, labels from `work.navigation.*`) following the same end-date order as the list. No comments.
 
 ## Blog Layout
@@ -82,8 +82,8 @@ Top nav order: **작업(Work) → 블로그 → 프로필 → 사이드 프로�
 `/side-project` hosts three projects switched by the `?tab=` query param. Bingo and Jangbogi render inside `MobileContainer`; Palette renders in a plain `max-w-2xl` column:
 
 - **Bingo** — React. Entry: `src/components/side-project/bingo/BingoEntry.tsx` → `BingoBoard`. GPS-based 3×3 board, Supabase tables `bingo_*`. Styles in `bingo.css`; the `font-bingo` class scopes system fonts so the site's Pretendard body font does not leak into the bingo UI.
-- **Jangbogi** (장보기) — vanilla HTML/JS/CSS SPA served from `public/jangbogi/` and embedded via iframe by `JangbogiFrame`. Supabase tables `jangbogi_*`. No build step. Same-origin, so no CSP/CORS concerns.
-- **Palette** (컬러 관여도) — `src/components/side-project/palette/PaletteEntry.tsx`. Also embeddable inside Work articles via the `[PaletteEntry.tsx]` placeholder.
+- **Jangbogi** (장보기) — vanilla HTML/JS/CSS SPA served from `public/jangbogi/` and embedded via iframe by `JangbogiFrame` (lazy-loaded). Supabase tables `jangbogi_*`. No build step. Same-origin, so no CSP/CORS concerns. Also embeddable inside posts/Work articles via the `[JangbogiFrame.tsx]` placeholder.
+- **Palette** (컬러 관여도) — `src/components/side-project/palette/PaletteEntry.tsx`. Also embeddable inside posts/Work articles via the `[PaletteEntry.tsx]` placeholder.
 
 Tab switching: `SideProjectSubNav` reads `?tab=` via `useSearchParams` and renders the active link with `font-semibold underline`. The component returns `null` outside `/side-project`, so the sub-nav row only appears when relevant.
 

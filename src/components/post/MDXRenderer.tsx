@@ -2,6 +2,8 @@
 import { useMDXComponent } from "next-contentlayer2/hooks";
 import dynamic from "next/dynamic";
 import type { CSSProperties, IframeHTMLAttributes } from "react";
+import JangbogiFrame from "@/components/side-project/JangbogiFrame";
+import MobileContainer from "@/components/side-project/MobileContainer";
 import PaletteEntry from "@/components/side-project/palette/PaletteEntry";
 
 // Image 컴포넌트를 동적 로딩으로 최적화
@@ -128,11 +130,24 @@ function PaletteEmbed() {
   );
 }
 
+// 본문 `[JangbogiFrame.tsx]` 자리에 인라인 임베드되는 장보기 프로토타입.
+// MobileContainer가 폰 프레임 테두리를 가지고 있어 별도 외곽선은 두르지 않는다.
+function JangbogiEmbed() {
+  return (
+    <div className="not-prose my-6 sm:my-8">
+      <MobileContainer>
+        <JangbogiFrame />
+      </MobileContainer>
+    </div>
+  );
+}
+
 const mdxComponents = {
   img: ImgComponent,
   // remark-obsidian이 본문의 <iframe>을 <Iframe>으로 승격시킨다
   Iframe: IframeComponent,
   PaletteEntry: PaletteEmbed,
+  JangbogiFrame: JangbogiEmbed,
 };
 
 export default function MDXRenderer({ code }: MDXRendererProps) {
