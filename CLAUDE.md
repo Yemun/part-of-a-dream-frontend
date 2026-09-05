@@ -51,7 +51,7 @@ npm run sync    # Pull posts/work docs + images from the Obsidian vault, commit,
 - **Markdown pipeline**: `src/lib/mdx/remark-obsidian.mjs` → rehype (slug, pretty-code, autolink, unwrap-images). No GFM extensions (footnotes, tables) are enabled
 
 ### Navigation
-Top nav order: **업무(Work) → 블로그 → 프로필 → 사이드 프로젝트** (`NavigationClient`). Work is active on `/` and `/work/*`; Blog on `/posts/*`.
+Top nav order: **작업(Work) → 블로그 → 프로필 → 사이드 프로젝트** (`NavigationClient`). Work is active on `/` and `/work/*`; Blog on `/posts/*`.
 
 ### Key Components
 - **PostCard**: Circular SVG design with random positioning. Generic: `href` (default `/posts/[slug]`) and `dateLabel` props let the Work list reuse it
@@ -67,8 +67,8 @@ Top nav order: **업무(Work) → 블로그 → 프로필 → 사이드 프로�
 
 `/` lists `Work` documents with the same year-rail + circular-card UI the blog used to have; each card links to `/work/[slug]`. The year rail and the sort order use the **end date** (`getWorkEndDate`): ongoing work (empty `endDate`) counts as today, so it sits under the current year at the top.
 
-- **Source**: Obsidian vault `2 정리/포트폴리오/*.md`. Only files listed in `WORK_FILES` inside `scripts/sync-obsidian.sh` are copied to `content/work/` — add a filename there to publish another doc.
-- **Frontmatter**: `title`, `description`, `category`, `company`, `role`, `startDate`, `endDate` (empty = ongoing), `problem[]`, `impact[]`, `tags[]`, `product`, `productDescription`. Only `title` and `startDate` are required.
+- **Source**: Obsidian vault `2 정리/포트폴리오/*.md`. `npm run sync` copies **every** doc in that folder to `content/work/` (same rule as blog posts), so anything saved there is published.
+- **Frontmatter**: `title`, `description`, `category` (`work` / `side`, currently informational only — every doc is listed), `company`, `role`, `startDate`, `endDate` (empty = ongoing), `problem[]`, `impact[]`, `tags[]`, `product`, `productDescription`. Only `title` and `startDate` are required.
 - **Locale fallback**: `getWorks(locale)` / `getWorkBySlug()` fall back to every document when the locale has none, so `/en` still shows the Korean entries.
 - **Obsidian syntax** handled by `remark-obsidian`: `![[image.png]]` / `![[image.png|caption]]` → `/images/image.png` with the caption as alt; a bare filename in standard syntax (`![caption](image.png)`) is also prefixed with `/images/`; a paragraph that is exactly `[PaletteEntry.tsx]` → inline `<PaletteEntry />` wrapped in a 0.5px outlined box (allow-list in the plugin); raw `<iframe>` → `<Iframe>` component (string `style` is parsed, `allowfullscreen` mapped); code-fence languages are lower-cased.
 - Work pages have prev/next links (`PostNavigation` with `basePath="/work"`, labels from `work.navigation.*`) following the same end-date order as the list. No comments.

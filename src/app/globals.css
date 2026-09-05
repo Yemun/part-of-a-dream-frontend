@@ -6,7 +6,7 @@
 :root {
   --background: oklch(100% 0 0);
   --foreground: oklch(15% 0 0);
-  --dot-pattern: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='0.5' cy='0.5' r='0.5' fill='black'/%3E%3Ccircle cx='3.5' cy='3.5' r='0.5' fill='black'/%3E%3C/svg%3E");
+  --dot-pattern: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='0.5' cy='0.5' r='0.5' fill='black' fill-opacity='0.3'/%3E%3Ccircle cx='3.5' cy='3.5' r='0.5' fill='black' fill-opacity='0.3'/%3E%3C/svg%3E");
 }
 
 @theme inline {
@@ -77,11 +77,26 @@
   @apply rounded-2xl bg-gray-950 border-[0.5px] border-white;
 }
 
+/* 인라인 코드: typography 기본값이 붙이는 백틱(::before/::after)을 지우고 코드 칩으로 표시한다 */
+.prose code::before,
+.prose code::after {
+  content: none;
+}
+
+.prose :not(pre) > code {
+  @apply rounded-sm border-[0.5px] border-black/25 bg-black/5 px-1.5 py-0.5 text-[0.875em] font-medium dark:border-white/30 dark:bg-white/10;
+}
+
+/* 본문 강조는 bold가 아닌 semibold로 통일한다 (제목·인용문 안의 강조 포함) */
+.prose strong {
+  @apply font-semibold;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: oklch(7% 0 0);
     --foreground: oklch(92% 0 0);
-    --dot-pattern: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='0.5' cy='0.5' r='0.5' fill='white'/%3E%3Ccircle cx='3.5' cy='3.5' r='0.5' fill='white'/%3E%3C/svg%3E");
+    --dot-pattern: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='0.5' cy='0.5' r='0.5' fill='white' fill-opacity='0.3'/%3E%3Ccircle cx='3.5' cy='3.5' r='0.5' fill='white' fill-opacity='0.3'/%3E%3C/svg%3E");
   }
 }
 

@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "work": "업무",
+    "work": "작업",
     "blog": "블로그",
     "profile": "프로필",
     "sideProject": "사이드 프로젝트"
@@ -29,8 +29,8 @@
     "tags": "태그",
     "present": "현재",
     "navigation": {
-      "previous": "이전 업무",
-      "next": "다음 업무"
+      "previous": "이전 작업",
+      "next": "다음 작업"
     }
   },
   "profile": {
