@@ -1,0 +1,49 @@
+---
+title: Building the KDS Website
+description: Gathering design system records scattered across four places into one, and making everything traceable from request to deployment
+role: Site Design
+startDate: 2025-08-01
+endDate: 2025-12-31
+problem:
+  - Foundation and component policy records were scattered across Teams, Figma, Confluence, and email, making them hard to index
+  - Some agreed decisions were lost in manual migrations
+  - Requirements arrived verbally or over messenger, so priority shifts and requirement changes could not be tracked
+impact:
+  - Delivered a guideline website where every stakeholder sees the latest design system information in real time
+  - Tracked and managed requests from collection through deployment with a log table
+  - Moved agreed-upon assets into a database not tied to any specific solution
+product: Kbank Design System Site
+---
+
+## Problem
+
+Design system decisions are always recorded somewhere. The problem is that "somewhere" is scattered, or lives in someone's head. Most KDS policies were split across Teams conversations, Figma comments, Confluence documents, and internal and external emails. Finding out why the top padding of a list was set to `spacing-sem-100` meant digging through multiple documents, and more often than not, we ended up retracing memory rather than records.
+
+Guidelines were also split across Framer, Figma, Notion, and Confluence depending on the product's purpose. Records from solutions we had stopped using all had to be moved by hand, and some part of the record was always lost along the way.
+
+Requirements came in verbally or over messenger. So when priorities changed, the requester was never notified, and when a requirement changed, there was no way to trace what changed, when, or how. There were even cases where a developer was fleshing out a requirement nobody needed anymore, without the requester or the designer knowing.
+
+## Approach
+
+### Creating the Guideline
+
+I decided to treat records as a database rather than as documents.
+
+- **Adopted [Strapi](https://strapi.io/).** As a headless CMS, it separates the screen from the data, so the agreed-upon assets stay intact even if the front end is replaced later. It is open source and free. Using SQLite, the default supported database, made file-based backups simple to set up.
+- **Implemented each foundation and component as a collection** to build the database schema. "Color foundation" and "Button component" are no longer single documents; each is recorded in concrete fields of its own. To trace when and how a given property changed, I set up a log collection and linked it through related fields, so every modification is tracked.
+- **Built the site's front end with Vite** and deployed it to a domain accessible to company employees. Designers, developers, and product managers all look at the same website instead of each looking somewhere different.
+
+### Figma Integration
+
+- **Called the Figma library page whose name matches the component collection through the REST API** to pull in the component's building blocks. Because the collection name serves as the rule, no separate mapping table is needed. When a component is updated in Figma, the site updates with it.
+- **Called the finalized design files every hour to collect every comment written on them.** Requirements now live on the design file instead of in a messenger, and collection and notification happen in real time. Requirements that used to arrive verbally are replaced with traceable Figma comments.
+
+Collected requests accumulate in a **log table**. Because a request is connected in a single line from the moment it comes in through implementation and deployment, a change in priority becomes a record in itself, and the changes are continuously posted back to the Figma comment thread.
+
+## Outcome
+
+- Delivered a guideline website where every stakeholder can check **the latest design system information in real time**.
+- The log table made it possible to **track and manage everything from request collection through deployment**.
+- Moved the agreed-upon assets into a database, leaving them in a form **not tied to any specific solution**. Whatever tool is used, the agreed assets are preserved as a single, very small file.
+
+At a financial institution, a single asset everyone can communicate through delivered both flexible communication and simple internal controls. This project focused on building a shared vessel for everyone, so that each individual record could become a pillar supporting the bank's design as a whole.
