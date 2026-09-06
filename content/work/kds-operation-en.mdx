@@ -32,7 +32,7 @@ When I joined Kbank in 2021, KDS (Kbank Design System) was hardly in a state tha
 In 2025, Kbank kicked off a large-scale front-end migration from its existing framework, [IB20](https://www.ininext.com/html/sub/ito/ib20_03.html), to React. IB20 is a commercial web framework developed by Initech in Korea and used mainly by domestic financial institutions. At that point, the implementation vendor needed design criteria for common components that could be used on every screen. Kbank happened to be adopting Figma at the same time, so I converted the entire set of Framer components for Figma while applying the following criteria:
 
 - **Prioritized SASS class reuse.** I identified which classes used which styles, and how often each style was used, to structure the components and their names.
-- **Limited the scope of component-level style modification** with Figma as the source of truth. The guidelines defined which props could be overridden, so the decision about what counts as unnecessary fragmented code was made inside the design system.
+- Based on Figma, we limited the **scope of style modifications at the component level**. We reduced code fragmentation by restricting the props that can be overridden.
 
 This process yielded an unexpected bonus. Past design agreements that had never been documented survived as comments on the related classes in the legacy code. As I combed through the classes, I pulled those rules back out and organized them. Since internal materials are confidential, I will explain with a hypothetical example.
 
@@ -49,7 +49,7 @@ Let's assume the button below is mainly used fixed to the bottom of a page. Extr
 
 Based on this, a matching component called `btn-primary` is created in Figma. Once several patterns like this are identified and built as components, the implementation vendor abstracts them into a new, generalized button concept called `RectangleButton`.
 
-![Example of converting a Framer component into a Figma component](/images/screenshot-figma-component-transition-example.png)
+![Examples of code found in various markup languages converted into Figma components](/images/screenshot-figma-component-transition-example.png)
 
 By applying this method repeatedly to the style code of every screen targeted for migration, a component set built on the React framework can be assembled as shown below. The code is an example of the shape of the deliverable the implementation vendor would produce.
 
