@@ -5,7 +5,6 @@ import type { ProfileData } from "@/lib/careerUtils";
 import { processCareerToGraph, formatDuration } from "@/lib/careerUtils";
 import CareerGraph from "./CareerGraph";
 import EducationSection from "./EducationSection";
-import ContactSection from "./ContactSection";
 
 export default function ProfileClient({
   profileData,
@@ -41,8 +40,6 @@ export default function ProfileClient({
       <div className="mt-8">
         <EducationSection education={profileData.education} />
       </div>
-
-      <ContactSection contact={profileData.contact} />
     </section>
   );
 }

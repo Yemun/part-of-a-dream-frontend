@@ -9,7 +9,7 @@ npm run dev     # Development server
 npm run build   # Production build 
 npm run lint    # ESLint check
 npm run deploy  # Build, commit, and deploy
-npm run sync    # Pull posts/work docs + images from the Obsidian vault, commit, push
+npm run sync    # Pull posts/work docs + images from the Obsidian vault and commit locally (no push)
 ```
 
 ## Tech Stack
