@@ -54,23 +54,39 @@
 }
 
 .prose ul {
-  @apply mb-6 space-y-2 text-base pl-6;
+  @apply mb-6 space-y-3 text-base pl-6;
 }
 
 @media (min-width: 640px) {
   .prose ul {
-    @apply mb-8 text-lg;
+    @apply mb-8 space-y-4 text-lg;
   }
 }
 
 .prose ol {
-  @apply mb-6 space-y-2 text-base pl-6;
+  @apply mb-6 space-y-3 text-base pl-6;
 }
 
 @media (min-width: 640px) {
   .prose ol {
-    @apply mb-8 text-lg;
+    @apply mb-8 space-y-4 text-lg;
   }
+}
+
+/* 항목 내부 행간은 본문 문단(.prose p)과 같은 리듬으로 맞춘다 */
+.prose li {
+  @apply leading-8;
+}
+
+@media (min-width: 640px) {
+  .prose li {
+    @apply leading-9;
+  }
+}
+
+/* 불릿·번호는 typography 기본값(gray-300)보다 진하게 */
+.prose li::marker {
+  @apply text-gray-600 dark:text-gray-300;
 }
 
 .prose pre {
@@ -84,7 +100,7 @@
 }
 
 .prose :not(pre) > code {
-  @apply rounded-sm border-[0.5px] border-black/25 bg-black/5 px-1.5 py-0.5 text-[0.875em] font-medium dark:border-white/30 dark:bg-white/10;
+  @apply rounded-sm bg-black/5 px-1.5 py-0.5 text-[0.875em] font-medium dark:bg-white/10;
 }
 
 /* 본문 강조는 bold가 아닌 semibold로 통일한다 (제목·인용문 안의 강조 포함) */
