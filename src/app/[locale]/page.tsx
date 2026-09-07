@@ -2,7 +2,6 @@ import { getWorks, getWorkEndDate, WorkItem } from "@/lib/content";
 import { groupByYear } from "@/lib/groupByYear";
 import { formatDate } from "@/lib/careerUtils";
 import PostCard from "@/components/post/PostCard";
-import TiltToggle from "@/components/post/TiltToggle";
 import { createMetadata } from "@/lib/metadata";
 import { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -74,7 +73,6 @@ export default async function Home({ params }: PageProps) {
   return (
     <>
       <style>{`html, body { overflow-x: hidden; }`}</style>
-      <TiltToggle />
       {worksByYear.map(([year, yearWorks]) => (
         <div key={year} className="flex">
           <div className="inline-flex text-xs font-medium px-1 -ml-px -mt-px border [writing-mode:vertical-rl] [text-orientation:upright] tracking-tighter">

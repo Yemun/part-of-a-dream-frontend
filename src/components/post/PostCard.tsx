@@ -24,7 +24,6 @@ interface PostCardProps {
 const CIRCLE_SIZE = 96; // w-24
 const LOAD_MS = 2000; // 첫 진입: 가운데에서 제자리로 굴러간다
 const HOVER_MS = 1400; // PC hover: 새 랜덤 자리로. 천천히 굴러가야 쫓아가서 다시 잡을 수 있다
-const TILT_MS = 300; // 모바일 기울기: 짧게 잡아 손 움직임을 부드럽게 따라간다
 const EASE = "cubic-bezier(0.215, 0.61, 0.355, 1)";
 
 // [-range, range] 안의 랜덤 x. avoid 를 주면 그 근처는 피해 눈에 띄게 움직이도록 한다
@@ -44,17 +43,13 @@ export default function PostCard({
   index = 0,
 }: PostCardProps) {
   const linkHref = href ?? `/posts/${post.slug}`;
-  const { getX, setX, tiltEnabled, subscribeTilt } = usePostCardAnimation();
+  const { getX, setX } = usePostCardAnimation();
   const [circleX, setCircleX] = useState(0);
   const [labelX, setLabelX] = useState(0);
   const [transitionMs, setTransitionMs] = useState(LOAD_MS);
   const circleRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
-  // 쉬는 자리. hover 로 바뀌고, 기울기는 여기서 출발해 굴러간다
-  const baseX = useRef(0);
-  // 첫 진입 굴림이 끝나는 시각. 그 전까지는 tilt 입력을 무시한다
-  const movingUntil = useRef(0);
   // 첫 진입 굴림을 시작시키는 타이머. 시작 전에 hover 되면 취소하고 hover 이동으로 대체한다
   const loadTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
@@ -96,11 +91,9 @@ export default function PostCard({
   useEffect(() => {
     const saved = getX(linkHref);
     const x = saved ?? randomX(measureRange());
-    baseX.current = x;
     if (saved === undefined) setX(linkHref, x);
 
     const delay = saved === undefined ? index * 100 : 0;
-    movingUntil.current = performance.now() + delay + LOAD_MS;
     loadTimeout.current = setTimeout(() => {
       requestAnimationFrame(() => moveTo(x, LOAD_MS));
     }, delay);
@@ -116,21 +109,9 @@ export default function PostCard({
     clearTimeout(loadTimeout.current);
     // 피할 기준은 목표 자리가 아니라 지금 보이는 자리 (커서가 거기에 있다)
     const x = randomX(measureRange(), Math.round(visibleX()));
-    baseX.current = x;
     setX(linkHref, x);
     moveTo(x, HOVER_MS);
   };
-
-  // 모바일: 기울인 만큼 쉬는 자리에서 굴러간다
-  useEffect(() => {
-    if (!tiltEnabled) return;
-    return subscribeTilt((tilt) => {
-      if (performance.now() < movingUntil.current) return;
-      const range = measureRange();
-      const x = Math.max(-range, Math.min(range, baseX.current + tilt * range));
-      moveTo(Math.round(x), TILT_MS);
-    });
-  }, [tiltEnabled, subscribeTilt, measureRange, moveTo]);
 
   // 이동 거리만큼 굴러간 것처럼 보이도록 회전 (둘레 = π × 지름)
   const rotate = Math.round((circleX / (Math.PI * CIRCLE_SIZE)) * 360);

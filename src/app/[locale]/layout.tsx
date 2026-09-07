@@ -41,6 +41,12 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <head>
+        {/* Pretendard. CSS @import 로 두면 메인 CSS 를 다 받은 뒤에야 발견되어 렌더링이 한 단계 더 늦어진다 */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <Script
