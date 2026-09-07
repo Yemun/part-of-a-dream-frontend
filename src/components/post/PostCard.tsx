@@ -3,7 +3,13 @@
 import { Link } from "@/i18n/routing";
 import RelativeTime from "@/components/common/RelativeTime";
 import type { BlogPost } from "@/lib/content";
-import { useState, useEffect, useRef, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { usePostCardAnimation } from "./PostCardAnimationProvider";
 
 interface PostCardProps {
@@ -15,6 +21,22 @@ interface PostCardProps {
   index?: number;
 }
 
+const CIRCLE_SIZE = 96; // w-24
+const LOAD_MS = 2000; // 첫 진입: 가운데에서 제자리로 굴러간다
+const HOVER_MS = 1400; // PC hover: 새 랜덤 자리로. 천천히 굴러가야 쫓아가서 다시 잡을 수 있다
+const TILT_MS = 300; // 모바일 기울기: 짧게 잡아 손 움직임을 부드럽게 따라간다
+const EASE = "cubic-bezier(0.215, 0.61, 0.355, 1)";
+
+// [-range, range] 안의 랜덤 x. avoid 를 주면 그 근처는 피해 눈에 띄게 움직이도록 한다
+function randomX(range: number, avoid?: number) {
+  let x = 0;
+  for (let i = 0; i < 6; i++) {
+    x = Math.round(Math.random() * range * 2 - range);
+    if (avoid === undefined || Math.abs(x - avoid) >= range * 0.5) break;
+  }
+  return x;
+}
+
 export default function PostCard({
   post,
   href,
@@ -22,75 +44,103 @@ export default function PostCard({
   index = 0,
 }: PostCardProps) {
   const linkHref = href ?? `/posts/${post.slug}`;
-  const { isFirstLoad, getTransform, setTransform } = usePostCardAnimation();
-  const [randomTransform, setRandomTransform] = useState("");
-  const [translateX, setTranslateX] = useState(0);
-  const firstLoad = useRef(isFirstLoad);
-  const [shouldTransition] = useState(isFirstLoad);
+  const { getX, setX, tiltEnabled, subscribeTilt } = usePostCardAnimation();
+  const [circleX, setCircleX] = useState(0);
+  const [labelX, setLabelX] = useState(0);
+  const [transitionMs, setTransitionMs] = useState(LOAD_MS);
   const circleRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
+  // 쉬는 자리. hover 로 바뀌고, 기울기는 여기서 출발해 굴러간다
+  const baseX = useRef(0);
+  // 첫 진입 굴림이 끝나는 시각. 그 전까지는 tilt 입력을 무시한다
+  const movingUntil = useRef(0);
+  // 첫 진입 굴림을 시작시키는 타이머. 시작 전에 hover 되면 취소하고 hover 이동으로 대체한다
+  const loadTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
-  // 라벨은 원(96px)보다 훨씬 넓어서 원과 같은 x를 그대로 쓰면
-  // 카드 밖(연도 레일)까지 삐져나온다. 라벨 자신의 폭 기준으로 다시 가둔다.
-  const clampLabelX = (x: number) => {
-    const label = labelRef.current;
-    const card = cardRef.current;
-    if (!label || !card) return x;
-    const max = (card.clientWidth - label.getBoundingClientRect().width) / 2;
-    if (max <= 0) return 0;
-    return Math.max(-max, Math.min(max, x));
-  };
-
-  useEffect(() => {
-    const saved = getTransform(linkHref);
-    if (saved) {
-      requestAnimationFrame(() => {
-        setRandomTransform(saved.transform);
-        setTranslateX(clampLabelX(saved.x));
-      });
-      return;
-    }
-
+  // 원이 움직일 수 있는 최대 거리. transform 의 영향을 받지 않도록 layout 폭을 쓴다
+  const measureRange = useCallback(() => {
     const el = circleRef.current;
     const parent = el?.parentElement;
-    if (!el || !parent) return;
-    const parentRect = parent.getBoundingClientRect();
-    const circleRect = el.getBoundingClientRect();
-    const maxX = (parentRect.width - circleRect.width) / 2;
-    const x = Math.round(Math.random() * maxX * 2 - maxX);
-    const radius = circleRect.width / 2;
-    const rotate = Math.round((x / (2 * Math.PI * radius)) * 360);
-    const transform = `translate(${x}px, 0px) rotate(${rotate}deg)`;
-    setTransform(linkHref, { transform, x });
+    if (!el || !parent) return 0;
+    return Math.max(0, (parent.clientWidth - el.offsetWidth) / 2);
+  }, []);
 
-    if (firstLoad.current) {
-      const delay = index * 100;
-      const timeoutId = setTimeout(() => {
-        requestAnimationFrame(() => {
-          setTranslateX(clampLabelX(x));
-          setRandomTransform(transform);
-        });
-      }, delay);
-      return () => clearTimeout(timeoutId);
-    } else {
-      requestAnimationFrame(() => {
-        setTranslateX(clampLabelX(x));
-        setRandomTransform(transform);
-      });
+  // 지금 화면에 보이는 x. 이동 중이면 목표 자리가 아니라 중간 지점을 돌려준다
+  const visibleX = useCallback(() => {
+    const el = circleRef.current;
+    if (!el) return 0;
+    const transform = getComputedStyle(el).transform;
+    return transform === "none" ? 0 : new DOMMatrix(transform).m41;
+  }, []);
+
+  const moveTo = useCallback((x: number, ms: number) => {
+    setTransitionMs(ms);
+    setCircleX(x);
+
+    // 라벨은 원(96px)보다 훨씬 넓어서 원과 같은 x를 그대로 쓰면
+    // 카드 밖(연도 레일)까지 삐져나온다. 라벨 자신의 폭 기준으로 다시 가둔다.
+    const label = labelRef.current;
+    const card = cardRef.current;
+    if (!label || !card) {
+      setLabelX(x);
+      return;
     }
-  }, [post, linkHref]);
+    const max = (card.clientWidth - label.offsetWidth) / 2;
+    setLabelX(max <= 0 ? 0 : Math.max(-max, Math.min(max, x)));
+  }, []);
+
+  // 마운트: 저장된 자리가 있으면 거기로, 없으면 랜덤 자리로 굴러간다
+  useEffect(() => {
+    const saved = getX(linkHref);
+    const x = saved ?? randomX(measureRange());
+    baseX.current = x;
+    if (saved === undefined) setX(linkHref, x);
+
+    const delay = saved === undefined ? index * 100 : 0;
+    movingUntil.current = performance.now() + delay + LOAD_MS;
+    loadTimeout.current = setTimeout(() => {
+      requestAnimationFrame(() => moveTo(x, LOAD_MS));
+    }, delay);
+    return () => clearTimeout(loadTimeout.current);
+  }, [linkHref, index, getX, setX, measureRange, moveTo]);
+
+  // PC: 원 위에 커서가 올라오면 새 랜덤 자리로 달아난다.
+  // 굴러가는 도중에 다시 잡혀도 그 자리에서 방향을 바꿔 또 달아난다
+  const handleMouseEnter = () => {
+    // 터치 기기의 탭은 hover 를 흉내내므로 마우스 환경에서만
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    clearTimeout(loadTimeout.current);
+    // 피할 기준은 목표 자리가 아니라 지금 보이는 자리 (커서가 거기에 있다)
+    const x = randomX(measureRange(), Math.round(visibleX()));
+    baseX.current = x;
+    setX(linkHref, x);
+    moveTo(x, HOVER_MS);
+  };
+
+  // 모바일: 기울인 만큼 쉬는 자리에서 굴러간다
+  useEffect(() => {
+    if (!tiltEnabled) return;
+    return subscribeTilt((tilt) => {
+      if (performance.now() < movingUntil.current) return;
+      const range = measureRange();
+      const x = Math.max(-range, Math.min(range, baseX.current + tilt * range));
+      moveTo(Math.round(x), TILT_MS);
+    });
+  }, [tiltEnabled, subscribeTilt, measureRange, moveTo]);
+
+  // 이동 거리만큼 굴러간 것처럼 보이도록 회전 (둘레 = π × 지름)
+  const rotate = Math.round((circleX / (Math.PI * CIRCLE_SIZE)) * 360);
+  const transition = `transform ${transitionMs}ms ${EASE}`;
 
   return (
     <div ref={cardRef} className="-ml-px -mt-px border">
       <div
         className="text-sm text-center font-medium"
-        style={{
-          transform: `translateX(${translateX}px)`,
-          ...(shouldTransition && {
-            transition: "transform 2s cubic-bezier(0.215, 0.61, 0.355, 1)",
-          }),
-        }}
+        style={{ transform: `translateX(${labelX}px)`, transition }}
       >
         <span ref={labelRef} className="inline-block">
           {dateLabel ?? <RelativeTime dateString={post.publishedAt} />}
@@ -103,11 +153,10 @@ export default function PostCard({
       >
         <div
           ref={circleRef}
+          onMouseEnter={handleMouseEnter}
           style={{
-            transform: randomTransform || "translate(0px, 0px) rotate(0deg)",
-            ...(shouldTransition && {
-              transition: "transform 2s cubic-bezier(0.215, 0.61, 0.355, 1)",
-            }),
+            transform: `translate(${circleX}px, 0px) rotate(${rotate}deg)`,
+            transition,
           }}
         >
           <div className="w-24 h-24 rounded-full outline-2 outline-red-500 dark:outline-red-400 flex items-center justify-center bg-white dark:bg-black group-hover:bg-red-500 dark:group-hover:bg-red-400 transition-colors">

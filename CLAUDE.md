@@ -54,7 +54,7 @@ npm run sync    # Pull posts/work docs + images from the Obsidian vault and comm
 Top nav order: **작업(Work) → 블로그 → 프로필 → 사이드 프로젝트** (`NavigationClient`). Work is active on `/` and `/work/*`; Blog on `/posts/*`.
 
 ### Key Components
-- **PostCard**: Circular SVG design with random positioning. Generic: `href` (default `/posts/[slug]`) and `dateLabel` props let the Work list reuse it
+- **PostCard**: Circular SVG design with random positioning. Generic: `href` (default `/posts/[slug]`) and `dateLabel` props let the Work list reuse it. Interaction: on PC, hovering the circle rolls it to a new random spot; on touch devices it rolls with the left/right tilt (`deviceorientation`). iOS needs a user-gesture permission, so `TiltToggle` renders a small button there (auto on Android). State and the single orientation listener live in `PostCardAnimationProvider`. The date label follows the circle but is clamped to its own width so it never overflows the card
 - **BlogSideNav** (`src/components/post/`): year-grouped post list for the blog layout. Sticky left sidebar on `lg` and up only; hidden on mobile/tablet
 - **WorkSummaryCards** (`src/components/work/`): frontmatter summary grid above a Work article. Row 1: product (falls back to company) / role / period+duration; row 2: problem | impact side by side; tags row only when present. Empty fields drop out
 - **MDXRenderer**: Pre-compiled MDX with syntax highlighting (shiki dual theme; `globals.css` pins the dark palette because `.prose pre` is always dark). `components` map overrides `img`, `Iframe`, `PaletteEntry`, and `JangbogiFrame`

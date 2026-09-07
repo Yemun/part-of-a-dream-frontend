@@ -31,7 +31,8 @@
     "navigation": {
       "previous": "이전 작업",
       "next": "다음 작업"
-    }
+    },
+    "tilt": "기울여서 움직이기"
   },
   "profile": {
     "title": "프로필",

@@ -31,7 +31,8 @@
     "navigation": {
       "previous": "Previous",
       "next": "Next"
-    }
+    },
+    "tilt": "Tilt to move"
   },
   "profile": {
     "title": "About Me",
