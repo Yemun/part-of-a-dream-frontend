@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Comment, updateComment, deleteComment } from "@/lib/content";
+import { Comment, updateComment, deleteComment } from "@/lib/comments";
 import RelativeTime from "@/components/common/RelativeTime";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";

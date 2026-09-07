@@ -2,7 +2,7 @@
 
 import { Link } from "@/i18n/routing";
 import RelativeTime from "@/components/common/RelativeTime";
-import { BlogPost } from "@/lib/content";
+import type { BlogPost } from "@/lib/content";
 import { useState, useEffect, useRef, type ReactNode } from "react";
 import { usePostCardAnimation } from "./PostCardAnimationProvider";
 
@@ -28,13 +28,26 @@ export default function PostCard({
   const firstLoad = useRef(isFirstLoad);
   const [shouldTransition] = useState(isFirstLoad);
   const circleRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
+
+  // 라벨은 원(96px)보다 훨씬 넓어서 원과 같은 x를 그대로 쓰면
+  // 카드 밖(연도 레일)까지 삐져나온다. 라벨 자신의 폭 기준으로 다시 가둔다.
+  const clampLabelX = (x: number) => {
+    const label = labelRef.current;
+    const card = cardRef.current;
+    if (!label || !card) return x;
+    const max = (card.clientWidth - label.getBoundingClientRect().width) / 2;
+    if (max <= 0) return 0;
+    return Math.max(-max, Math.min(max, x));
+  };
 
   useEffect(() => {
     const saved = getTransform(linkHref);
     if (saved) {
       requestAnimationFrame(() => {
         setRandomTransform(saved.transform);
-        setTranslateX(saved.x);
+        setTranslateX(clampLabelX(saved.x));
       });
       return;
     }
@@ -55,21 +68,21 @@ export default function PostCard({
       const delay = index * 100;
       const timeoutId = setTimeout(() => {
         requestAnimationFrame(() => {
-          setTranslateX(x);
+          setTranslateX(clampLabelX(x));
           setRandomTransform(transform);
         });
       }, delay);
       return () => clearTimeout(timeoutId);
     } else {
       requestAnimationFrame(() => {
-        setTranslateX(x);
+        setTranslateX(clampLabelX(x));
         setRandomTransform(transform);
       });
     }
   }, [post, linkHref]);
 
   return (
-    <div className="-ml-px -mt-px border">
+    <div ref={cardRef} className="-ml-px -mt-px border">
       <div
         className="text-sm text-center font-medium"
         style={{
@@ -79,7 +92,9 @@ export default function PostCard({
           }),
         }}
       >
-        {dateLabel ?? <RelativeTime dateString={post.publishedAt} />}
+        <span ref={labelRef} className="inline-block">
+          {dateLabel ?? <RelativeTime dateString={post.publishedAt} />}
+        </span>
       </div>
       <Link
         href={linkHref}

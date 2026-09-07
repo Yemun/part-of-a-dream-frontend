@@ -4,7 +4,7 @@ import PageShell from "@/components/layout/PageShell";
 import { createMetadata } from "@/lib/metadata";
 import "@/app/globals.css";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing, isValidLocale } from "@/i18n/routing";
 import { PostCardAnimationProvider } from "@/components/post/PostCardAnimationProvider";
@@ -30,6 +30,10 @@ export default async function LocaleLayout({
   if (!isValidLocale(locale)) {
     notFound();
   }
+
+  // 정적 렌더링 활성화. 이 호출이 없으면 getMessages()가 요청 헤더를 읽어
+  // 트리 전체가 동적 렌더링으로 떨어진다.
+  setRequestLocale(locale);
 
   // Optimized message loading - load essential messages only
   const messages = await getMessages();

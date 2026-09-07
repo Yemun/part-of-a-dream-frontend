@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { Comment, getComments } from "@/lib/content";
+import { Comment, getComments } from "@/lib/comments";
 import CommentList from "@/components/comment/CommentList";
 import CommentForm from "@/components/comment/CommentForm";
 import CommentSkeleton from "@/components/comment/CommentSkeleton";
@@ -43,13 +43,11 @@ export default function CommentSection({
   // 초기화는 한 번만 실행 - 중복 API 호출 방지
   useEffect(() => {
     if (hasInitialized) return;
-
-    if (initialComments.length > 0) {
-      setComments(initialComments);
-    } else {
-      fetchComments();
-    }
     setHasInitialized(true);
+
+    // 페이지가 정적 생성되므로 initialComments는 빌드 시점 스냅샷이다.
+    // 첫 페인트는 그 값으로 즉시 그리고, 마운트 후 백그라운드로 최신 목록을 받아온다.
+    fetchComments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postSlug]); // 의도적으로 의존성 제거하여 중복 API 호출 방지
 
@@ -69,7 +67,8 @@ export default function CommentSection({
     fetchComments();
   }, [fetchComments]);
 
-  if (isLoading) {
+  // 보여줄 댓글이 이미 있으면 갱신 중에도 기존 목록을 유지한다
+  if (isLoading && comments.length === 0) {
     return (
       <div className="pt-8">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
@@ -80,7 +79,7 @@ export default function CommentSection({
     );
   }
 
-  if (error) {
+  if (error && comments.length === 0) {
     return (
       <div className="pt-8">
         <div className="text-center text-red-500 dark:text-red-400">

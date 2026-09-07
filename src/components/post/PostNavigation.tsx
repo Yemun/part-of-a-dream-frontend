@@ -1,6 +1,6 @@
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { BlogPost } from "@/lib/content";
+import type { BlogPost } from "@/lib/content";
 
 type NavItem = Pick<BlogPost, "slug" | "title">;
 
